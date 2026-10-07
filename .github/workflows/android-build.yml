@@ -72,3 +72,8 @@ jobs:
       with:
         name: Echo-Music-Universal-APK
         path: app/build/outputs/apk/**/*.apk
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
