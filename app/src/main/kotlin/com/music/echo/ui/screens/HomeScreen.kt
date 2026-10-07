@@ -1,4 +1,4 @@
-import app/src/main/kotlin/com/music/echo/ui/component/PattukalAmbientGlow.kt
+import com.music.echo.ui.component.PattukalAmbientGlow
 package echo.music.iad1tya.ui.screens
 
 import androidx.activity.compose.BackHandler
