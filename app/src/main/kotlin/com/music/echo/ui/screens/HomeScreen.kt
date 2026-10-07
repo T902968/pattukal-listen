@@ -1248,6 +1248,10 @@ fun HomeScreen(
                           contentScale = ContentScale.Crop,
                           modifier = Modifier.fillMaxSize()
                         )
+                        PattukalAmbientGlow(
+    modifier = Modifier.fillMaxSize(),
+    glowColor = MaterialTheme.colorScheme.primary,
+) {}
 
                         Box(
                           modifier =
