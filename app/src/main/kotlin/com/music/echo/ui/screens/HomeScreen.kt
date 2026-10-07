@@ -1318,15 +1318,15 @@ fun HomeScreen(
             color = Color.White.copy(alpha = 0.7f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
-        )
+           )
     }
-  } 
+  }
                   }
                 }
               }
             }
             HomeSection.FromTheCommunity 
-      -> {
+            -> {
               communityPlaylists
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { playlists ->
