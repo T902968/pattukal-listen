@@ -1,4 +1,4 @@
-package echo.music.iad1tya.ui.component
+package com.music.echo.ui.component
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -9,13 +9,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -24,65 +25,101 @@ fun PattukalAmbientGlow(
     glowColor: Color = Color(0xFFFF4D6D),
     content: @Composable () -> Unit
 ) {
-    val transition = rememberInfiniteTransition(label = "ambient_light")
+    val transition = rememberInfiniteTransition(label = "pattukal_liquid")
 
     val movement by transition.animateFloat(
-        initialValue = -0.25f,
-        targetValue = 1.25f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 5000,
-                easing = LinearEasing
+        initialValue = -0.35f,
+        targetValue = 1.35f,
+        animationSpec =
+            infiniteRepeatable(
+                animation =
+                    tween(
+                        durationMillis = 5000,
+                        easing = LinearEasing
+                    ),
+                repeatMode = RepeatMode.Reverse
             ),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "blob_movement"
+        label = "liquid_movement"
     )
 
-    Box(
-        modifier = modifier
-    ) {
+    val reflection by transition.animateFloat(
+        initialValue = -35f,
+        targetValue = 35f,
+        animationSpec =
+            infiniteRepeatable(
+                animation =
+                    tween(
+                        durationMillis = 3600,
+                        easing = LinearEasing
+                    ),
+                repeatMode = RepeatMode.Reverse
+            ),
+        label = "liquid_reflection"
+    )
+
+    Box(modifier = modifier) {
+
+        // Moving ambient light
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .blur(28.dp)
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(
-                            glowColor.copy(alpha = 0.65f),
-                            glowColor.copy(alpha = 0.25f),
-                            Color.Transparent
-                        ),
-                        center = androidx.compose.ui.geometry.Offset(
-                            x = movement * 1000f,
-                            y = (1f - movement) * 700f
-                        ),
-                        radius = 260f
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .blur(28.dp)
+                    .background(
+                        Brush.radialGradient(
+                            colors =
+                                listOf(
+                                    glowColor.copy(alpha = 0.55f),
+                                    glowColor.copy(alpha = 0.20f),
+                                    Color.Transparent
+                                ),
+                            center =
+                                androidx.compose.ui.geometry.Offset(
+                                    x = movement * 1000f,
+                                    y = (1f - movement) * 700f
+                                ),
+                            radius = 280f
+                        )
                     )
-                )
         )
 
+        // Moving liquid reflection
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.08f),
-                            Color.Transparent
-                        ),
-                        radius = 500f
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        rotationZ = reflection
+                        transformOrigin = TransformOrigin(0.5f, 0.5f)
+                    }
+                    .background(
+                        Brush.linearGradient(
+                            colors =
+                                listOf(
+                                    Color.Transparent,
+                                    Color.White.copy(alpha = 0.04f),
+                                    Color.White.copy(alpha = 0.13f),
+                                    Color.Transparent
+                                )
+                        )
                     )
-                )
         )
 
+        // Soft glass highlight
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Color.Transparent,
-                    RoundedCornerShape(28.dp)
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.radialGradient(
+                            colors =
+                                listOf(
+                                    Color.White.copy(alpha = 0.07f),
+                                    Color.Transparent
+                                ),
+                            radius = 500f
+                        )
+                    )
         )
 
         content()
