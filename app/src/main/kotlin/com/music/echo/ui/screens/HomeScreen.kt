@@ -1208,104 +1208,119 @@ fun HomeScreen(
                       val isActive = song!!.id == mediaMetadata?.id
 
                       Box(
-                        modifier =
-                          Modifier.fillMaxSize()
-                            .maskClip(MaterialTheme.shapes.extraLarge)
-                            .maskBorder(
-                              BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                              MaterialTheme.shapes.extraLarge
-                            )
-                            .focusable()
-                            .combinedClickable(
-                              onClick = {
-                                if (isActive) {
-                                  playerConnection.togglePlayPause()
-                                } else {
-                                  playerConnection.playQueue(
-                                    YouTubeQueue.radio(song!!.toMediaMetadata())
-                                  )
-                                }
-                              },
-                              onLongClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                menuState.show {
-                                  SongMenu(
-                                    originalSong = song!!,
-                                    navController = navController,
-                                    onDismiss = menuState::dismiss
-                                  )
-                                }
-                              }
-                            )
-                      ) {
-                        AsyncImage(
-                          model =
-                            coil3.request.ImageRequest.Builder(LocalContext.current)
-                              .data(song!!.thumbnailUrl)
-                              .crossfade(true)
-                              .build(),
-                          contentDescription = null,
-                          contentScale = ContentScale.Crop,
-                          modifier = Modifier.fillMaxSize()
+    modifier =
+        Modifier.fillMaxSize()
+            .maskClip(MaterialTheme.shapes.extraLarge)
+            .maskBorder(
+                BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.outlineVariant
+                ),
+                MaterialTheme.shapes.extraLarge
+            )
+            .shadow(
+                elevation = 12.dp,
+                shape = MaterialTheme.shapes.extraLarge,
+                clip = false
+            )
+            .focusable()
+            .combinedClickable(
+                onClick = {
+                    if (isActive) {
+                        playerConnection.togglePlayPause()
+                    } else {
+                        playerConnection.playQueue(
+                            YouTubeQueue.radio(song!!.toMediaMetadata())
                         )
-                        PattukalAmbientGlow(
-    modifier = Modifier.fillMaxSize(),
-    glowColor = MaterialTheme.colorScheme.primary,
-) {}
-
-                        Box(
-                          modifier =
-                            Modifier.fillMaxSize()
-                              .background(
-                                Brush.verticalGradient(
-                                  colors =
-                                    listOf(
-                                      Color.Transparent,
-                                      Color.Transparent,
-                                      Color.Black.copy(alpha = 0.7f)
-                                    )
-                                )
-                              )
-                        )
-
-                        if (isActive && isPlaying) {
-                          Box(
-                            modifier =
-                              Modifier.align(Alignment.TopEnd)
-                                .padding(12.dp)
-                                .size(32.dp)
-                                .background(MaterialTheme.colorScheme.onSurface, CircleShape),
-                            contentAlignment = Alignment.Center
-                          ) {
-                            Icon(
-                              painter = painterResource(R.drawable.volume_up),
-                              contentDescription = null,
-                              tint = MaterialTheme.colorScheme.onPrimary,
-                              modifier = Modifier.size(18.dp)
-                            )
-                          }
-                        }
-
-                        Column(modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)) {
-                          Text(
-                            text = song!!.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.White,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                          )
-                          Text(
-                            text = song!!.artists.joinToString { it.name },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White.copy(alpha = 0.7f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                          )
-                        }
-                      }
                     }
-                  }
+                },
+                onLongClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    menuState.show {
+                        SongMenu(
+                            originalSong = song!!,
+                            navController = navController,
+                            onDismiss = menuState::dismiss
+                        )
+                    }
                 }
+            )
+) {
+    AsyncImage(
+        model =
+            coil3.request.ImageRequest.Builder(LocalContext.current)
+                .data(song!!.thumbnailUrl)
+                .crossfade(true)
+                .build(),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
+
+    PattukalAmbientGlow(
+        modifier = Modifier.fillMaxSize(),
+        glowColor = MaterialTheme.colorScheme.primary,
+    ) {}
+
+    Box(
+        modifier =
+            Modifier.fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors =
+                            listOf(
+                                Color.Transparent,
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.7f)
+                            )
+                    )
+                )
+    )
+
+    if (isActive && isPlaying) {
+        Box(
+            modifier =
+                Modifier.align(Alignment.TopEnd)
+                    .padding(12.dp)
+                    .size(32.dp)
+                    .background(
+                        MaterialTheme.colorScheme.onSurface,
+                        CircleShape
+                    ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.volume_up),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+
+    Column(
+        modifier =
+            Modifier.align(Alignment.BottomStart)
+                .padding(16.dp)
+    ) {
+        Text(
+            text = song!!.title,
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.White,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Text(
+            text = song!!.artists.joinToString { it.name },
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.White.copy(alpha = 0.7f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+  }   
+                
             }
             HomeSection.FromTheCommunity -> {
               communityPlaylists
