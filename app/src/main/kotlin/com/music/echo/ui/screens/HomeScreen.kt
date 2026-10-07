@@ -1320,8 +1320,10 @@ fun HomeScreen(
             overflow = TextOverflow.Ellipsis
         )
     }
-  }   
-                
+  } 
+                  }
+                }
+              }
             }
             HomeSection.FromTheCommunity -> {
               communityPlaylists
