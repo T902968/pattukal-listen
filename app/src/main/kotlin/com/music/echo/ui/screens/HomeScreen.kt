@@ -44,11 +44,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
@@ -153,7 +153,6 @@ import echo.music.iad1tya.utils.listItemShape
 import echo.music.iad1tya.utils.rememberEnumPreference
 import echo.music.iad1tya.utils.rememberPreference
 import echo.music.iad1tya.viewmodels.CommunityPlaylistItem
-import echo.music.iad1tya.viewmodels.DailyDiscoverItem
 import echo.music.iad1tya.viewmodels.HomeViewModel
 import kotlin.math.min
 import kotlin.random.Random
@@ -188,6 +187,65 @@ sealed class HomeSection(val id: String, val baseWeight: Int) {
         HomeSection("mood_and_genres", 5)
 }
 
+/*
+ * NEW VISUAL LAYER
+ *
+ * This is UI only.
+ * No player, queue, database or music-loading logic is changed.
+ */
+@Composable
+private fun PattukalLiquidBackground(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.20f),
+                            Color.Transparent
+                        ),
+                        radius = 850f
+                    )
+                )
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.14f),
+                            Color.Transparent
+                        ),
+                        radius = 700f
+                    )
+                )
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
+                            Color.Transparent,
+                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.04f)
+                        )
+                    )
+                )
+        )
+    }
+}
+
 @Composable
 fun CommunityPlaylistCard(
     item: CommunityPlaylistItem,
@@ -198,7 +256,7 @@ fun CommunityPlaylistCard(
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current
     val scope = rememberCoroutineScope()
-    val isDark = isSystemInDarkTheme()
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
 
     val containerColor =
         if (isDark) {
@@ -213,53 +271,70 @@ fun CommunityPlaylistCard(
     val isBookmarked = dbPlaylist?.playlist?.bookmarkedAt != null
 
     Card(
-        modifier = modifier.width(320.dp).height(420.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
+        modifier = modifier
+            .width(320.dp)
+            .height(420.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor.copy(alpha = 0.88f)
+        ),
         shape = RoundedCornerShape(28.dp),
+        border = BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+        ),
         onClick = onClick
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+
             Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Box(
-                    modifier =
-                        Modifier.size(100.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(18.dp))
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Row(modifier = Modifier.weight(1f)) {
                             AsyncImage(
-                                model =
-                                    item.songs.getOrNull(0)?.thumbnail?.resize(544, 544),
+                                model = item.songs.getOrNull(0)?.thumbnail?.resize(544, 544),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.weight(1f).fillMaxSize()
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxSize()
                             )
+
                             AsyncImage(
-                                model =
-                                    item.songs.getOrNull(1)?.thumbnail?.resize(544, 544),
+                                model = item.songs.getOrNull(1)?.thumbnail?.resize(544, 544),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.weight(1f).fillMaxSize()
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxSize()
                             )
                         }
 
                         Row(modifier = Modifier.weight(1f)) {
                             AsyncImage(
-                                model =
-                                    item.songs.getOrNull(2)?.thumbnail?.resize(544, 544),
+                                model = item.songs.getOrNull(2)?.thumbnail?.resize(544, 544),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.weight(1f).fillMaxSize()
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxSize()
                             )
+
                             AsyncImage(
-                                model =
-                                    item.songs.getOrNull(3)?.thumbnail?.resize(544, 544),
+                                model = item.songs.getOrNull(3)?.thumbnail?.resize(544, 544),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.weight(1f).fillMaxSize()
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxSize()
                             )
                         }
                     }
@@ -281,38 +356,36 @@ fun CommunityPlaylistCard(
                     Text(
                         text = item.playlist.author?.name ?: "",
                         style = MaterialTheme.typography.bodyMedium,
-                        color =
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                                .copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                         maxLines = 1
                     )
                 }
             }
 
             Column(
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
             ) {
                 item.songs.take(3).forEach { song ->
                     Row(
-                        modifier =
-                            Modifier.fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .combinedClickable(
-                                    onClick = { onSongClick(song) }
-                                ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .combinedClickable(
+                                onClick = { onSongClick(song) }
+                            ),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         AsyncImage(
                             model = song.thumbnail.resize(544, 544),
                             contentDescription = null,
-                            modifier =
-                                Modifier.size(56.dp)
-                                    .clip(RoundedCornerShape(12.dp)),
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(RoundedCornerShape(12.dp)),
                             contentScale = ContentScale.Crop
                         )
 
@@ -327,9 +400,7 @@ fun CommunityPlaylistCard(
                             Text(
                                 text = song.artists.joinToString(", ") { it.name },
                                 style = MaterialTheme.typography.bodySmall,
-                                color =
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                        .copy(alpha = 0.8f),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -339,9 +410,9 @@ fun CommunityPlaylistCard(
             }
 
             Row(
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
                 horizontalArrangement =
                     Arrangement.spacedBy(
                         12.dp,
@@ -354,12 +425,12 @@ fun CommunityPlaylistCard(
                             playerConnection?.playQueue(YouTubeQueue(it))
                         }
                     },
-                    modifier =
-                        Modifier.size(48.dp)
-                            .background(
-                                MaterialTheme.colorScheme.onSurface,
-                                CircleShape
-                            )
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            MaterialTheme.colorScheme.onSurface,
+                            CircleShape
+                        )
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_widget_play),
@@ -375,13 +446,12 @@ fun CommunityPlaylistCard(
                             playerConnection?.playQueue(YouTubeQueue(it))
                         }
                     },
-                    modifier =
-                        Modifier.size(48.dp)
-                            .background(
-                                MaterialTheme.colorScheme.secondaryContainer
-                                    .copy(alpha = 0.5f),
-                                CircleShape
-                            )
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                            CircleShape
+                        )
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.radio),
@@ -446,23 +516,20 @@ fun CommunityPlaylistCard(
                             }
                         }
                     },
-                    modifier =
-                        Modifier.size(48.dp)
-                            .background(
-                                MaterialTheme.colorScheme.secondaryContainer
-                                    .copy(alpha = 0.5f),
-                                CircleShape
-                            )
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                            CircleShape
+                        )
                 ) {
                     Icon(
-                        painter =
-                            painterResource(
-                                if (isBookmarked) {
-                                    R.drawable.library_add_check
-                                } else {
-                                    R.drawable.library_add
-                                }
-                            ),
+                        painter = painterResource(
+                            if (isBookmarked)
+                                R.drawable.library_add_check
+                            else
+                                R.drawable.library_add
+                        ),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         modifier = Modifier.size(24.dp)
@@ -495,37 +562,34 @@ fun DailyDiscoverCard(
     val playsString = stringResource(R.string.plays)
 
     Card(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(28.dp))
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = {
-                        haptic.performHapticFeedback(
-                            HapticFeedbackType.LongPress
-                        )
+        modifier = modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(28.dp))
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    haptic.performHapticFeedback(
+                        HapticFeedbackType.LongPress
+                    )
 
-                        if (song != null) {
-                            menuState.show {
-                                YouTubeSongMenu(
-                                    song = song,
-                                    navController = navController,
-                                    onDismiss = {
-                                        menuState.dismiss()
-                                    }
-                                )
-                            }
+                    if (song != null) {
+                        menuState.show {
+                            YouTubeSongMenu(
+                                song = song,
+                                navController = navController,
+                                onDismiss = { menuState.dismiss() }
+                            )
                         }
                     }
-                ),
-        colors =
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                }
             ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
         shape = RoundedCornerShape(28.dp)
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+
             AsyncImage(
                 model =
                     ImageRequest.Builder(LocalContext.current)
@@ -542,25 +606,24 @@ fun DailyDiscoverCard(
 
             if (maxWidth > 200.dp) {
                 Box(
-                    modifier =
-                        Modifier.fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    colors =
-                                        listOf(
-                                            Color.Black.copy(alpha = 0.3f),
-                                            Color.Transparent,
-                                            Color.Black.copy(alpha = 0.6f),
-                                            Color.Black.copy(alpha = 0.9f)
-                                        )
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Black.copy(alpha = 0.25f),
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.65f),
+                                    Color.Black.copy(alpha = 0.92f)
                                 )
                             )
+                        )
                 )
 
                 Column(
-                    modifier =
-                        Modifier.fillMaxSize()
-                            .padding(24.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
@@ -571,23 +634,18 @@ fun DailyDiscoverCard(
                         )
 
                         Text(
-                            text =
-                                buildString {
-                                    append(
-                                        (
-                                            dailyDiscover.recommendation
-                                                as? SongItem
-                                            )?.artists?.joinToString(", ") {
-                                                it.name
-                                            } ?: ""
-                                    )
+                            text = buildString {
+                                append(
+                                    (dailyDiscover.recommendation as? SongItem)
+                                        ?.artists
+                                        ?.joinToString(", ") { it.name }
+                                        ?: ""
+                                )
 
-                                    if (playCount > 0) {
-                                        append(
-                                            " • $playCount $playsString"
-                                        )
-                                    }
-                                },
+                                if (playCount > 0) {
+                                    append(" • $playCount $playsString")
+                                }
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White.copy(alpha = 0.7f)
                         )
@@ -616,8 +674,9 @@ fun DailyDiscoverCard(
                             stringResource(
                                 messageRes,
                                 "${dailyDiscover.seed.title} • ${
-                                    dailyDiscover.seed.artists
-                                        .joinToString(", ") { it.name }
+                                    dailyDiscover.seed.artists.joinToString(", ") {
+                                        it.name
+                                    }
                                 }"
                             ),
                         style = MaterialTheme.typography.bodySmall,
@@ -648,81 +707,48 @@ fun HomeScreen(
     val playerConnection = LocalPlayerConnection.current ?: return
     val haptic = LocalHapticFeedback.current
 
-    val isPlaying by
-        playerConnection.isEffectivelyPlaying.collectAsState()
-
-    val mediaMetadata by
-        playerConnection.mediaMetadata.collectAsState()
+    val isPlaying by playerConnection.isEffectivelyPlaying.collectAsState()
+    val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
 
     val quickPicks by viewModel.quickPicks.collectAsState()
-    val aiRecommendedPlaylist by
-        viewModel.aiRecommendedPlaylist.collectAsState()
-    val forgottenFavorites by
-        viewModel.forgottenFavorites.collectAsState()
-    val keepListening by
-        viewModel.keepListening.collectAsState()
-    val similarRecommendations by
-        viewModel.similarRecommendations.collectAsState()
-    val accountPlaylists by
-        viewModel.accountPlaylists.collectAsState()
-    val homePage by
-        viewModel.homePage.collectAsState()
-    val explorePage by
-        viewModel.explorePage.collectAsState()
-    val dailyDiscover by
-        viewModel.dailyDiscover.collectAsState()
-    val communityPlaylists by
-        viewModel.communityPlaylists.collectAsState()
+    val aiRecommendedPlaylist by viewModel.aiRecommendedPlaylist.collectAsState()
+    val forgottenFavorites by viewModel.forgottenFavorites.collectAsState()
+    val keepListening by viewModel.keepListening.collectAsState()
+    val similarRecommendations by viewModel.similarRecommendations.collectAsState()
+    val accountPlaylists by viewModel.accountPlaylists.collectAsState()
+    val homePage by viewModel.homePage.collectAsState()
+    val explorePage by viewModel.explorePage.collectAsState()
+    val dailyDiscover by viewModel.dailyDiscover.collectAsState()
+    val communityPlaylists by viewModel.communityPlaylists.collectAsState()
 
-    val allLocalItems by
-        viewModel.allLocalItems.collectAsState()
-    val allYtItems by
-        viewModel.allYtItems.collectAsState()
-    val speedDialItems by
-        viewModel.speedDialItems.collectAsState()
-    val selectedChip by
-        viewModel.selectedChip.collectAsState()
+    val allLocalItems by viewModel.allLocalItems.collectAsState()
+    val allYtItems by viewModel.allYtItems.collectAsState()
+    val speedDialItems by viewModel.speedDialItems.collectAsState()
+    val selectedChip by viewModel.selectedChip.collectAsState()
 
-    val isLoading: Boolean by
-        viewModel.isLoading.collectAsState()
-
+    val isLoading: Boolean by viewModel.isLoading.collectAsState()
     val isMoodAndGenresLoading =
         isLoading && explorePage?.moodAndGenres == null
 
-    val isRefreshing by
-        viewModel.isRefreshing.collectAsState()
-
-    val isRandomizing by
-        viewModel.isRandomizing.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val isRandomizing by viewModel.isRandomizing.collectAsState()
 
     val pullRefreshState = rememberPullToRefreshState()
 
-    val quickPicksLazyGridState =
-        rememberLazyGridState()
+    val quickPicksLazyGridState = rememberLazyGridState()
+    val forgottenFavoritesLazyGridState = rememberLazyGridState()
 
-    val forgottenFavoritesLazyGridState =
-        rememberLazyGridState()
-
-    val accountName by
-        viewModel.accountName.collectAsState()
-
-    val accountImageUrl by
-        viewModel.accountImageUrl.collectAsState()
+    val accountName by viewModel.accountName.collectAsState()
+    val accountImageUrl by viewModel.accountImageUrl.collectAsState()
 
     val innerTubeCookie by
         rememberPreference(InnerTubeCookieKey, "")
 
     val (randomizeHomeOrder) =
-        rememberPreference(
-            RandomizeHomeOrderKey,
-            true
-        )
+        rememberPreference(RandomizeHomeOrderKey, true)
 
     val (showSpeedDial) =
-        rememberPreference(
-            ShowSpeedDialKey,
-            true
-        )
+        rememberPreference(ShowSpeedDialKey, true)
 
     val isLoggedIn =
         remember(innerTubeCookie) {
@@ -748,11 +774,10 @@ fun HomeScreen(
         )
 
     val currentGridHeight =
-        if (gridItemSize == GridItemSize.BIG) {
+        if (gridItemSize == GridItemSize.BIG)
             GridThumbnailHeight
-        } else {
+        else
             SmallGridThumbnailHeight
-        }
 
     val backStackEntry by
         navController.currentBackStackEntryAsState()
@@ -765,7 +790,9 @@ fun HomeScreen(
 
     var randomSeed by
         rememberSaveable {
-            mutableLongStateOf(System.currentTimeMillis())
+            mutableLongStateOf(
+                System.currentTimeMillis()
+            )
         }
 
     LaunchedEffect(isRefreshing) {
@@ -773,11 +800,6 @@ fun HomeScreen(
             randomSeed = System.currentTimeMillis()
         }
     }
-
-    val foundInSettings =
-        stringResource(
-            R.string.found_in_settings_content
-        )
 
     LaunchedEffect(scrollToTop?.value) {
         if (scrollToTop?.value == true) {
@@ -795,6 +817,7 @@ fun HomeScreen(
                 .lastOrNull()
                 ?.index
         }.collect { lastVisibleIndex ->
+
             val len =
                 lazylistState.layoutInfo.totalItemsCount
 
@@ -823,19 +846,18 @@ fun HomeScreen(
                 SongGridItem(
                     song = it,
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier
+                            .fillMaxWidth()
                             .combinedClickable(
                                 onClick = {
                                     if (it.id == mediaMetadata?.id) {
-                                        playerConnection
-                                            .togglePlayPause()
+                                        playerConnection.togglePlayPause()
                                     } else {
-                                        playerConnection
-                                            .playQueue(
-                                                YouTubeQueue.radio(
-                                                    it.toMediaMetadata()
-                                                )
+                                        playerConnection.playQueue(
+                                            YouTubeQueue.radio(
+                                                it.toMediaMetadata()
                                             )
+                                        )
                                     }
                                 },
                                 onLongClick = {
@@ -847,14 +869,12 @@ fun HomeScreen(
                                         SongMenu(
                                             originalSong = it,
                                             navController = navController,
-                                            onDismiss =
-                                                menuState::dismiss
+                                            onDismiss = menuState::dismiss
                                         )
                                     }
                                 }
                             ),
-                    isActive =
-                        it.id == mediaMetadata?.id,
+                    isActive = it.id == mediaMetadata?.id,
                     isPlaying = isPlaying
                 )
 
@@ -866,7 +886,8 @@ fun HomeScreen(
                     isPlaying = isPlaying,
                     coroutineScope = scope,
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier
+                            .fillMaxWidth()
                             .combinedClickable(
                                 onClick = {
                                     navController.navigate(
@@ -881,10 +902,8 @@ fun HomeScreen(
                                     menuState.show {
                                         AlbumMenu(
                                             originalAlbum = it,
-                                            navController =
-                                                navController,
-                                            onDismiss =
-                                                menuState::dismiss
+                                            navController = navController,
+                                            onDismiss = menuState::dismiss
                                         )
                                     }
                                 }
@@ -895,7 +914,8 @@ fun HomeScreen(
                 ArtistGridItem(
                     artist = it,
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier
+                            .fillMaxWidth()
                             .combinedClickable(
                                 onClick = {
                                     navController.navigate(
@@ -911,8 +931,7 @@ fun HomeScreen(
                                         ArtistMenu(
                                             originalArtist = it,
                                             coroutineScope = scope,
-                                            onDismiss =
-                                                menuState::dismiss
+                                            onDismiss = menuState::dismiss
                                         )
                                     }
                                 }
@@ -924,14 +943,14 @@ fun HomeScreen(
     }
 
     val ytGridItem: @Composable (YTItem) -> Unit = { item ->
+
         YouTubeGridItem(
             item = item,
             isActive =
-                item.id in
-                    listOf(
-                        mediaMetadata?.album?.id,
-                        mediaMetadata?.id
-                    ),
+                item.id in listOf(
+                    mediaMetadata?.album?.id,
+                    mediaMetadata?.id
+                ),
             isPlaying = isPlaying,
             coroutineScope = scope,
             thumbnailRatio = 1f,
@@ -962,8 +981,9 @@ fun HomeScreen(
                                 )
 
                             is PlaylistItem ->
-                                navController
-                                    .navigateToPlaylistItem(item)
+                                navController.navigateToPlaylistItem(
+                                    item
+                                )
                         }
                     },
                     onLongClick = {
@@ -976,34 +996,28 @@ fun HomeScreen(
                                 is SongItem ->
                                     YouTubeSongMenu(
                                         song = item,
-                                        navController =
-                                            navController,
-                                        onDismiss =
-                                            menuState::dismiss
+                                        navController = navController,
+                                        onDismiss = menuState::dismiss
                                     )
 
                                 is AlbumItem ->
                                     YouTubeAlbumMenu(
                                         albumItem = item,
-                                        navController =
-                                            navController,
-                                        onDismiss =
-                                            menuState::dismiss
+                                        navController = navController,
+                                        onDismiss = menuState::dismiss
                                     )
 
                                 is ArtistItem ->
                                     YouTubeArtistMenu(
                                         artist = item,
-                                        onDismiss =
-                                            menuState::dismiss
+                                        onDismiss = menuState::dismiss
                                     )
 
                                 is PlaylistItem ->
                                     YouTubePlaylistMenu(
                                         playlist = item,
                                         coroutineScope = scope,
-                                        onDismiss =
-                                            menuState::dismiss
+                                        onDismiss = menuState::dismiss
                                     )
                             }
                         }
@@ -1028,6 +1042,7 @@ fun HomeScreen(
             explorePage?.moodAndGenres,
             aiRecommendedPlaylist
         ) {
+
             val list =
                 mutableListOf<HomeSection>()
 
@@ -1042,42 +1057,28 @@ fun HomeScreen(
                 aiRecommendedPlaylist != null &&
                 aiRecommendedPlaylist!!.second.isNotEmpty()
             ) {
-                list.add(HomeSection.AiRecommendations)
+                list.add(
+                    HomeSection.AiRecommendations
+                )
             }
 
-            if (quickPicks?.isNotEmpty() == true) {
+            if (quickPicks?.isNotEmpty() == true)
                 list.add(HomeSection.QuickPicks)
-            }
 
-            if (
-                communityPlaylists?.isNotEmpty() == true
-            ) {
+            if (communityPlaylists?.isNotEmpty() == true)
                 list.add(HomeSection.FromTheCommunity)
-            }
 
-            if (
-                dailyDiscover?.isNotEmpty() == true
-            ) {
+            if (dailyDiscover?.isNotEmpty() == true)
                 list.add(HomeSection.DailyDiscover)
-            }
 
-            if (
-                keepListening?.isNotEmpty() == true
-            ) {
+            if (keepListening?.isNotEmpty() == true)
                 list.add(HomeSection.KeepListening)
-            }
 
-            if (
-                accountPlaylists?.isNotEmpty() == true
-            ) {
+            if (accountPlaylists?.isNotEmpty() == true)
                 list.add(HomeSection.AccountPlaylists)
-            }
 
-            if (
-                forgottenFavorites?.isNotEmpty() == true
-            ) {
+            if (forgottenFavorites?.isNotEmpty() == true)
                 list.add(HomeSection.ForgottenFavorites)
-            }
 
             similarRecommendations?.indices?.forEach { i ->
                 list.add(
@@ -1091,14 +1092,13 @@ fun HomeScreen(
                 )
             }
 
-            if (
-                explorePage?.moodAndGenres != null
-            ) {
+            if (explorePage?.moodAndGenres != null)
                 list.add(HomeSection.MoodAndGenres)
-            }
 
             if (randomizeHomeOrder) {
+
                 list.sortedByDescending { section ->
+
                     val sectionRandom =
                         Random(
                             randomSeed +
@@ -1155,7 +1155,9 @@ fun HomeScreen(
 
                     base + modifier
                 }
+
             } else {
+
                 val defaultOrder =
                     mapOf(
                         HomeSection.QuickPicks to 1000,
@@ -1200,109 +1202,80 @@ fun HomeScreen(
                 state = pullRefreshState,
                 isRefreshing = isRefreshing,
                 modifier =
-                    Modifier.align(Alignment.TopCenter)
+                    Modifier
+                        .align(Alignment.TopCenter)
                         .padding(
-                            LocalPlayerAwareWindowInsets.current
+                            LocalPlayerAwareWindowInsets
+                                .current
                                 .asPaddingValues()
                         )
             )
         }
     ) {
-        BoxWithConstraints(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.TopStart
-        ) {
-            val horizontalLazyGridItemWidthFactor =
-                if (maxWidth * 0.475f >= 320.dp) {
-                    0.475f
-                } else {
-                    0.9f
-                }
 
-            val horizontalLazyGridItemWidth =
-                maxWidth *
-                    horizontalLazyGridItemWidthFactor
+        /*
+         * NEW BACKGROUND
+         *
+         * Everything inside remains the original HomeScreen content.
+         */
+        Box(modifier = Modifier.fillMaxSize()) {
 
-            val quickPicksSnapLayoutInfoProvider =
-                remember(quickPicksLazyGridState) {
-                    SnapLayoutInfoProvider(
-                        lazyGridState =
-                            quickPicksLazyGridState,
-                        positionInLayout = {
-                                layoutSize,
-                                itemSize ->
-                            (
-                                layoutSize *
-                                    horizontalLazyGridItemWidthFactor /
-                                    2f -
-                                    itemSize / 2f
-                            )
-                        }
-                    )
-                }
+            PattukalLiquidBackground(
+                modifier = Modifier.matchParentSize()
+            )
 
-            val forgottenFavoritesSnapLayoutInfoProvider =
-                remember(
-                    forgottenFavoritesLazyGridState
-                ) {
-                    SnapLayoutInfoProvider(
-                        lazyGridState =
-                            forgottenFavoritesLazyGridState,
-                        positionInLayout = {
-                                layoutSize,
-                                itemSize ->
-                            (
-                                layoutSize *
-                                    horizontalLazyGridItemWidthFactor /
-                                    2f -
-                                    itemSize / 2f
-                            )
-                        }
-                    )
-                }
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.TopStart
+            ) {
 
-            /*
-             * PREMIUM PATTUKAL HOME BACKGROUND
-             *
-             * This is visual only.
-             * No player, queue, loading, navigation or music logic
-             * is changed here.
-             */
-            Box(modifier = Modifier.fillMaxSize()) {
+                val horizontalLazyGridItemWidthFactor =
+                    if (maxWidth * 0.475f >= 320.dp)
+                        0.475f
+                    else
+                        0.9f
 
-                Box(
-                    modifier =
-                        Modifier.fillMaxSize()
-                            .background(
-                                Brush.radialGradient(
-                                    colors =
-                                        listOf(
-                                            MaterialTheme.colorScheme.primary
-                                                .copy(alpha = 0.10f),
-                                            MaterialTheme.colorScheme.secondary
-                                                .copy(alpha = 0.06f),
-                                            Color.Transparent
-                                        ),
-                                    radius = 900f
-                                )
-                            )
-                )
+                val horizontalLazyGridItemWidth =
+                    maxWidth *
+                        horizontalLazyGridItemWidthFactor
 
-                Box(
-                    modifier =
-                        Modifier.fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    colors =
-                                        listOf(
-                                            MaterialTheme.colorScheme.surface,
-                                            MaterialTheme.colorScheme.surface
-                                                .copy(alpha = 0.98f),
-                                            MaterialTheme.colorScheme.surface
-                                        )
-                                )
-                            )
-                )
+                val quickPicksSnapLayoutInfoProvider =
+                    remember(quickPicksLazyGridState) {
+                        SnapLayoutInfoProvider(
+                            lazyGridState =
+                                quickPicksLazyGridState,
+                            positionInLayout = {
+                                    layoutSize,
+                                    itemSize ->
+                                (
+                                    layoutSize *
+                                        horizontalLazyGridItemWidthFactor /
+                                        2f -
+                                        itemSize / 2f
+                                    )
+                            }
+                        )
+                    }
+
+                val forgottenFavoritesSnapLayoutInfoProvider =
+                    remember(
+                        forgottenFavoritesLazyGridState
+                    ) {
+                        SnapLayoutInfoProvider(
+                            lazyGridState =
+                                forgottenFavoritesLazyGridState,
+                            positionInLayout = {
+                                    layoutSize,
+                                    itemSize ->
+                                (
+                                    layoutSize *
+                                        horizontalLazyGridItemWidthFactor /
+                                        2f -
+                                        itemSize / 2f
+                                    )
+                            }
+                        )
+                    }
 
                 LazyColumn(
                     state = lazylistState,
@@ -1311,9 +1284,11 @@ fun HomeScreen(
                             lazylistState
                         ),
                     contentPadding =
-                        LocalPlayerAwareWindowInsets.current
+                        LocalPlayerAwareWindowInsets
+                            .current
                             .asPaddingValues()
                 ) {
+
                     item {
                         ChipsRow(
                             chips =
@@ -1348,14 +1323,18 @@ fun HomeScreen(
                             ShimmerHost {
                                 Row(
                                     modifier =
-                                        Modifier.padding(
-                                            horizontal = 16.dp,
-                                            vertical = 8.dp
-                                        ).horizontalScroll(
-                                            rememberScrollState()
-                                        ),
+                                        Modifier
+                                            .padding(
+                                                horizontal = 16.dp,
+                                                vertical = 8.dp
+                                            )
+                                            .horizontalScroll(
+                                                rememberScrollState()
+                                            ),
                                     horizontalArrangement =
-                                        Arrangement.spacedBy(8.dp)
+                                        Arrangement.spacedBy(
+                                            8.dp
+                                        )
                                 ) {
                                     repeat(5) {
                                         TextPlaceholder(
@@ -1376,14 +1355,15 @@ fun HomeScreen(
                     }
 
                     homeSections.forEach { section ->
+
                         when (section) {
 
                             HomeSection.SpeedDial -> {
+
                                 speedDialItems
-                                    .takeIf {
-                                        it.isNotEmpty()
-                                    }
+                                    .takeIf { it.isNotEmpty() }
                                     ?.let { items ->
+
                                         item(
                                             key =
                                                 "speed_dial_title"
@@ -1402,32 +1382,30 @@ fun HomeScreen(
                                             key =
                                                 "speed_dial_list"
                                         ) {
+
                                             val targetItemSize =
                                                 160.dp
 
                                             val availableWidth =
-                                                this@BoxWithConstraints.maxWidth - 32.dp - 32.dp
+                                                maxWidth - 32.dp
 
                                             val columns =
                                                 (
                                                     availableWidth /
                                                         targetItemSize
-                                                )
+                                                    )
                                                     .toInt()
                                                     .coerceAtLeast(
                                                         3
                                                     )
 
                                             val rows =
-                                                if (columns >= 6) {
+                                                if (columns >= 6)
                                                     1
-                                                } else if (
-                                                    columns >= 4
-                                                ) {
+                                                else if (columns >= 4)
                                                     2
-                                                } else {
+                                                else
                                                     3
-                                                }
 
                                             val itemsPerPage =
                                                 columns * rows
@@ -1443,28 +1421,29 @@ fun HomeScreen(
                                                             items.size +
                                                                 itemsPerPage -
                                                                 1
-                                                        ) /
+                                                            ) /
                                                             itemsPerPage
                                                     }
                                                 )
 
                                             Column(
                                                 modifier =
-                                                    Modifier.fillMaxWidth()
+                                                    Modifier
+                                                        .fillMaxWidth()
                                                         .animateItem()
                                             ) {
+
                                                 HorizontalPager(
                                                     state =
                                                         pagerState,
                                                     contentPadding =
                                                         PaddingValues(
-                                                            horizontal =
-                                                                16.dp
+                                                            horizontal = 16.dp
                                                         ),
-                                                    pageSpacing =
-                                                        16.dp,
+                                                    pageSpacing = 16.dp,
                                                     modifier =
-                                                        Modifier.fillMaxWidth()
+                                                        Modifier
+                                                            .fillMaxWidth()
                                                             .height(
                                                                 itemWidth *
                                                                     rows
@@ -1488,38 +1467,43 @@ fun HomeScreen(
                                                         modifier =
                                                             Modifier.fillMaxSize()
                                                     ) {
+
                                                         for (
                                                             row in
-                                                                0 until rows
+                                                            0 until rows
                                                         ) {
+
                                                             Row(
                                                                 modifier =
                                                                     Modifier.fillMaxWidth()
                                                             ) {
+
                                                                 for (
                                                                     col in
-                                                                        0 until columns
+                                                                    0 until columns
                                                                 ) {
+
                                                                     val itemIndex =
                                                                         row *
                                                                             columns +
                                                                             col
 
                                                                     val isRandomizeSlot =
-                                                                        page ==
-                                                                            0 &&
+                                                                        page == 0 &&
                                                                             itemIndex ==
                                                                             itemsPerPage -
-                                                                                1
+                                                                            1
 
                                                                     if (
                                                                         isRandomizeSlot
                                                                     ) {
+
                                                                         Box(
                                                                             modifier =
-                                                                                Modifier.width(
-                                                                                    itemWidth
-                                                                                )
+                                                                                Modifier
+                                                                                    .width(
+                                                                                        itemWidth
+                                                                                    )
                                                                                     .height(
                                                                                         itemWidth
                                                                                     )
@@ -1527,27 +1511,33 @@ fun HomeScreen(
                                                                                         4.dp
                                                                                     )
                                                                         ) {
+
                                                                             RandomizeGridItem(
                                                                                 isLoading =
                                                                                     isRandomizing,
                                                                                 onClick = {
+
                                                                                     if (
                                                                                         isRandomizing
                                                                                     ) {
                                                                                         randomizeJob?.cancel()
                                                                                     } else {
+
                                                                                         randomizeJob =
                                                                                             scope.launch {
+
                                                                                                 val randomItem =
                                                                                                     viewModel.getRandomItem()
 
                                                                                                 if (
                                                                                                     randomItem !=
-                                                                                                        null
+                                                                                                    null
                                                                                                 ) {
+
                                                                                                     when (
                                                                                                         randomItem
                                                                                                     ) {
+
                                                                                                         is SongItem ->
                                                                                                             playerConnection.playQueue(
                                                                                                                 YouTubeQueue(
@@ -1581,30 +1571,33 @@ fun HomeScreen(
                                                                                 }
                                                                             )
                                                                         }
+
                                                                     } else if (
                                                                         itemIndex <
-                                                                            pageItems.size
+                                                                        pageItems.size
                                                                     ) {
+
                                                                         val item =
                                                                             pageItems[
                                                                                 itemIndex
                                                                             ]
 
                                                                         val isPinned by
-                                                                            database.speedDialDao
+                                                                            database
+                                                                                .speedDialDao
                                                                                 .isPinned(
                                                                                     item.id
                                                                                 )
                                                                                 .collectAsState(
-                                                                                    initial =
-                                                                                        false
+                                                                                    initial = false
                                                                                 )
 
                                                                         Box(
                                                                             modifier =
-                                                                                Modifier.width(
-                                                                                    itemWidth
-                                                                                )
+                                                                                Modifier
+                                                                                    .width(
+                                                                                        itemWidth
+                                                                                    )
                                                                                     .height(
                                                                                         itemWidth
                                                                                     )
@@ -1612,6 +1605,7 @@ fun HomeScreen(
                                                                                         4.dp
                                                                                     )
                                                                         ) {
+
                                                                             SpeedDialGridItem(
                                                                                 item =
                                                                                     item,
@@ -1626,12 +1620,15 @@ fun HomeScreen(
                                                                                 isPlaying =
                                                                                     isPlaying,
                                                                                 modifier =
-                                                                                    Modifier.fillMaxSize()
+                                                                                    Modifier
+                                                                                        .fillMaxSize()
                                                                                         .combinedClickable(
                                                                                             onClick = {
+
                                                                                                 when (
                                                                                                     item
                                                                                                 ) {
+
                                                                                                     is SongItem ->
                                                                                                         playerConnection.playQueue(
                                                                                                             YouTubeQueue(
@@ -1661,14 +1658,17 @@ fun HomeScreen(
                                                                                                 }
                                                                                             },
                                                                                             onLongClick = {
+
                                                                                                 haptic.performHapticFeedback(
                                                                                                     HapticFeedbackType.LongPress
                                                                                                 )
 
                                                                                                 menuState.show {
+
                                                                                                     when (
                                                                                                         item
                                                                                                     ) {
+
                                                                                                         is SongItem ->
                                                                                                             YouTubeSongMenu(
                                                                                                                 song =
@@ -1712,7 +1712,9 @@ fun HomeScreen(
                                                                                         )
                                                                             )
                                                                         }
+
                                                                     } else {
+
                                                                         Spacer(
                                                                             modifier =
                                                                                 Modifier.width(
@@ -1728,41 +1730,49 @@ fun HomeScreen(
 
                                                 if (
                                                     pagerState.pageCount >
-                                                        1
+                                                    1
                                                 ) {
+
                                                     Row(
                                                         modifier =
-                                                            Modifier.height(
-                                                                24.dp
-                                                            )
+                                                            Modifier
+                                                                .height(
+                                                                    24.dp
+                                                                )
                                                                 .fillMaxWidth(),
                                                         horizontalArrangement =
                                                             Arrangement.Center,
                                                         verticalAlignment =
                                                             Alignment.CenterVertically
                                                     ) {
+
                                                         repeat(
                                                             pagerState.pageCount
                                                         ) { iteration ->
+
                                                             val color =
                                                                 if (
                                                                     pagerState.currentPage ==
-                                                                        iteration
+                                                                    iteration
                                                                 ) {
-                                                                    MaterialTheme.colorScheme.onSurface
+                                                                    MaterialTheme
+                                                                        .colorScheme
+                                                                        .onSurface
                                                                 } else {
-                                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                                    MaterialTheme
+                                                                        .colorScheme
+                                                                        .onSurfaceVariant
                                                                         .copy(
-                                                                            alpha =
-                                                                                0.5f
+                                                                            alpha = 0.5f
                                                                         )
                                                                 }
 
                                                             Box(
                                                                 modifier =
-                                                                    Modifier.padding(
-                                                                        4.dp
-                                                                    )
+                                                                    Modifier
+                                                                        .padding(
+                                                                            4.dp
+                                                                        )
                                                                         .clip(
                                                                             RoundedCornerShape(
                                                                                 ThumbnailCornerRadius
@@ -1784,15 +1794,22 @@ fun HomeScreen(
                             }
 
                             HomeSection.AiRecommendations -> {
+
                                 aiRecommendedPlaylist?.let { pair ->
-                                    val (playlist, songs) = pair
+
+                                    val (
+                                        playlist,
+                                        songs
+                                    ) = pair
 
                                     item(
                                         key =
                                             "ai_recommendation_title"
                                     ) {
+
                                         val lastUpdatedStr =
-                                            playlist.playlist
+                                            playlist
+                                                .playlist
                                                 .lastUpdateTime
                                                 ?.let {
                                                     "Last updated: " +
@@ -1823,11 +1840,11 @@ fun HomeScreen(
                                         key =
                                             "ai_recommendation_list"
                                     ) {
+
                                         LazyRow(
                                             contentPadding =
                                                 PaddingValues(
-                                                    horizontal =
-                                                        16.dp
+                                                    horizontal = 16.dp
                                                 ),
                                             horizontalArrangement =
                                                 Arrangement.spacedBy(
@@ -1836,13 +1853,17 @@ fun HomeScreen(
                                             modifier =
                                                 Modifier.animateItem()
                                         ) {
+
                                             items(
                                                 items =
                                                     songs.distinctBy {
                                                         it.id
                                                     },
-                                                key = { it.id }
+                                                key = {
+                                                    it.id
+                                                }
                                             ) { songObj ->
+
                                                 localGridItem(
                                                     songObj
                                                 )
@@ -1852,21 +1873,17 @@ fun HomeScreen(
                                 }
                             }
 
-                            /*
-                             * PREMIUM QUICK PICKS
-                             *
-                             * Playback logic below is unchanged.
-                             */
                             HomeSection.QuickPicks -> {
+
                                 quickPicks
-                                    ?.takeIf {
-                                        it.isNotEmpty()
-                                    }
+                                    ?.takeIf { it.isNotEmpty() }
                                     ?.let { quickPicks ->
+
                                         item(
                                             key =
                                                 "quick_picks_list"
                                         ) {
+
                                             val distinctQuickPicks =
                                                 quickPicks.distinctBy {
                                                     it.id
@@ -1876,8 +1893,9 @@ fun HomeScreen(
                                                 LocalConfiguration.current
 
                                             val heroWidth =
-                                                configuration.screenWidthDp.dp -
-                                                    32.dp
+                                                configuration
+                                                    .screenWidthDp
+                                                    .dp - 32.dp
 
                                             val carouselState =
                                                 rememberCarouselState {
@@ -1887,7 +1905,9 @@ fun HomeScreen(
                                             LaunchedEffect(
                                                 carouselState
                                             ) {
+
                                                 while (true) {
+
                                                     kotlinx.coroutines.delay(
                                                         5000
                                                     )
@@ -1896,11 +1916,12 @@ fun HomeScreen(
                                                         distinctQuickPicks.isNotEmpty() &&
                                                         !carouselState.isScrollInProgress
                                                     ) {
+
                                                         val nextIndex =
                                                             (
                                                                 carouselState.currentItem +
                                                                     1
-                                                            ) %
+                                                                ) %
                                                                 distinctQuickPicks.size
 
                                                         carouselState.animateScrollToItem(
@@ -1915,15 +1936,14 @@ fun HomeScreen(
                                                     carouselState,
                                                 maxItemWidth =
                                                     heroWidth,
-                                                itemSpacing =
-                                                    10.dp,
+                                                itemSpacing = 8.dp,
                                                 contentPadding =
                                                     PaddingValues(
-                                                        horizontal =
-                                                            16.dp
+                                                        horizontal = 16.dp
                                                     ),
                                                 modifier =
-                                                    Modifier.fillMaxWidth()
+                                                    Modifier
+                                                        .fillMaxWidth()
                                                         .height(
                                                             290.dp
                                                         )
@@ -1936,12 +1956,14 @@ fun HomeScreen(
                                                     ]
 
                                                 val song by
-                                                    database.song(
-                                                        originalSong.id
-                                                    ).collectAsState(
-                                                        initial =
-                                                            originalSong
-                                                    )
+                                                    database
+                                                        .song(
+                                                            originalSong.id
+                                                        )
+                                                        .collectAsState(
+                                                            initial =
+                                                                originalSong
+                                                        )
 
                                                 val isActive =
                                                     song!!.id ==
@@ -1949,13 +1971,31 @@ fun HomeScreen(
 
                                                 Box(
                                                     modifier =
-                                                        Modifier.fillMaxSize()
-                                                            .clip(
-                                                                MaterialTheme.shapes.extraLarge
+                                                        Modifier
+                                                            .fillMaxSize()
+                                                            .maskClip(
+                                                                MaterialTheme
+                                                                    .shapes
+                                                                    .extraLarge
+                                                            )
+                                                            .maskBorder(
+                                                                BorderStroke(
+                                                                    1.dp,
+                                                                    MaterialTheme
+                                                                        .colorScheme
+                                                                        .primary
+                                                                        .copy(
+                                                                            alpha = 0.45f
+                                                                        )
+                                                                ),
+                                                                MaterialTheme
+                                                                    .shapes
+                                                                    .extraLarge
                                                             )
                                                             .focusable()
                                                             .combinedClickable(
                                                                 onClick = {
+
                                                                     if (
                                                                         isActive
                                                                     ) {
@@ -1965,17 +2005,20 @@ fun HomeScreen(
                                                                         playerConnection
                                                                             .playQueue(
                                                                                 YouTubeQueue.radio(
-                                                                                    song!!.toMediaMetadata()
+                                                                                    song!!
+                                                                                        .toMediaMetadata()
                                                                                 )
                                                                             )
                                                                     }
                                                                 },
                                                                 onLongClick = {
+
                                                                     haptic.performHapticFeedback(
                                                                         HapticFeedbackType.LongPress
                                                                     )
 
                                                                     menuState.show {
+
                                                                         SongMenu(
                                                                             originalSong =
                                                                                 song!!,
@@ -1989,16 +2032,15 @@ fun HomeScreen(
                                                             )
                                                 ) {
 
-                                                    /*
-                                                     * Album artwork
-                                                     */
                                                     AsyncImage(
                                                         model =
-                                                            ImageRequest.Builder(
-                                                                LocalContext.current
-                                                            )
+                                                            ImageRequest
+                                                                .Builder(
+                                                                    LocalContext.current
+                                                                )
                                                                 .data(
-                                                                    song!!.thumbnailUrl
+                                                                    song!!
+                                                                        .thumbnailUrl
                                                                 )
                                                                 .crossfade(
                                                                     true
@@ -2012,37 +2054,10 @@ fun HomeScreen(
                                                             Modifier.fillMaxSize()
                                                     )
 
-                                                    /*
-                                                     * Premium glass reflection.
-                                                     */
                                                     Box(
                                                         modifier =
-                                                            Modifier.fillMaxSize()
-                                                                .background(
-                                                                    Brush.linearGradient(
-                                                                        colors =
-                                                                            listOf(
-                                                                                Color.White.copy(
-                                                                                    alpha =
-                                                                                        0.10f
-                                                                                ),
-                                                                                Color.Transparent,
-                                                                                Color.Transparent,
-                                                                                Color.White.copy(
-                                                                                    alpha =
-                                                                                        0.035f
-                                                                                )
-                                                                            )
-                                                                    )
-                                                                )
-                                                    )
-
-                                                    /*
-                                                     * Dark cinematic gradient.
-                                                     */
-                                                    Box(
-                                                        modifier =
-                                                            Modifier.fillMaxSize()
+                                                            Modifier
+                                                                .fillMaxSize()
                                                                 .background(
                                                                     Brush.verticalGradient(
                                                                         colors =
@@ -2050,8 +2065,7 @@ fun HomeScreen(
                                                                                 Color.Transparent,
                                                                                 Color.Transparent,
                                                                                 Color.Black.copy(
-                                                                                    alpha =
-                                                                                        0.78f
+                                                                                    alpha = 0.75f
                                                                                 )
                                                                             )
                                                                     )
@@ -2062,11 +2076,13 @@ fun HomeScreen(
                                                         isActive &&
                                                         isPlaying
                                                     ) {
+
                                                         Box(
                                                             modifier =
-                                                                Modifier.align(
-                                                                    Alignment.TopEnd
-                                                                )
+                                                                Modifier
+                                                                    .align(
+                                                                        Alignment.TopEnd
+                                                                    )
                                                                     .padding(
                                                                         12.dp
                                                                     )
@@ -2074,15 +2090,15 @@ fun HomeScreen(
                                                                         36.dp
                                                                     )
                                                                     .background(
-                                                                        MaterialTheme.colorScheme.onSurface.copy(
-                                                                            alpha =
-                                                                                0.92f
-                                                                        ),
+                                                                        MaterialTheme
+                                                                            .colorScheme
+                                                                            .primary,
                                                                         CircleShape
                                                                     ),
                                                             contentAlignment =
                                                                 Alignment.Center
                                                         ) {
+
                                                             Icon(
                                                                 painter =
                                                                     painterResource(
@@ -2091,7 +2107,9 @@ fun HomeScreen(
                                                                 contentDescription =
                                                                     null,
                                                                 tint =
-                                                                    MaterialTheme.colorScheme.onPrimary,
+                                                                    MaterialTheme
+                                                                        .colorScheme
+                                                                        .onPrimary,
                                                                 modifier =
                                                                     Modifier.size(
                                                                         18.dp
@@ -2102,22 +2120,25 @@ fun HomeScreen(
 
                                                     Column(
                                                         modifier =
-                                                            Modifier.align(
-                                                                Alignment.BottomStart
-                                                            )
+                                                            Modifier
+                                                                .align(
+                                                                    Alignment.BottomStart
+                                                                )
                                                                 .padding(
                                                                     18.dp
                                                                 )
                                                     ) {
+
                                                         Text(
                                                             text =
                                                                 song!!.title,
                                                             style =
-                                                                MaterialTheme.typography.titleMedium,
+                                                                MaterialTheme
+                                                                    .typography
+                                                                    .titleMedium,
                                                             color =
                                                                 Color.White,
-                                                            maxLines =
-                                                                1,
+                                                            maxLines = 1,
                                                             overflow =
                                                                 TextOverflow.Ellipsis
                                                         )
@@ -2128,14 +2149,14 @@ fun HomeScreen(
                                                                     it.name
                                                                 },
                                                             style =
-                                                                MaterialTheme.typography.bodyMedium,
+                                                                MaterialTheme
+                                                                    .typography
+                                                                    .bodyMedium,
                                                             color =
                                                                 Color.White.copy(
-                                                                    alpha =
-                                                                        0.72f
+                                                                    alpha = 0.72f
                                                                 ),
-                                                            maxLines =
-                                                                1,
+                                                            maxLines = 1,
                                                             overflow =
                                                                 TextOverflow.Ellipsis
                                                         )
@@ -2147,15 +2168,16 @@ fun HomeScreen(
                             }
 
                             HomeSection.FromTheCommunity -> {
+
                                 communityPlaylists
-                                    ?.takeIf {
-                                        it.isNotEmpty()
-                                    }
+                                    ?.takeIf { it.isNotEmpty() }
                                     ?.let { playlists ->
+
                                         item(
                                             key =
                                                 "community_playlists_title"
                                         ) {
+
                                             NavigationTitle(
                                                 title =
                                                     stringResource(
@@ -2170,11 +2192,11 @@ fun HomeScreen(
                                             key =
                                                 "community_playlists_content"
                                         ) {
+
                                             LazyRow(
                                                 contentPadding =
                                                     PaddingValues(
-                                                        horizontal =
-                                                            16.dp
+                                                        horizontal = 16.dp
                                                     ),
                                                 horizontalArrangement =
                                                     Arrangement.spacedBy(
@@ -2183,6 +2205,7 @@ fun HomeScreen(
                                                 modifier =
                                                     Modifier.animateItem()
                                             ) {
+
                                                 items(
                                                     playlists.distinctBy {
                                                         it.playlist.id
@@ -2191,27 +2214,26 @@ fun HomeScreen(
                                                         it.playlist.id
                                                     }
                                                 ) { item ->
+
                                                     CommunityPlaylistCard(
                                                         item = item,
                                                         onClick = {
-                                                            navController
-                                                                .navigateToPlaylistItem(
-                                                                    item.playlist
-                                                                )
+                                                            navController.navigateToPlaylistItem(
+                                                                item.playlist
+                                                            )
                                                         },
-                                                        onSongClick = {
-                                                            song ->
-                                                            playerConnection
-                                                                .playQueue(
-                                                                    YouTubeQueue(
-                                                                        song.endpoint
-                                                                            ?: WatchEndpoint(
-                                                                                videoId =
-                                                                                    song.id
-                                                                            ),
-                                                                        song.toMediaMetadata()
-                                                                    )
+                                                        onSongClick = { song ->
+
+                                                            playerConnection.playQueue(
+                                                                YouTubeQueue(
+                                                                    song.endpoint
+                                                                        ?: WatchEndpoint(
+                                                                            videoId =
+                                                                                song.id
+                                                                        ),
+                                                                    song.toMediaMetadata()
                                                                 )
+                                                            )
                                                         }
                                                     )
                                                 }
@@ -2221,15 +2243,16 @@ fun HomeScreen(
                             }
 
                             HomeSection.DailyDiscover -> {
+
                                 dailyDiscover
-                                    ?.takeIf {
-                                        it.isNotEmpty()
-                                    }
+                                    ?.takeIf { it.isNotEmpty() }
                                     ?.let { discoverList ->
+
                                         item(
                                             key =
                                                 "daily_discover_title"
                                         ) {
+
                                             val title =
                                                 stringResource(
                                                     R.string.your_daily_discover
@@ -2238,6 +2261,7 @@ fun HomeScreen(
                                             NavigationTitle(
                                                 title = title,
                                                 onPlayAllClick = {
+
                                                     val queueItems =
                                                         discoverList.mapNotNull {
                                                             (
@@ -2250,17 +2274,17 @@ fun HomeScreen(
                                                     if (
                                                         queueItems.isNotEmpty()
                                                     ) {
-                                                        playerConnection
-                                                            .playQueue(
-                                                                ListQueue(
-                                                                    title =
-                                                                        title,
-                                                                    items =
-                                                                        queueItems.map {
-                                                                            it.toMediaItem()
-                                                                        }
-                                                                )
+
+                                                        playerConnection.playQueue(
+                                                            ListQueue(
+                                                                title =
+                                                                    title,
+                                                                items =
+                                                                    queueItems.map {
+                                                                        it.toMediaItem()
+                                                                    }
                                                             )
+                                                        )
                                                     }
                                                 }
                                             )
@@ -2270,19 +2294,21 @@ fun HomeScreen(
                                             key =
                                                 "daily_discover_content"
                                         ) {
+
                                             Box(
                                                 modifier =
-                                                    Modifier.fillMaxWidth()
+                                                    Modifier
+                                                        .fillMaxWidth()
                                                         .height(
                                                             340.dp
                                                         )
                                                         .padding(
-                                                            horizontal =
-                                                                16.dp
+                                                            horizontal = 16.dp
                                                         ),
                                                 contentAlignment =
                                                     Alignment.Center
                                             ) {
+
                                                 val carouselState =
                                                     rememberCarouselState {
                                                         discoverList.size
@@ -2296,11 +2322,13 @@ fun HomeScreen(
                                                     itemSpacing =
                                                         16.dp,
                                                     modifier =
-                                                        Modifier.fillMaxWidth()
+                                                        Modifier
+                                                            .fillMaxWidth()
                                                             .height(
                                                                 320.dp
                                                             )
                                                 ) { i ->
+
                                                     val item =
                                                         discoverList[i]
 
@@ -2308,6 +2336,7 @@ fun HomeScreen(
                                                         dailyDiscover =
                                                             item,
                                                         onClick = {
+
                                                             val song =
                                                                 item.recommendation
                                                                     as? SongItem
@@ -2317,26 +2346,28 @@ fun HomeScreen(
 
                                                             if (
                                                                 mediaMetadata !=
-                                                                    null
+                                                                null
                                                             ) {
-                                                                playerConnection
-                                                                    .playQueue(
-                                                                        YouTubeQueue(
-                                                                            song.endpoint
-                                                                                ?: WatchEndpoint(
-                                                                                    videoId =
-                                                                                        song.id
-                                                                                ),
-                                                                            mediaMetadata
-                                                                        )
+
+                                                                playerConnection.playQueue(
+                                                                    YouTubeQueue(
+                                                                        song.endpoint
+                                                                            ?: WatchEndpoint(
+                                                                                videoId =
+                                                                                    song.id
+                                                                            ),
+                                                                        mediaMetadata
                                                                     )
+                                                                )
                                                             }
                                                         },
                                                         navController =
                                                             navController,
                                                         modifier =
-                                                            Modifier.clip(
-                                                                MaterialTheme.shapes.extraLarge
+                                                            Modifier.maskClip(
+                                                                MaterialTheme
+                                                                    .shapes
+                                                                    .extraLarge
                                                             )
                                                     )
                                                 }
@@ -2346,15 +2377,16 @@ fun HomeScreen(
                             }
 
                             HomeSection.KeepListening -> {
+
                                 keepListening
-                                    ?.takeIf {
-                                        it.isNotEmpty()
-                                    }
+                                    ?.takeIf { it.isNotEmpty() }
                                     ?.let { keepListening ->
+
                                         item(
                                             key =
                                                 "keep_listening_title"
                                         ) {
+
                                             NavigationTitle(
                                                 title =
                                                     stringResource(
@@ -2369,15 +2401,14 @@ fun HomeScreen(
                                             key =
                                                 "keep_listening_list"
                                         ) {
+
                                             val rows =
                                                 if (
-                                                    keepListening.size >
-                                                        6
-                                                ) {
+                                                    keepListening.size > 6
+                                                )
                                                     2
-                                                } else {
+                                                else
                                                     1
-                                                }
 
                                             LazyHorizontalGrid(
                                                 state =
@@ -2387,29 +2418,40 @@ fun HomeScreen(
                                                         rows
                                                     ),
                                                 contentPadding =
-                                                    WindowInsets.systemBars
+                                                    WindowInsets
+                                                        .systemBars
                                                         .only(
                                                             WindowInsetsSides.Horizontal
                                                         )
                                                         .asPaddingValues(),
                                                 modifier =
-                                                    Modifier.fillMaxWidth()
+                                                    Modifier
+                                                        .fillMaxWidth()
                                                         .height(
                                                             (
                                                                 currentGridHeight +
                                                                     with(
                                                                         LocalDensity.current
                                                                     ) {
-                                                                        MaterialTheme.typography.bodyLarge.lineHeight.toDp() *
+                                                                        MaterialTheme
+                                                                            .typography
+                                                                            .bodyLarge
+                                                                            .lineHeight
+                                                                            .toDp() *
                                                                             2 +
-                                                                            MaterialTheme.typography.bodyMedium.lineHeight.toDp() *
+                                                                            MaterialTheme
+                                                                                .typography
+                                                                                .bodyMedium
+                                                                                .lineHeight
+                                                                                .toDp() *
                                                                             2
                                                                     }
-                                                            ) *
+                                                                ) *
                                                                 rows
                                                         )
                                                         .animateItem()
                                             ) {
+
                                                 items(
                                                     keepListening.distinctBy {
                                                         it.id
@@ -2426,15 +2468,16 @@ fun HomeScreen(
                             }
 
                             HomeSection.AccountPlaylists -> {
+
                                 accountPlaylists
-                                    ?.takeIf {
-                                        it.isNotEmpty()
-                                    }
+                                    ?.takeIf { it.isNotEmpty() }
                                     ?.let { accountPlaylists ->
+
                                         item(
                                             key =
                                                 "account_playlists_title"
                                         ) {
+
                                             NavigationTitle(
                                                 label =
                                                     stringResource(
@@ -2443,14 +2486,17 @@ fun HomeScreen(
                                                 title =
                                                     accountName,
                                                 thumbnail = {
+
                                                     if (
                                                         url != null
                                                     ) {
+
                                                         AsyncImage(
                                                             model =
-                                                                ImageRequest.Builder(
-                                                                    LocalContext.current
-                                                                )
+                                                                ImageRequest
+                                                                    .Builder(
+                                                                        LocalContext.current
+                                                                    )
                                                                     .data(
                                                                         url
                                                                     )
@@ -2479,15 +2525,19 @@ fun HomeScreen(
                                                             contentScale =
                                                                 ContentScale.Crop,
                                                             modifier =
-                                                                Modifier.size(
-                                                                    ListThumbnailSize
-                                                                ).clip(
-                                                                    RoundedCornerShape(
-                                                                        ThumbnailCornerRadius
+                                                                Modifier
+                                                                    .size(
+                                                                        ListThumbnailSize
                                                                     )
-                                                                )
+                                                                    .clip(
+                                                                        RoundedCornerShape(
+                                                                            ThumbnailCornerRadius
+                                                                        )
+                                                                    )
                                                         )
+
                                                     } else {
+
                                                         Icon(
                                                             painter =
                                                                 painterResource(
@@ -2517,9 +2567,11 @@ fun HomeScreen(
                                             key =
                                                 "account_playlists_list"
                                         ) {
+
                                             LazyRow(
                                                 contentPadding =
-                                                    WindowInsets.systemBars
+                                                    WindowInsets
+                                                        .systemBars
                                                         .only(
                                                             WindowInsetsSides.Horizontal
                                                         )
@@ -2527,6 +2579,7 @@ fun HomeScreen(
                                                 modifier =
                                                     Modifier.animateItem()
                                             ) {
+
                                                 items(
                                                     items =
                                                         accountPlaylists.distinctBy {
@@ -2536,6 +2589,7 @@ fun HomeScreen(
                                                         it.id
                                                     }
                                                 ) { item ->
+
                                                     ytGridItem(item)
                                                 }
                                             }
@@ -2544,15 +2598,16 @@ fun HomeScreen(
                             }
 
                             HomeSection.ForgottenFavorites -> {
+
                                 forgottenFavorites
-                                    ?.takeIf {
-                                        it.isNotEmpty()
-                                    }
+                                    ?.takeIf { it.isNotEmpty() }
                                     ?.let { forgottenFavorites ->
+
                                         item(
                                             key =
                                                 "forgotten_favorites_title"
                                         ) {
+
                                             val forgottenFavoritesTitle =
                                                 stringResource(
                                                     R.string.forgotten_favorites
@@ -2564,21 +2619,21 @@ fun HomeScreen(
                                                 modifier =
                                                     Modifier.animateItem(),
                                                 onPlayAllClick = {
-                                                    playerConnection
-                                                        .playQueue(
-                                                            ListQueue(
-                                                                title =
-                                                                    forgottenFavoritesTitle,
-                                                                items =
-                                                                    forgottenFavorites
-                                                                        .distinctBy {
-                                                                            it.id
-                                                                        }
-                                                                        .map {
-                                                                            it.toMediaItem()
-                                                                        }
-                                                            )
+
+                                                    playerConnection.playQueue(
+                                                        ListQueue(
+                                                            title =
+                                                                forgottenFavoritesTitle,
+                                                            items =
+                                                                forgottenFavorites
+                                                                    .distinctBy {
+                                                                        it.id
+                                                                    }
+                                                                    .map {
+                                                                        it.toMediaItem()
+                                                                    }
                                                         )
+                                                    )
                                                 }
                                             )
                                         }
@@ -2587,6 +2642,7 @@ fun HomeScreen(
                                             key =
                                                 "forgotten_favorites_list"
                                         ) {
+
                                             val rows =
                                                 min(
                                                     4,
@@ -2601,7 +2657,8 @@ fun HomeScreen(
                                                         rows
                                                     ),
                                                 contentPadding =
-                                                    WindowInsets.systemBars
+                                                    WindowInsets
+                                                        .systemBars
                                                         .only(
                                                             WindowInsetsSides.Horizontal
                                                         )
@@ -2611,22 +2668,22 @@ fun HomeScreen(
                                                         forgottenFavoritesSnapLayoutInfoProvider
                                                     ),
                                                 modifier =
-                                                    Modifier.fillMaxWidth()
+                                                    Modifier
+                                                        .fillMaxWidth()
                                                         .height(
                                                             ListItemHeight *
                                                                 rows
                                                         )
                                                         .animateItem()
                                             ) {
+
                                                 itemsIndexed(
                                                     items =
-                                                        forgottenFavorites
-                                                            .distinctBy {
-                                                                it.id
-                                                            },
+                                                        forgottenFavorites.distinctBy {
+                                                            it.id
+                                                        },
                                                     key = {
-                                                            _,
-                                                            it ->
+                                                            _, it ->
                                                         it.id
                                                     }
                                                 ) {
@@ -2634,16 +2691,17 @@ fun HomeScreen(
                                                         originalSong ->
 
                                                     val song by
-                                                        database.song(
-                                                            originalSong.id
-                                                        ).collectAsState(
-                                                            initial =
-                                                                originalSong
-                                                        )
+                                                        database
+                                                            .song(
+                                                                originalSong.id
+                                                            )
+                                                            .collectAsState(
+                                                                initial =
+                                                                    originalSong
+                                                            )
 
                                                     SongListItem(
-                                                        song =
-                                                            song!!,
+                                                        song = song!!,
                                                         showInLibraryIcon =
                                                             true,
                                                         isActive =
@@ -2662,13 +2720,16 @@ fun HomeScreen(
                                                                     rows
                                                             ),
                                                         trailingContent = {
+
                                                             IconButton(
                                                                 onClick = {
+
                                                                     haptic.performHapticFeedback(
                                                                         HapticFeedbackType.LongPress
                                                                     )
 
                                                                     menuState.show {
+
                                                                         SongMenu(
                                                                             originalSong =
                                                                                 song!!,
@@ -2680,6 +2741,7 @@ fun HomeScreen(
                                                                     }
                                                                 }
                                                             ) {
+
                                                                 Icon(
                                                                     painter =
                                                                         painterResource(
@@ -2691,32 +2753,39 @@ fun HomeScreen(
                                                             }
                                                         },
                                                         modifier =
-                                                            Modifier.width(
-                                                                horizontalLazyGridItemWidth
-                                                            )
+                                                            Modifier
+                                                                .width(
+                                                                    horizontalLazyGridItemWidth
+                                                                )
                                                                 .combinedClickable(
                                                                     onClick = {
+
                                                                         if (
                                                                             song!!.id ==
-                                                                                mediaMetadata?.id
+                                                                            mediaMetadata?.id
                                                                         ) {
+
                                                                             playerConnection
                                                                                 .togglePlayPause()
+
                                                                         } else {
-                                                                            playerConnection
-                                                                                .playQueue(
-                                                                                    YouTubeQueue.radio(
-                                                                                        song!!.toMediaMetadata()
-                                                                                    )
+
+                                                                            playerConnection.playQueue(
+                                                                                YouTubeQueue.radio(
+                                                                                    song!!
+                                                                                        .toMediaMetadata()
                                                                                 )
+                                                                            )
                                                                         }
                                                                     },
                                                                     onLongClick = {
+
                                                                         haptic.performHapticFeedback(
                                                                             HapticFeedbackType.LongPress
                                                                         )
 
                                                                         menuState.show {
+
                                                                             SongMenu(
                                                                                 originalSong =
                                                                                     song!!,
@@ -2736,6 +2805,7 @@ fun HomeScreen(
                             }
 
                             is HomeSection.SimilarRecommendation -> {
+
                                 val recommendation =
                                     similarRecommendations
                                         ?.getOrNull(
@@ -2743,10 +2813,12 @@ fun HomeScreen(
                                         )
 
                                 recommendation?.let {
+
                                     item(
                                         key =
                                             "similar_to_title_${section.index}"
                                     ) {
+
                                         NavigationTitle(
                                             label =
                                                 stringResource(
@@ -2771,15 +2843,18 @@ fun HomeScreen(
                                                                 contentDescription =
                                                                     null,
                                                                 modifier =
-                                                                    Modifier.size(
-                                                                        ListThumbnailSize
-                                                                    ).clip(
-                                                                        shape
-                                                                    )
+                                                                    Modifier
+                                                                        .size(
+                                                                            ListThumbnailSize
+                                                                        )
+                                                                        .clip(
+                                                                            shape
+                                                                        )
                                                             )
                                                         }
                                                     },
                                             onClick = {
+
                                                 val recTitle =
                                                     recommendation.title
 
@@ -2811,9 +2886,11 @@ fun HomeScreen(
                                         key =
                                             "similar_to_list_${section.index}"
                                     ) {
+
                                         LazyRow(
                                             contentPadding =
-                                                WindowInsets.systemBars
+                                                WindowInsets
+                                                    .systemBars
                                                     .only(
                                                         WindowInsetsSides.Horizontal
                                                     )
@@ -2821,6 +2898,7 @@ fun HomeScreen(
                                             modifier =
                                                 Modifier.animateItem()
                                         ) {
+
                                             items(
                                                 recommendation.items
                                                     .distinctBy {
@@ -2830,6 +2908,7 @@ fun HomeScreen(
                                                     it.id
                                                 }
                                             ) { item ->
+
                                                 ytGridItem(item)
                                             }
                                         }
@@ -2838,13 +2917,16 @@ fun HomeScreen(
                             }
 
                             is HomeSection.HomePageSection -> {
+
                                 val sectionData =
-                                    homePage?.sections
+                                    homePage
+                                        ?.sections
                                         ?.getOrNull(
                                             section.index
                                         )
 
                                 sectionData?.let {
+
                                     val sectionSongs =
                                         sectionData.items
                                             .filterIsInstance<SongItem>()
@@ -2862,6 +2944,7 @@ fun HomeScreen(
                                         key =
                                             "home_section_title_${section.index}"
                                     ) {
+
                                         NavigationTitle(
                                             title =
                                                 sectionData.title,
@@ -2883,19 +2966,23 @@ fun HomeScreen(
                                                                 contentDescription =
                                                                     null,
                                                                 modifier =
-                                                                    Modifier.size(
-                                                                        ListThumbnailSize
-                                                                    ).clip(
-                                                                        shape
-                                                                    )
+                                                                    Modifier
+                                                                        .size(
+                                                                            ListThumbnailSize
+                                                                        )
+                                                                        .clip(
+                                                                            shape
+                                                                        )
                                                             )
                                                         }
                                                     },
                                             onClick =
-                                                sectionData.endpoint
+                                                sectionData
+                                                    .endpoint
                                                     ?.let {
                                                         endpoint ->
                                                         {
+
                                                             when {
                                                                 endpoint.browseId ==
                                                                     "FEmusic_moods_and_genres" ->
@@ -2921,18 +3008,17 @@ fun HomeScreen(
                                                     hasPlayableSongs
                                                 ) {
                                                     {
-                                                        playerConnection
-                                                            .playQueue(
-                                                                ListQueue(
-                                                                    title =
-                                                                        sectionData.title,
-                                                                    items =
-                                                                        sectionSongs.map {
-                                                                            it.toMediaMetadata()
-                                                                                .toMediaItem()
-                                                                        }
-                                                                )
+                                                        playerConnection.playQueue(
+                                                            ListQueue(
+                                                                title =
+                                                                    sectionData.title,
+                                                                items =
+                                                                    sectionSongs.map {
+                                                                        it.toMediaMetadata()
+                                                                            .toMediaItem()
+                                                                    }
                                                             )
+                                                        )
                                                     }
                                                 } else {
                                                     null
@@ -2945,10 +3031,12 @@ fun HomeScreen(
                                     if (
                                         isSongsOnlySection
                                     ) {
+
                                         item(
                                             key =
                                                 "home_section_list_${section.index}"
                                         ) {
+
                                             LazyHorizontalGrid(
                                                 state =
                                                     rememberLazyGridState(),
@@ -2957,28 +3045,29 @@ fun HomeScreen(
                                                         4
                                                     ),
                                                 contentPadding =
-                                                    WindowInsets.systemBars
+                                                    WindowInsets
+                                                        .systemBars
                                                         .only(
                                                             WindowInsetsSides.Horizontal
                                                         )
                                                         .asPaddingValues(),
                                                 modifier =
-                                                    Modifier.fillMaxWidth()
+                                                    Modifier
+                                                        .fillMaxWidth()
                                                         .height(
                                                             ListItemHeight *
                                                                 4
                                                         )
                                                         .animateItem()
                                             ) {
+
                                                 itemsIndexed(
                                                     items =
-                                                        sectionSongs
-                                                            .distinctBy {
-                                                                it.id
-                                                            },
+                                                        sectionSongs.distinctBy {
+                                                            it.id
+                                                        },
                                                     key = {
-                                                            _,
-                                                            it ->
+                                                            _, it ->
                                                         it.id
                                                     }
                                                 ) {
@@ -2986,8 +3075,7 @@ fun HomeScreen(
                                                         song ->
 
                                                     YouTubeListItem(
-                                                        item =
-                                                            song,
+                                                        item = song,
                                                         isActive =
                                                             song.id ==
                                                                 mediaMetadata?.id,
@@ -3004,9 +3092,12 @@ fun HomeScreen(
                                                                     4
                                                             ),
                                                         trailingContent = {
+
                                                             IconButton(
                                                                 onClick = {
+
                                                                     menuState.show {
+
                                                                         YouTubeSongMenu(
                                                                             song =
                                                                                 song,
@@ -3018,6 +3109,7 @@ fun HomeScreen(
                                                                     }
                                                                 }
                                                             ) {
+
                                                                 Icon(
                                                                     painter =
                                                                         painterResource(
@@ -3029,32 +3121,38 @@ fun HomeScreen(
                                                             }
                                                         },
                                                         modifier =
-                                                            Modifier.width(
-                                                                horizontalLazyGridItemWidth
-                                                            )
+                                                            Modifier
+                                                                .width(
+                                                                    horizontalLazyGridItemWidth
+                                                                )
                                                                 .combinedClickable(
                                                                     onClick = {
+
                                                                         if (
                                                                             song.id ==
-                                                                                mediaMetadata?.id
+                                                                            mediaMetadata?.id
                                                                         ) {
+
                                                                             playerConnection
                                                                                 .togglePlayPause()
+
                                                                         } else {
-                                                                            playerConnection
-                                                                                .playQueue(
-                                                                                    YouTubeQueue.radio(
-                                                                                        song.toMediaMetadata()
-                                                                                    )
+
+                                                                            playerConnection.playQueue(
+                                                                                YouTubeQueue.radio(
+                                                                                    song.toMediaMetadata()
                                                                                 )
+                                                                            )
                                                                         }
                                                                     },
                                                                     onLongClick = {
+
                                                                         haptic.performHapticFeedback(
                                                                             HapticFeedbackType.LongPress
                                                                         )
 
                                                                         menuState.show {
+
                                                                             YouTubeSongMenu(
                                                                                 song =
                                                                                     song,
@@ -3070,14 +3168,18 @@ fun HomeScreen(
                                                 }
                                             }
                                         }
+
                                     } else {
+
                                         item(
                                             key =
                                                 "home_section_list_${section.index}"
                                         ) {
+
                                             LazyRow(
                                                 contentPadding =
-                                                    WindowInsets.systemBars
+                                                    WindowInsets
+                                                        .systemBars
                                                         .only(
                                                             WindowInsetsSides.Horizontal
                                                         )
@@ -3085,6 +3187,7 @@ fun HomeScreen(
                                                 modifier =
                                                     Modifier.animateItem()
                                             ) {
+
                                                 items(
                                                     sectionData.items
                                                         .distinctBy {
@@ -3094,6 +3197,7 @@ fun HomeScreen(
                                                         it.id
                                                     }
                                                 ) { item ->
+
                                                     ytGridItem(item)
                                                 }
                                             }
@@ -3103,116 +3207,142 @@ fun HomeScreen(
                             }
 
                             HomeSection.MoodAndGenres -> {
-                                explorePage?.moodAndGenres?.let {
-                                    moodAndGenres ->
 
-                                    item(
-                                        key =
-                                            "mood_and_genres_title"
-                                    ) {
-                                        NavigationTitle(
-                                            title =
-                                                stringResource(
-                                                    R.string.mood_and_genres
-                                                ),
-                                            onClick = {
-                                                navController.navigate(
-                                                    "mood_and_genres"
-                                                )
-                                            },
-                                            modifier =
-                                                Modifier.animateItem()
-                                        )
-                                    }
+                                explorePage
+                                    ?.moodAndGenres
+                                    ?.let { moodAndGenres ->
 
-                                    item(
-                                        key =
-                                            "mood_and_genres_list"
-                                    ) {
-                                        LazyHorizontalGrid(
-                                            rows =
-                                                GridCells.Fixed(
-                                                    4
-                                                ),
-                                            contentPadding =
-                                                PaddingValues(6.dp),
-                                            modifier =
-                                                Modifier.height(
-                                                    (
-                                                        MoodAndGenresButtonHeight +
-                                                            12.dp
-                                                    ) *
-                                                        4 +
-                                                        12.dp
-                                                ).animateItem()
+                                        item(
+                                            key =
+                                                "mood_and_genres_title"
                                         ) {
-                                            items(
-                                                moodAndGenres.distinctBy {
-                                                    it.title
+
+                                            NavigationTitle(
+                                                title =
+                                                    stringResource(
+                                                        R.string.mood_and_genres
+                                                    ),
+                                                onClick = {
+                                                    navController.navigate(
+                                                        "mood_and_genres"
+                                                    )
                                                 },
-                                                key = {
-                                                    it.title
-                                                }
+                                                modifier =
+                                                    Modifier.animateItem()
+                                            )
+                                        }
+
+                                        item(
+                                            key =
+                                                "mood_and_genres_list"
+                                        ) {
+
+                                            LazyHorizontalGrid(
+                                                rows =
+                                                    GridCells.Fixed(
+                                                        4
+                                                    ),
+                                                contentPadding =
+                                                    PaddingValues(
+                                                        6.dp
+                                                    ),
+                                                modifier =
+                                                    Modifier
+                                                        .height(
+                                                            (
+                                                                MoodAndGenresButtonHeight +
+                                                                    12.dp
+                                                                ) *
+                                                                4 +
+                                                                12.dp
+                                                        )
+                                                        .animateItem()
                                             ) {
-                                                MoodAndGenresButton(
-                                                    title = it.title,
-                                                    onClick = {
-                                                        navController.navigate(
-                                                            "youtube_browse/${it.endpoint.browseId}?params=${it.endpoint.params}"
-                                                        )
-                                                    },
-                                                    modifier =
-                                                        Modifier.padding(
-                                                            6.dp
-                                                        ).width(
-                                                            180.dp
-                                                        )
-                                                )
+
+                                                items(
+                                                    moodAndGenres
+                                                        .distinctBy {
+                                                            it.title
+                                                        },
+                                                    key = {
+                                                        it.title
+                                                    }
+                                                ) {
+
+                                                    MoodAndGenresButton(
+                                                        title =
+                                                            it.title,
+                                                        onClick = {
+
+                                                            navController.navigate(
+                                                                "youtube_browse/${it.endpoint.browseId}?params=${it.endpoint.params}"
+                                                            )
+                                                        },
+                                                        modifier =
+                                                            Modifier
+                                                                .padding(
+                                                                    6.dp
+                                                                )
+                                                                .width(
+                                                                    180.dp
+                                                                )
+                                                    )
+                                                }
                                             }
                                         }
                                     }
-                                }
                             }
                         }
                     }
 
-                    /*
-                     * EXISTING LOADING / SHIMMER SECTION
-                     * Kept functionally unchanged.
-                     */
                     if (
                         isLoading ||
-                        homePage?.continuation != null &&
-                            homePage?.sections?.isNotEmpty() == true
+                        (
+                            homePage?.continuation != null &&
+                                homePage?.sections?.isNotEmpty() == true
+                            )
                     ) {
-                        item(key = "loading_shimmer") {
+
+                        item(
+                            key = "loading_shimmer"
+                        ) {
+
                             ShimmerHost(
                                 modifier =
                                     Modifier.animateItem()
                             ) {
+
                                 Row(
                                     modifier =
-                                        Modifier.horizontalScroll(
-                                            rememberScrollState()
-                                        ).padding(
-                                            WindowInsets.systemBars
-                                                .only(
-                                                    WindowInsetsSides.Horizontal
-                                                )
-                                                .asPaddingValues()
-                                        )
+                                        Modifier
+                                            .horizontalScroll(
+                                                rememberScrollState()
+                                            )
+                                            .padding(
+                                                WindowInsets
+                                                    .systemBars
+                                                    .only(
+                                                        WindowInsetsSides.Horizontal
+                                                    )
+                                                    .asPaddingValues()
+                                            )
                                 ) {
+
                                     repeat(3) {
+
                                         Spacer(
                                             modifier =
-                                                Modifier.padding(
-                                                    horizontal =
-                                                        8.dp,
-                                                    vertical =
-                                                        12.dp
-                                                )
-                                                    .width(250.dp)
-                                                    .height(290.dp)
+                                                Modifier
+                                                    .padding(
+                                                        horizontal = 8.dp,
+                                                        vertical = 12.dp
+                                                    )
+                                                    .width(
+                                                        250.dp
+                                                    )
+                                                    .height(
+                                                        290.dp
+                                                    )
                                                     .clip(
                                                         MaterialTheme
                                                             .shapes
@@ -3230,31 +3360,35 @@ fun HomeScreen(
                                 TextPlaceholder(
                                     height = 36.dp,
                                     modifier =
-                                        Modifier.padding(12.dp)
+                                        Modifier
+                                            .padding(12.dp)
                                             .width(200.dp)
                                 )
 
                                 Column(
                                     modifier =
-                                        Modifier.fillMaxWidth()
+                                        Modifier
+                                            .fillMaxWidth()
                                             .padding(
-                                                horizontal =
-                                                    12.dp
+                                                horizontal = 12.dp
                                             )
                                 ) {
+
                                     repeat(2) {
+
                                         Row(
                                             modifier =
                                                 Modifier.fillMaxWidth()
                                         ) {
+
                                             repeat(3) {
+
                                                 GridItemPlaceHolder(
                                                     modifier =
                                                         Modifier.weight(
                                                             1f
                                                         ),
-                                                    fillMaxWidth =
-                                                        true
+                                                    fillMaxWidth = true
                                                 )
                                             }
                                         }
@@ -3264,22 +3398,27 @@ fun HomeScreen(
                                 TextPlaceholder(
                                     height = 36.dp,
                                     modifier =
-                                        Modifier.padding(12.dp)
+                                        Modifier
+                                            .padding(12.dp)
                                             .width(250.dp)
                                 )
 
                                 Row(
                                     modifier =
-                                        Modifier.horizontalScroll(
-                                            rememberScrollState()
-                                        ).padding(
-                                            WindowInsets.systemBars
-                                                .only(
-                                                    WindowInsetsSides.Horizontal
-                                                )
-                                                .asPaddingValues()
-                                        )
+                                        Modifier
+                                            .horizontalScroll(
+                                                rememberScrollState()
+                                            )
+                                            .padding(
+                                                WindowInsets
+                                                    .systemBars
+                                                    .only(
+                                                        WindowInsetsSides.Horizontal
+                                                    )
+                                                    .asPaddingValues()
+                                            )
                                 ) {
+
                                     repeat(4) {
                                         GridItemPlaceHolder()
                                     }
@@ -3288,7 +3427,9 @@ fun HomeScreen(
                         }
                     }
 
-                    item(key = "bottom_spacer") {
+                    item(
+                        key = "bottom_spacer"
+                    ) {
                         Spacer(
                             modifier =
                                 Modifier.height(30.dp)
