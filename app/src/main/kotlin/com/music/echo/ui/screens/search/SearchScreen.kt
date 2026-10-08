@@ -90,6 +90,8 @@ import echo.music.iad1tya.db.entities.SearchHistory
 import echo.music.iad1tya.playback.queues.YouTubeQueue
 import echo.music.iad1tya.ui.component.LocalMenuState
 import echo.music.iad1tya.ui.component.NavigationTitle
+import echo.music.iad1tya.ui.component.PattukalGlassCard
+import echo.music.iad1tya.ui.component.PattukalScreenGlow
 import echo.music.iad1tya.ui.component.YouTubeGridItem
 import echo.music.iad1tya.ui.menu.YouTubeAlbumMenu
 import echo.music.iad1tya.ui.screens.search.suggestions.SuggestionsTabContent
@@ -203,7 +205,9 @@ fun SearchScreen(navController: NavController, pureBlack: Boolean) {
     }
   }
 
-  Scaffold(
+  Box(modifier = Modifier.fillMaxSize()) {
+    PattukalScreenGlow(modifier = Modifier.matchParentSize())
+    Scaffold(
     topBar = {
       Column(
         modifier =
@@ -517,4 +521,6 @@ fun AlbumsTabContent(
       }
     }
   }
+    }
+
 }
