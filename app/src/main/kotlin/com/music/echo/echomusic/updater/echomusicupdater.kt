@@ -198,6 +198,14 @@ fun UpdateScreen(navController: NavHostController) {
             LocalDateTime.now().format(DateTimeFormatter.ofPattern("d MMMM yyyy, h:mm a"))
           )
           saveUpdateAvailableState(context, isAvailable)
+          if (isAvailable && autoUpdateCheckEnabled) {
+            queueAutomaticUpdateDownload(
+              context = context,
+              version = tag,
+              size = size,
+              apkUrl = apkUrl
+            )
+          }
           status =
             if (isAvailable) {
               EchoUpdateStatus.Available(
@@ -565,6 +573,49 @@ fun UpdateScreen(navController: NavHostController) {
 
 const val PREFS_NAME = "settings"
 const val KEY_AUTO_UPDATE_CHECK = "auto_update_check"
+const val KEY_AUTO_DOWNLOADED_VERSION = "auto_downloaded_version"
+
+fun queueAutomaticUpdateDownload(
+  context: Context,
+  version: String,
+  size: String,
+  apkUrl: String?
+) {
+  if (apkUrl.isNullOrBlank()) return
+
+  val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+  if (prefs.getString(KEY_AUTO_DOWNLOADED_VERSION, "") == version) return
+
+  val constraints =
+    Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+
+  val request =
+    OneTimeWorkRequestBuilder<UpdateDownloadWorker>()
+      .setInputData(
+        workDataOf(
+          "apk_url" to apkUrl,
+          "version" to version,
+          "file_size" to size
+        )
+      )
+      .setConstraints(constraints)
+      .setBackoffCriteria(
+        BackoffPolicy.EXPONENTIAL,
+        10,
+        java.util.concurrent.TimeUnit.SECONDS
+      )
+      .addTag("update_download_auto")
+      .build()
+
+  WorkManager.getInstance(context).enqueueUniqueWork(
+    "update_download_auto",
+    ExistingWorkPolicy.KEEP,
+    request
+  )
+
+  prefs.edit().putString(KEY_AUTO_DOWNLOADED_VERSION, version).apply()
+}
+
 const val KEY_LAST_CHECKED_TIME = "last_checked_time"
 const val KEY_BETA_UPDATES = "beta_updates"
 const val KEY_UPDATE_AVAILABLE = "update_available"
