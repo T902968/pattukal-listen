@@ -188,6 +188,16 @@ fun FloatingMiniPlayer(
       label = "accessoryPressScale",
     )
 
+  // Resolve theme colors in composable scope; drawBehind is not composable.
+  val miniPlayerOutlineBrush =
+    Brush.horizontalGradient(
+      listOf(
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.24f),
+        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.10f),
+        MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f),
+      )
+    )
+
   // Same structure as MiniPlayer: the drag detector sits on the outermost
   // container so the whole accessory is swipeable, and the entire content row
   // slides with the drag.
@@ -278,14 +288,7 @@ fun FloatingMiniPlayer(
           .drawBehind {
             val corner = if (isInline) 14.dp.toPx() else 18.dp.toPx()
             drawRoundRect(
-              brush =
-                Brush.horizontalGradient(
-                  listOf(
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.24f),
-                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.10f),
-                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f),
-                  )
-                ),
+              brush = miniPlayerOutlineBrush,
               style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.2.dp.toPx()),
               cornerRadius = androidx.compose.ui.geometry.CornerRadius(corner, corner),
             )
