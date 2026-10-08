@@ -2,9 +2,6 @@ name: Paattukal Release
 
 on:
   push:
-    branches:
-      - "main"
-      - "ui/paattukal-liquid-glass"
     tags:
       - "v*"
   workflow_dispatch:
