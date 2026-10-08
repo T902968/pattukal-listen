@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   release:
@@ -22,7 +23,26 @@ jobs:
         with:
           submodules: recursive
 
+      # The website download must use the exact known-good Action #49 APK.
+      # This avoids rebuilding/repackaging the baseline APK.
+      - name: Download exact Action #49 APK
+        if: github.ref == 'refs/heads/ui/paattukal-liquid-glass'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifact
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/T902968/pattukal-listen/actions/artifacts/11537550150/zip > artifact/run49.zip
+          unzip -j artifact/run49.zip 'universalFoss/debug/*.apk' -d artifact
+          APK_PATH=$(find artifact -maxdepth 1 -type f -name '*.apk' -print -quit)
+          test -n "$APK_PATH"
+          mv "$APK_PATH" pattukal.apk
+
       - name: Set up JDK 21
+        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass'
         uses: actions/setup-java@v4
         with:
           java-version: "21"
@@ -30,11 +50,13 @@ jobs:
           cache: gradle
 
       - name: Setup Android NDK
+        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass'
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;28.2.13676358" || true
 
       - name: Check release signing secrets
+        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass'
         id: signing
         env:
           KEYSTORE: ${{ secrets.PATTUKAL_KEYSTORE_BASE64 }}
@@ -49,14 +71,14 @@ jobs:
           fi
 
       - name: Prepare signing keystore
-        if: steps.signing.outputs.available == 'true'
+        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass' && steps.signing.outputs.available == 'true'
         env:
           PATTUKAL_KEYSTORE_BASE64: ${{ secrets.PATTUKAL_KEYSTORE_BASE64 }}
         run: |
           echo "$PATTUKAL_KEYSTORE_BASE64" | base64 --decode > keystore.jks
 
       - name: Build signed release APK
-        if: steps.signing.outputs.available == 'true'
+        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass' && steps.signing.outputs.available == 'true'
         env:
           STORE_PASSWORD: ${{ secrets.PATTUKAL_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.PATTUKAL_KEY_ALIAS }}
@@ -67,7 +89,7 @@ jobs:
           cp app/build/outputs/apk/universalFossRelease/*.apk pattukal.apk
 
       - name: Prepare debug signing keystore
-        if: steps.signing.outputs.available != 'true'
+        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass' && steps.signing.outputs.available != 'true'
         run: |
           mkdir -p "$HOME/.android"
           keytool -genkeypair -v \
@@ -81,7 +103,7 @@ jobs:
             -dname "CN=Android Debug,O=Android,C=US"
 
       - name: Build downloadable debug APK
-        if: steps.signing.outputs.available != 'true'
+        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass' && steps.signing.outputs.available != 'true'
         run: |
           chmod +x gradlew
           ./gradlew assembleUniversalFossDebug
@@ -89,13 +111,21 @@ jobs:
           test -n "$APK_PATH"
           cp "$APK_PATH" pattukal.apk
 
+      - name: Verify website APK
+        run: |
+          set -euo pipefail
+          test -s pattukal.apk
+          sha256sum pattukal.apk
+          unzip -t pattukal.apk >/dev/null
+          echo "APK archive verification passed."
+
       - name: Publish latest downloadable APK
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ui/paattukal-liquid-glass'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes 2>/dev/null || true
-          gh release create latest pattukal.apk --title "Paattukal Latest" --notes "Latest Paattukal APK. Signed release builds are used automatically when release signing secrets are configured."
+          gh release create latest pattukal.apk --title "Paattukal Latest" --notes "Paattukal APK. Website download uses the verified Action #49 baseline."
 
       - name: Publish versioned release
         if: startsWith(github.ref, 'refs/tags/v')
