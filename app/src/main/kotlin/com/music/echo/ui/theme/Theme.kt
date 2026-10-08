@@ -27,7 +27,7 @@ import echo.music.iad1tya.constants.AppFont
 import echo.music.iad1tya.constants.SelectedFontKey
 import echo.music.iad1tya.utils.rememberPreference
 
-val DefaultThemeColor = Color(0xFFED5564)
+val DefaultThemeColor = Color(0xFF8B5CF6)
 
 @Composable
 fun echomusicTheme(
@@ -65,7 +65,7 @@ fun echomusicTheme(
     }
 
   val useSystemDynamicColor =
-    (themeColor == DefaultThemeColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+    false
 
   val baseColorScheme =
     if (useSystemDynamicColor) {
@@ -95,7 +95,11 @@ fun echomusicTheme(
     typography = getTypography(brandFont),
     shapes =
       androidx.compose.material3.MaterialTheme.shapes.copy(
-        extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
+        extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+        small = androidx.compose.foundation.shape.RoundedCornerShape(22.dp),
+        medium = androidx.compose.foundation.shape.RoundedCornerShape(26.dp),
+        large = androidx.compose.foundation.shape.RoundedCornerShape(30.dp),
+        extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(34.dp)
       ),
     content = content
   )
