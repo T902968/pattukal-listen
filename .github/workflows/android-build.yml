@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Pattukal APK
+    name: Validate Pattukal Android build
     runs-on: ubuntu-latest
 
     steps:
@@ -33,39 +33,18 @@ jobs:
           rm -f "$ANDROID_HOME/ndk/27.1.12297006.zip"
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.1.12297006"
 
-      - name: Check permanent release signing
-        env:
-          KEYSTORE: ${{ secrets.PATTUKAL_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.PATTUKAL_STORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.PATTUKAL_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.PATTUKAL_KEY_PASSWORD }}
+      - name: Run unit tests
         run: |
-          set -euo pipefail
-          test -n "$KEYSTORE" || { echo "Missing PATTUKAL_KEYSTORE_BASE64"; exit 1; }
-          test -n "$STORE_PASSWORD" || { echo "Missing PATTUKAL_STORE_PASSWORD"; exit 1; }
-          test -n "$KEY_ALIAS" || { echo "Missing PATTUKAL_KEY_ALIAS"; exit 1; }
-          test -n "$KEY_PASSWORD" || { echo "Missing PATTUKAL_KEY_PASSWORD"; exit 1; }
-
-      - name: Prepare permanent signing keystore
-        env:
-          PATTUKAL_KEYSTORE_BASE64: ${{ secrets.PATTUKAL_KEYSTORE_BASE64 }}
-        run: |
-          set -euo pipefail
-          echo "$PATTUKAL_KEYSTORE_BASE64" | base64 --decode > keystore.jks
-          test -s keystore.jks
-
-      - name: Build signed release APK
-        env:
-          STORE_PASSWORD: ${{ secrets.PATTUKAL_STORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.PATTUKAL_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.PATTUKAL_KEY_PASSWORD }}
-        run: |
-          set -euo pipefail
           chmod +x gradlew
-          ./gradlew assembleUniversalFossRelease
+          ./gradlew :core:testDebugUnitTest :app:testUniversalFossDebugUnitTest
 
-      - name: Upload Pattukal APK
+      - name: Build validation APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleUniversalFossDebug
+
+      - name: Upload validation APK
         uses: actions/upload-artifact@v7
         with:
-          name: Pattukal-Universal-APK
-          path: app/build/outputs/apk/universalFossRelease/*.apk
+          name: Pattukal-Validation-APK
+          path: app/build/outputs/apk/universalFossDebug/*.apk
