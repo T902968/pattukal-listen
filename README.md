@@ -101,6 +101,17 @@ This repository does not claim ownership of the original upstream project or its
 
 ---
 
+## 👥 Contributors
+
+<!-- readme: contributors -start -->
+<a href="https://github.com/T902968">T902968</a> — AKSHAY'S UI · App/UI Design
+
+*Vyomkesh — Graphic Design*
+
+<!-- readme: contributors -end -->
+
+---
+
 ## 👤 Paattukal
 
 **AKSHAY'S UI**  
