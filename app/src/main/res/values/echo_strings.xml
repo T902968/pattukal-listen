@@ -394,7 +394,7 @@
     <string name="enable_scrobbling">Enable scrobbling</string>
     <string name="lastfm_now_playing">Send Now Playing</string>
     <string name="last_fm_send_likes">Send Likes/Unlikes</string>
-    <string name="last_fm_send_likes_description">Love/Unlove songs in Last.fm when they are Liked/Unliked in echomusic</string>
+    <string name="last_fm_send_likes_description">Love/Unlove songs in Last.fm when they are Liked/Unliked in Paattukal</string>
     <string name="logging_in">Logging in…</string>
 
     <string name="scrobbling_configuration">Scrobbling Configuration</string>
@@ -481,19 +481,19 @@
     <string name="wrapped_total_artists_subtitle">unique artists</string>
     <string name="wrapped_total_songs_title">You listened to</string>
     <string name="wrapped_total_songs_subtitle">unique songs</string>
-    <string name="wrapped_intro_title">echomusic</string>
+    <string name="wrapped_intro_title">Paattukal</string>
     <string name="wrapped_intro_subtitle">it\'s time to see what you\'ve been listening to</string>
     <string name="wrapped_intro_button">let\'s go!</string>
-    <string name="wrapped_end_thanks">Thanks for listening with echomusic!</string>
+    <string name="wrapped_end_thanks">Thanks for listening with Paattukal!</string>
     <string name="wrapped_end_create_playlist">Create Your Wrapped Playlist</string>
     <string name="wrapped_end_creating_playlist">Creating...</string>
     <string name="wrapped_end_playlist_saved">Playlist Saved</string>
-    <string name="wrapped_logo_content_description">echomusic Logo</string>
+    <string name="wrapped_logo_content_description">Paattukal Logo</string>
     <string name="wrapped_year">2025</string>
     <string name="wrapped_ready_title">YOUR WRAPPED IS READY!</string>
     <string name="wrapped_ready_subtitle">Time to see what you loved this year.</string>
     <string name="wrapped_thank_you">Thank you for listening</string>
-    <string name="wrapped_special_thanks">Special thanks to echodh for creating echomusic</string>
+    <string name="wrapped_special_thanks">Special thanks to echodh for creating Paattukal</string>
     <string name="wrapped_close">Close wrapped</string>
     <string name="wrapped_playlist_title">Your %s Wrapped</string>
     <string name="wrapped_create_playlist">Create playlist</string>
@@ -551,7 +551,7 @@
     <string name="eq_preset_dirac_game">Dirac Game</string>
     <string name="eq_enable_title">Equalizer</string>
     <string name="eq_enable_summary">Toggle professional audio processing</string>
-    <string name="eq_label_echo">Echo Signature</string>
+    <string name="eq_label_echo">Paattukal Signature</string>
     <string name="eq_label_dolby">Dolby Atmos</string>
     <string name="eq_label_dirac">Dirac Audio</string>
     <string name="eq_reset">Reset</string>
@@ -569,9 +569,9 @@
     <string name="plays">plays</string>
     <string name="casting_to">Casting to %s</string>
     <string name="progress_percent">Progress %s%%</string>
-    <string name="listening_to_echomusic">Listening to echomusic</string>
+    <string name="listening_to_echomusic">Listening to Paattukal</string>
     <string name="listen_on_youtube_music">Listen on YouTube Music</string>
-    <string name="visit_echomusic">Visit echomusic</string>
+    <string name="visit_echomusic">Visit Paattukal</string>
     <string name="open">Open</string>
     <string name="failed_to_create_image">Failed to create image: %s</string>
     <string name="copied_title">Copied Title</string>
@@ -588,42 +588,42 @@
     <!-- Widget strings -->
     <string name="album_art">Album art</string>
     <string name="no_song_playing">No song playing</string>
-    <string name="tap_to_open">Tap to open echomusic</string>
+    <string name="tap_to_open">Tap to open Paattukal</string>
     <string name="previous">Previous</string>
     <string name="play_pause">Play/Pause</string>
     <string name="next">Next</string>
     <string name="like">Like</string>
     <string name="not_playing">No song playing</string>
-    <string name="tap_to_play">Tap to open echomusic</string>
+    <string name="tap_to_play">Tap to open Paattukal</string>
     <string name="widget_description">Music player widget with playback controls</string>
     <string name="queue_widget_description">Music player with queue preview</string>
     <string name="turntable_widget_description">Circular music widget with play and like controls</string>
-    <string name="widget_music_player">Echo Classic (4×1)</string>
-    <string name="widget_turntable">Echo Classic Turntable (2×2)</string>
-    <string name="widget_modern_name">Echo Modern (4×2)</string>
+    <string name="widget_music_player">Paattukal Classic (4×1)</string>
+    <string name="widget_turntable">Paattukal Classic Turntable (2×2)</string>
+    <string name="widget_modern_name">Paattukal Modern (4×2)</string>
     <string name="widget_modern_desc">Sleek player with progress bar, favorite, and library controls</string>
-    <string name="widget_device_name">Echo Stream (4×2)</string>
+    <string name="widget_device_name">Paattukal Stream (4×2)</string>
     <string name="widget_device_desc">Modern card showing active playback device and audio output</string>
-    <string name="widget_square_name">Echo Compact (2×2)</string>
+    <string name="widget_square_name">Paattukal Compact (2×2)</string>
     <string name="widget_square_desc">Minimal square player with vibrant glowing controls</string>
-    <string name="widget_showcase_name">Echo Showcase (4×4)</string>
+    <string name="widget_showcase_name">Paattukal Showcase (4×4)</string>
     <string name="widget_showcase_desc">Expanded hero card with full artwork banner and branded header</string>
-    <string name="widget_slim_name">Echo Pill (4×1)</string>
+    <string name="widget_slim_name">Paattukal Pill (4×1)</string>
     <string name="widget_slim_desc">Ultra-compact horizontal strip with live playback progress</string>
-    <string name="widget_vinyl_name">Echo Vinyl Disc (Square)</string>
+    <string name="widget_vinyl_name">Paattukal Vinyl Disc (Square)</string>
     <string name="widget_vinyl_desc">Realistic spinning vinyl turntable with tonearm and frosted dark glass</string>
-    <string name="widget_aurora_name">Echo Aurora Studio (4×2)</string>
+    <string name="widget_aurora_name">Paattukal Aurora Studio (4×2)</string>
     <string name="widget_aurora_desc">Aurora glassmorphism card with synchronized lyrics, device switcher, and glowing controls</string>
-    <string name="widget_vintage_name">Echo Vintage Turntable (4×2)</string>
+    <string name="widget_vintage_name">Paattukal Vintage Turntable (4×2)</string>
     <string name="widget_vintage_desc">Warm parchment retro turntable with spinning vinyl disc and chocolate accents</string>
-    <string name="widget_adaptive_name">Echo Adaptive Player</string>
+    <string name="widget_adaptive_name">Paattukal Adaptive Player</string>
     <string name="widget_adaptive_desc">Adaptive 2-in-1 player that expands to show upcoming songs queue</string>
     <string name="widget_queue_empty">No upcoming songs</string>
 
     <string name="playback_progress">Playback progress</string>
     <string name="widget_playing_on">Playing on</string>
     <string name="widget_this_phone">This Phone</string>
-    <string name="widget_echo_music">Echo Music</string>
+    <string name="widget_echo_music">Paattukal</string>
     <string name="widget_queue">Queue</string>
     <string name="widget_cast">Cast</string>
     <string name="widget_options">More options</string>
@@ -744,7 +744,7 @@
     <string name="ai_lyrics_translation">AI Hub</string>
     <string name="contribute_to_lossless">Contribute to Lossless Music</string>
     <string name="lossless_music_hub">Lossless Music Hub</string>
-    <string name="lossless_desc">Add high-fidelity lossless .flac audio to the Echo Music ecosystem. Max file size: 99MB.</string>
+    <string name="lossless_desc">Add high-fidelity lossless .flac audio to the Paattukal ecosystem. Max file size: 99MB.</string>
     <string name="login_with_github">Log in with GitHub</string>
     <string name="lossless_audio_file">Lossless Audio File</string>
     <string name="choose_file">Choose .flac file (Max 99MB)</string>
@@ -804,7 +804,7 @@
     <string name="crash_share_logs">Share Logs</string>
     <string name="copy_logs">Copy Logs</string>
     <string name="crash_share_title">Share crash report</string>
-    <string name="crash_report_subject">echomusic Crash Report</string>
+    <string name="crash_report_subject">Paattukal Crash Report</string>
     <string name="crash_close">Close</string>
     <string name="crash_no_log">No crash log available</string>
 
@@ -856,7 +856,7 @@
     <string name="delete_from_history">Delete from history</string>
     <string name="re_listen">Re-listen</string>
     <string name="hold_to_recognize">Hold search icon to recognize music</string>
-    <string name="play_on_app">Play on Echo Music</string>
+    <string name="play_on_app">Play on Paattukal</string>
     <string name="recognized_track">Recognized Track</string>
 
     <!-- CSV Import Strings -->
@@ -895,9 +895,9 @@
     <string name="discord_rpc_preview">Rich Presence Preview</string>
     <string name="discord_presence">Presence</string>
     <string name="discord_connect_description">Sign in with Discord to share what you\'re listening to</string>
-    <string name="discord_playing_echomusic">Playing echomusic</string>
-    <string name="discord_watching_echomusic">Watching echomusic</string>
-    <string name="discord_competing_echomusic">Competing in echomusic</string>
+    <string name="discord_playing_echomusic">Playing Paattukal</string>
+    <string name="discord_watching_echomusic">Watching Paattukal</string>
+    <string name="discord_competing_echomusic">Competing in Paattukal</string>
     <string name="discord_activity_name">Activity name</string>
     <string name="discord_activity_name_description">Custom name for the activity (leave empty for default)</string>
     <string name="discord_advanced_mode">Advanced mode</string>
@@ -957,7 +957,7 @@
 
     <string name="perm_required">Required</string>
     <string name="perm_permissions">Permissions</string>
-    <string name="perm_intro_text">These permissions are required for echomusic to function correctly. Please grant them to proceed.</string>
+    <string name="perm_intro_text">These permissions are required for Paattukal to function correctly. Please grant them to proceed.</string>
 
     <string name="perm_notif_title">Notifications</string>
     <string name="perm_notif_desc">Know immediately when your music is playing and control it from the notification bar.</string>
@@ -967,7 +967,7 @@
 
     <string name="feat_discover">Discover</string>
     <string name="feat_features">Features</string>
-    <string name="feat_intro">Explore everything echomusic has to offer for your music journey.</string>
+    <string name="feat_intro">Explore everything Paattukal has to offer for your music journey.</string>
 
     <string name="feat_lyrics_title">Smart Lyrics</string>
     <string name="feat_lyrics_desc">Enjoy synchronized, word-by-word lyrics for millions of songs.</string>
@@ -991,7 +991,7 @@
     <string name="welcome_update_status">Updated</string>
     <string name="welcome_update_intro">Ensuring you have the latest features and security improvements.</string>
     <string name="welcome_checking_updates">Checking for updates…</string>
-    <string name="welcome_up_to_date">echomusic is up to date!</string>
+    <string name="welcome_up_to_date">Paattukal is up to date!</string>
     <string name="welcome_update_available">New version is available: %s</string>
     <string name="welcome_everything_ready">Everything is now up to date</string>
     <string name="commits_title">Commits</string>
@@ -1054,7 +1054,7 @@
     <string name="local_songs_empty_desc">Open settings from the top bar and run a device scan to find offline audio on this device.</string>
     <string name="local_songs_no_matches_desc">Try a different song, artist, or album name.</string>
     <!-- Music Recognizer Widget strings -->
-    <string name="widget_recognizer_name">Echo Recognizer (1×1)</string>
+    <string name="widget_recognizer_name">Paattukal Recognizer (1×1)</string>
     <string name="widget_recognizer_description">Identify songs playing around you directly from your home screen</string>
     <string name="widget_recognizer_tap_to_search">Tap to identify a song</string>
     <string name="widget_recognizer_listening">Listening…</string>
@@ -1068,7 +1068,7 @@
     <string name="widget_recognizer_channel_name">Music Recognition</string>
     <string name="widget_recognizer_channel_desc">Shows a notification while identifying a song from the widget</string>
     <string name="widget_recognizer_notification_text">Recording audio to identify the song…</string>
-    <string name="widget_playlists">Echo Playlists (4×2)</string>
+    <string name="widget_playlists">Paattukal Playlists (4×2)</string>
     <string name="widget_playlists_description">Playlist shortcuts with mini-player controls</string>
 
     <string name="choose_something_below">Choose something below</string>
