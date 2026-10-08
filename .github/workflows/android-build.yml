@@ -38,6 +38,14 @@ jobs:
           chmod +x gradlew
           ./gradlew :core:testDebugUnitTest :app:testUniversalFossDebugUnitTest
 
+      - name: Prepare Debug Keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair               -keystore "$HOME/.android/debug.keystore"               -storepass android               -alias androiddebugkey               -keypass android               -dname "CN=Android Debug,O=Android,C=US"               -keyalg RSA               -validity 10000
+          fi
+
       - name: Build validation APK
         run: |
           chmod +x gradlew
