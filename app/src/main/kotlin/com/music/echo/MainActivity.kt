@@ -1099,7 +1099,7 @@ class MainActivity : ComponentActivity() {
 
         val currentTitle =
           when (navBackStackEntry?.destination?.route) {
-            Screens.Home.route -> "Paattukal"
+            Screens.Home.route -> ""
             Screens.Search.route -> stringResource(R.string.search)
             Screens.Library.route -> stringResource(R.string.filter_library)
             Screens.ListenTogether.route -> stringResource(R.string.together)
@@ -1229,14 +1229,16 @@ class MainActivity : ComponentActivity() {
                 Row {
                   TopAppBar(
                     title = {
-                      Text(
-                        text = currentTitle,
-                        style =
-                          MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
-                          ),
-                      )
+                      if (currentTitle.isNotEmpty()) {
+                        Text(
+                          text = currentTitle,
+                          style =
+                            MaterialTheme.typography.titleLarge.copy(
+                              fontWeight = FontWeight.Bold,
+                              fontSize = 24.sp
+                            ),
+                        )
+                      }
                     },
                     actions = {
                       if (showHistoryButton) {
