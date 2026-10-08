@@ -4,25 +4,9 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,58 +24,31 @@ fun Material3SettingsGroup(
   scrollState: ScrollState? = null,
   items: List<Material3SettingsItem>
 ) {
-  Column(modifier = Modifier.fillMaxWidth()) {
+  Column(Modifier.fillMaxWidth()) {
     title?.let {
       Text(
         text = it.uppercase(),
-        style =
-          MaterialTheme.typography.labelLarge.copy(
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-          ),
+        style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier =
-          Modifier.padding(
-            bottom = if (compact) 4.dp else 8.dp,
-            top = if (compact) 4.dp else 8.dp,
-            start = 8.dp
-          )
+        modifier = Modifier.padding(bottom = if (compact) 4.dp else 8.dp, top = if (compact) 4.dp else 8.dp, start = 8.dp)
       )
     }
 
-    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-      items.forEachIndexed { index, item ->
-        val shape =
-          when {
-            items.size == 1 -> RoundedCornerShape(24.dp)
-            index == 0 ->
-              RoundedCornerShape(
-                topStart = 24.dp,
-                topEnd = 24.dp,
-                bottomStart = 4.dp,
-                bottomEnd = 4.dp
-              )
-            index == items.size - 1 ->
-              RoundedCornerShape(
-                topStart = 4.dp,
-                topEnd = 4.dp,
-                bottomStart = 24.dp,
-                bottomEnd = 24.dp
-              )
-            else -> RoundedCornerShape(4.dp)
-          }
-
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+      items.forEach { item ->
         Card(
           modifier = Modifier.fillMaxWidth().animateContentSize(),
-          shape = shape,
-          colors =
-            CardDefaults.cardColors(
-              containerColor =
-                if (item.isHighlighted) MaterialTheme.colorScheme.surfaceVariant
-                else MaterialTheme.colorScheme.surfaceContainerHigh
-            ),
-          elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+          shape = RoundedCornerShape(if (compact) 20.dp else 26.dp),
+          colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.76f)
+          ),
+          border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.28f)
+          ),
+          elevation = CardDefaults.cardElevation(defaultElevation = 1.dp, pressedElevation = 4.dp)
         ) {
-          Material3SettingsItemRow(item = item, compact = compact, scrollState = scrollState)
+          Material3SettingsItemRow(item, compact, scrollState)
         }
       }
     }
@@ -99,121 +56,45 @@ fun Material3SettingsGroup(
 }
 
 @Composable
-private fun Material3SettingsItemRow(
-  item: Material3SettingsItem,
-  compact: Boolean = false,
-  scrollState: ScrollState? = null
-) {
+private fun Material3SettingsItemRow(item: Material3SettingsItem, compact: Boolean = false, scrollState: ScrollState? = null) {
   Row(
-    modifier =
-      Modifier.fillMaxWidth()
-        .clickable(
-          enabled = item.enabled && item.onClick != null,
-          onClick = { item.onClick?.invoke() }
-        )
-        .then(
-          if (scrollState != null) Modifier.scrollToOnHighlight(scrollState, item.isHighlighted)
-          else Modifier
-        )
-        .padding(
-          horizontal = if (compact) 14.dp else 20.dp,
-          vertical = if (compact) 10.dp else 16.dp
-        ),
+    modifier = Modifier.fillMaxWidth()
+      .clickable(enabled = item.enabled && item.onClick != null) { item.onClick?.invoke() }
+      .then(if (scrollState != null) Modifier.scrollToOnHighlight(scrollState, item.isHighlighted) else Modifier)
+      .padding(horizontal = if (compact) 14.dp else 20.dp, vertical = if (compact) 10.dp else 16.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
     if (item.customIcon != null) {
-      Box(
-        modifier =
-          Modifier.size(if (compact) 34.dp else 40.dp)
-            .clip(item.iconShape ?: RoundedCornerShape(12.dp)),
-        contentAlignment = Alignment.Center
-      ) {
-        item.customIcon.invoke()
+      Box(Modifier.size(if (compact) 34.dp else 40.dp).clip(item.iconShape ?: RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) { item.customIcon.invoke() }
+      Spacer(Modifier.width(if (compact) 14.dp else 20.dp))
+    } else item.icon?.let { icon ->
+      Box(Modifier.size(if (compact) 34.dp else 40.dp).clip(item.iconShape ?: RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
+        if (item.showBadge) {
+          BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.error) }) { SettingIcon(item, icon, compact) }
+        } else SettingIcon(item, icon, compact)
       }
-      Spacer(modifier = Modifier.width(if (compact) 14.dp else 20.dp))
-    } else
-      item.icon?.let { icon ->
-        Box(
-          modifier =
-            Modifier.size(if (compact) 34.dp else 40.dp)
-              .clip(item.iconShape ?: RoundedCornerShape(12.dp)),
-          contentAlignment = Alignment.Center
-        ) {
-          if (item.showBadge) {
-            BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.error) }) {
-              if (item.tintIcon) {
-                Icon(
-                  painter = icon,
-                  contentDescription = null,
-                  tint =
-                    if (!item.enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                    else if (item.isHighlighted) MaterialTheme.colorScheme.onSurface
-                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                  modifier = Modifier.size(if (compact) 20.dp else 24.dp)
-                )
-              } else {
-                Image(
-                  painter = icon,
-                  contentDescription = null,
-                  modifier = Modifier.size(if (compact) 34.dp else 40.dp),
-                  contentScale = ContentScale.Crop
-                )
-              }
-            }
-          } else {
-            if (item.tintIcon) {
-              Icon(
-                painter = icon,
-                contentDescription = null,
-                tint =
-                  if (!item.enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                  else if (item.isHighlighted) MaterialTheme.colorScheme.onSurface
-                  else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                modifier = Modifier.size(if (compact) 20.dp else 24.dp)
-              )
-            } else {
-              Image(
-                painter = icon,
-                contentDescription = null,
-                modifier = Modifier.size(if (compact) 34.dp else 40.dp),
-                contentScale = ContentScale.Crop
-              )
-            }
-          }
-        }
-
-        Spacer(modifier = Modifier.width(if (compact) 12.dp else 16.dp))
-      }
-
-    Column(modifier = Modifier.weight(1f)) {
-      ProvideTextStyle(
-        MaterialTheme.typography.titleMedium.copy(
-          color =
-            if (!item.enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-            else MaterialTheme.colorScheme.onSurface
-        )
-      ) {
-        item.title()
-      }
-
-      item.description?.let { desc ->
-        Spacer(modifier = Modifier.height(2.dp))
-        ProvideTextStyle(
-          MaterialTheme.typography.bodyMedium.copy(
-            color =
-              if (!item.enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-              else MaterialTheme.colorScheme.onSurfaceVariant
-          )
-        ) {
-          desc()
-        }
-      }
+      Spacer(Modifier.width(if (compact) 12.dp else 16.dp))
     }
 
-    item.trailingContent?.let { trailing ->
-      Spacer(modifier = Modifier.width(8.dp))
-      trailing()
+    Column(Modifier.weight(1f)) {
+      ProvideTextStyle(MaterialTheme.typography.titleMedium.copy(color = if (!item.enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurface)) { item.title() }
+      item.description?.let {
+        Spacer(Modifier.height(2.dp))
+        ProvideTextStyle(MaterialTheme.typography.bodyMedium.copy(color = if (!item.enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurfaceVariant)) { it() }
+      }
     }
+    item.trailingContent?.let { Spacer(Modifier.width(8.dp)); it() }
+  }
+}
+
+@Composable
+private fun SettingIcon(item: Material3SettingsItem, icon: Painter, compact: Boolean) {
+  if (item.tintIcon) {
+    Icon(painter = icon, contentDescription = null,
+      tint = if (!item.enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) else if (item.isHighlighted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+      modifier = Modifier.size(if (compact) 20.dp else 24.dp))
+  } else {
+    Image(painter = icon, contentDescription = null, modifier = Modifier.size(if (compact) 34.dp else 40.dp), contentScale = ContentScale.Crop)
   }
 }
 
