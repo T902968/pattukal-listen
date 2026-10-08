@@ -31,6 +31,19 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;28.2.13676358" || true
 
+      - name: Prepare Debug Keystore
+        run: |
+          mkdir -p "$HOME/.android"
+
+          keytool -genkeypair \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA \
+            -validity 10000
+
       - name: Build Debug APK
         run: |
           chmod +x gradlew
