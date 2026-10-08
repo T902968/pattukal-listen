@@ -1,8 +1,99 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090812"><meta name="description" content="Paattukal — a modern Android music experience."><title>Paattukal — Listen your way</title>
-<style>:root{color-scheme:dark;--bg:#07070c;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.12);--text:#f7f4ff;--muted:#aaa5b7;--accent:#a78bfa}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 50% 0,#2b165f 0,transparent 35%),var(--bg);color:var(--text);min-height:100vh}main{max-width:980px;margin:auto;padding:28px 20px 70px}.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 0 60px}.brand{font-weight:800;letter-spacing:.04em}.nav a{color:var(--muted);text-decoration:none;margin-left:18px}.hero{text-align:center;padding:50px 0 70px}.logo{width:92px;height:92px;margin:auto;border-radius:28px;display:grid;place-items:center;background:linear-gradient(145deg,#c4b5fd,#6d28d9);box-shadow:0 25px 70px #7c3aed55;font-size:42px}.hero h1{font-size:clamp(44px,10vw,82px);margin:28px 0 10px;letter-spacing:-.06em}.hero p{max-width:600px;margin:0 auto 28px;color:var(--muted);font-size:18px;line-height:1.6}.buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.btn{padding:14px 22px;border-radius:16px;text-decoration:none;font-weight:700;border:1px solid var(--line);color:var(--text);background:var(--card)}.primary{background:linear-gradient(135deg,#a78bfa,#7c3aed);border:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{padding:24px;border:1px solid var(--line);border-radius:24px;background:var(--card);backdrop-filter:blur(14px)}.card h3{margin-top:0}.card p{color:var(--muted);line-height:1.6}.section{margin-top:50px}.section h2{text-align:center;font-size:30px}.credits{text-align:center;color:var(--muted);margin-top:60px;line-height:1.8}.credits strong{color:var(--text)}</style></head>
-<body><main><nav class="nav"><div class="brand">🎵 PAATTUKAL</div><a href="https://github.com/T902968/pattukal-listen">GitHub</a></nav>
-<section class="hero"><div class="logo">♪</div><h1>Paattukal</h1><p>A premium, modern Android music experience with liquid-glass depth, ambient album lighting and a focus on your music.</p><div class="buttons"><a class="btn primary" href="https://github.com/T902968/pattukal-listen/releases/latest">Download APK</a><a class="btn" href="https://github.com/T902968/pattukal-listen">View Source</a></div></section>
-<section class="section"><h2>Made for listening</h2><div class="grid"><div class="card"><h3>Home</h3><p>Albums, playlists and music discovery in a fresh visual experience.</p></div><div class="card"><h3>Library</h3><p>Songs, albums, artists, playlists and local music in one place.</p></div><div class="card"><h3>Now Playing</h3><p>Artwork-focused player with ambient lighting and modern controls.</p></div><div class="card"><h3>Liquid Glass</h3><p>Depth-inspired surfaces and lightweight motion without heavy blur.</p></div></div></section>
-<section class="section"><h2>Download</h2><div class="card" style="text-align:center"><h3>Latest Paattukal APK</h3><p>Download the newest published Android build from GitHub Releases.</p><a class="btn primary" href="https://github.com/T902968/pattukal-listen/releases/latest">Get Paattukal</a></div></section>
-<div class="credits"><strong>AKSHAY'S UI</strong> · Graphic Design by Vyomakesh<br>Music engine foundation inspired by Echo Music by Aditya Yadav<br><small>GPL-3.0 open-source project</small></div></main></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07060d">
+<meta name="description" content="Paattukal — a premium Android music experience.">
+<title>Paattukal — Music, reimagined</title>
+<style>
+:root{--bg:#07060d;--text:#faf8ff;--muted:#aaa5ba;--purple:#9b6cff;--cyan:#67e8f9;--glass:rgba(255,255,255,.065);--line:rgba(255,255,255,.13)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#07060d;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:-30%;z-index:-3;background:radial-gradient(circle at 20% 20%,#7c3aed55,transparent 25%),radial-gradient(circle at 80% 35%,#06b6d455,transparent 22%),radial-gradient(circle at 50% 90%,#a855f755,transparent 28%);filter:blur(35px);animation:aurora 14s ease-in-out infinite alternate}
+body:after{content:"";position:fixed;inset:0;z-index:-2;background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.025) 50%,transparent 80%);background-size:200% 100%;animation:shine 9s linear infinite;pointer-events:none}
+@keyframes aurora{to{transform:translate3d(4%, -3%,0) scale(1.08) rotate(3deg)}}@keyframes shine{to{background-position:-200% 0}}
+main{max-width:1180px;margin:auto;padding:22px 22px 80px}
+.nav{position:sticky;top:14px;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-bottom:35px;border:1px solid var(--line);border-radius:22px;background:rgba(12,10,20,.58);backdrop-filter:blur(18px);box-shadow:0 18px 60px #0005}
+.brand{font-weight:900;letter-spacing:.08em}.navlinks{display:flex;gap:20px}.nav a{color:#d9d3e7;text-decoration:none;font-size:14px}.nav a:hover{color:white}
+.hero{text-align:center;min-height:78vh;display:grid;place-items:center;padding:45px 0 80px;position:relative}
+.hero-inner{width:100%}
+.logo-wrap{width:132px;height:132px;margin:auto;position:relative;animation:float 5s ease-in-out infinite}
+.logo-wrap:before{content:"";position:absolute;inset:-45px;border-radius:50%;background:radial-gradient(circle,#9b6cff66,transparent 65%);filter:blur(10px);animation:pulse 3s ease-in-out infinite}
+.logo{width:132px;height:132px;border-radius:38px;display:grid;place-items:center;position:relative;background:linear-gradient(145deg,#d8ccff 0%,#8b5cf6 45%,#4c1d95 100%);box-shadow:inset 1px 1px 2px #fff9,0 35px 90px #7c3aed66;transform:perspective(500px) rotateX(8deg) rotateY(-8deg)}
+.logo:after{content:"♪";font-size:66px;font-weight:900;text-shadow:0 8px 20px #2e1065aa}
+@keyframes float{50%{transform:translateY(-12px)}}@keyframes pulse{50%{transform:scale(1.18);opacity:.65}}
+h1{font-size:clamp(58px,12vw,132px);line-height:.86;letter-spacing:-.075em;margin:42px 0 24px;background:linear-gradient(110deg,#fff 20%,#c4b5fd 48%,#67e8f9 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:700px;margin:0 auto 34px;color:var(--muted);font-size:clamp(17px,2vw,21px);line-height:1.7}
+.buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 26px;border-radius:18px;text-decoration:none;color:white;font-weight:800;border:1px solid var(--line);background:var(--glass);transition:.35s transform,.35s box-shadow,.35s border-color}
+.btn:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-120%);transition:.6s}.btn:hover:before{transform:translateX(120%)}.btn:hover{transform:translateY(-4px);border-color:#fff3;box-shadow:0 18px 45px #0006}
+.primary{background:linear-gradient(135deg,#a78bfa,#7c3aed 55%,#5b21b6);border-color:#c4b5fd66;box-shadow:0 14px 45px #7c3aed55}
+.download-icon{font-size:20px}
+.section{padding:90px 0}.section-title{text-align:center;font-size:clamp(32px,5vw,54px);letter-spacing:-.05em;margin:0 0 12px}.section-sub{text-align:center;color:var(--muted);margin:0 auto 42px;max-width:620px;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{position:relative;overflow:hidden;min-height:210px;padding:28px;border:1px solid var(--line);border-radius:30px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.035));backdrop-filter:blur(18px);box-shadow:inset 0 1px #fff1,0 25px 80px #0005;transition:.45s transform,.45s border-color}
+.card:before{content:"";position:absolute;width:160px;height:160px;right:-70px;top:-70px;border-radius:50%;background:radial-gradient(circle,#a78bfa55,transparent 70%);transition:.45s}.card:hover{transform:translateY(-9px) rotateX(2deg);border-color:#fff3}.card:hover:before{transform:scale(1.5)}
+.card .num{font-size:13px;color:#a78bfa;font-weight:800;letter-spacing:.12em}.card h3{font-size:24px;margin:34px 0 10px}.card p{color:var(--muted);line-height:1.65;margin:0}
+.download-box{position:relative;text-align:center;padding:70px 25px;border-radius:38px;overflow:hidden;border:1px solid #ffffff20;background:linear-gradient(135deg,#1b1234cc,#0d1424cc);box-shadow:0 30px 100px #0007}
+.download-box:before{content:"";position:absolute;width:420px;height:420px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#8b5cf633,transparent 65%);animation:pulse 5s ease-in-out infinite}
+.download-box>*{position:relative}.download-box h2{font-size:clamp(34px,6vw,68px);letter-spacing:-.06em;margin:0 0 14px}.download-box p{color:var(--muted);margin:0 auto 28px;line-height:1.6}
+.badge{display:inline-block;margin-top:18px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);color:#c9c2d6;background:#fff1;font-size:12px}
+.credits{text-align:center;color:#827b91;padding:70px 0 10px;line-height:1.9;font-size:14px}.credits strong{color:#e9e3f2}
+.reveal{opacity:0;transform:translateY(35px);transition:opacity .8s ease,transform .8s ease}.reveal.show{opacity:1;transform:none}
+@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.navlinks{gap:10px}.nav{border-radius:18px}}
+@media(max-width:520px){main{padding:14px 14px 50px}.grid{grid-template-columns:1fr}.nav{top:8px}.navlinks a:first-child{display:none}.hero{min-height:72vh}.logo,.logo-wrap{width:108px;height:108px}.logo:after{font-size:54px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<nav class="nav">
+<div class="brand">♪ PAATTUKAL</div>
+<div class="navlinks"><a href="#features">Features</a><a href="#download">Download</a><a href="https://github.com/T902968/pattukal-listen">GitHub</a></div>
+</nav>
+
+<section class="hero">
+<div class="hero-inner">
+<div class="logo-wrap"><div class="logo"></div></div>
+<h1>Paattukal</h1>
+<p>Music that feels alive. A premium Android music experience with liquid-glass depth, ambient artwork lighting and smooth motion.</p>
+<div class="buttons">
+<a class="btn primary" href="https://github.com/T902968/pattukal-listen/releases/latest/download/pattukal.apk"><span class="download-icon">↓</span> Download APK</a>
+<a class="btn" href="#features">Explore Paattukal</a>
+</div>
+<div class="badge">LATEST ANDROID BUILD · APK</div>
+</div>
+</section>
+
+<section id="features" class="section reveal">
+<h2 class="section-title">Built around your music.</h2>
+<p class="section-sub">A focused interface designed to make albums, playlists and listening feel effortless.</p>
+<div class="grid">
+<div class="card"><span class="num">01 · HOME</span><h3>Discover</h3><p>Albums and playlists arranged with depth instead of clutter.</p></div>
+<div class="card"><span class="num">02 · LIBRARY</span><h3>Your Library</h3><p>Songs, albums, artists and playlists in one clean space.</p></div>
+<div class="card"><span class="num">03 · PLAYER</span><h3>Now Playing</h3><p>Artwork-led controls with ambient lighting and premium motion.</p></div>
+<div class="card"><span class="num">04 · APPEARANCE</span><h3>Your Look</h3><p>Modern themes, glass surfaces and visual customization.</p></div>
+</div>
+</section>
+
+<section id="download" class="section reveal">
+<div class="download-box">
+<h2>Ready to listen?</h2>
+<p>Get the latest Paattukal APK directly. No Actions page. No extra download step.</p>
+<a class="btn primary" href="https://github.com/T902968/pattukal-listen/releases/latest/download/pattukal.apk"><span class="download-icon">↓</span> Download Paattukal APK</a>
+</div>
+</section>
+
+<footer class="credits">
+<strong>AKSHAY'S UI</strong> · Graphic Design by Vyomakesh<br>
+Music engine foundation inspired by Echo Music by Aditya Yadav<br>
+<small>GPL-3.0 open-source project</small>
+</footer>
+</main>
+<script>
+const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
