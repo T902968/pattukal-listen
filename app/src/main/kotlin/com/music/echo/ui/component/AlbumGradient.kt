@@ -35,7 +35,7 @@ fun AlbumGradient(thumbnailUrl: String?, modifier: Modifier = Modifier) {
     if (thumbnailUrl == null) return@LaunchedEffect
     withContext(Dispatchers.IO) {
       try {
-        val request = ImageRequest.Builder(context).data(thumbnailUrl).size(96, 96).allowHardware(false).build()
+        val request = ImageRequest.Builder(context).data(thumbnailUrl).size(96, 96).build()
         val bitmap = context.imageLoader.execute(request).image?.toBitmap()
         if (bitmap != null) {
           val palette = withContext(Dispatchers.Default) {
