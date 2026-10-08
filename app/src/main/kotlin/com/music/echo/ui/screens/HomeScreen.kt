@@ -1641,18 +1641,18 @@ fun HomeScreen(
                     contentPadding =
                       WindowInsets.systemBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
                     modifier = Modifier.animateItem()
-                  ) {
-items(
-    items = recommendation.items.distinctBy { it.id },
-    key = { it.id }
-) { item ->
-    ytGridItem(item)
-}
-}
-}
-}
-}
-is HomeSection.HomePageSection -> {
+                                    ) {
+                    items(
+                      items = recommendation.items.distinctBy { it.id },
+                      key = { it.id }
+                    ) { item ->
+                      ytGridItem(item)
+                    }
+                  }
+                }
+              }
+            }
+            is HomeSection.HomePageSection -> {
               val sectionData = homePage?.sections?.getOrNull(section.index)
               sectionData?.let {
                 val sectionSongs = sectionData.items.filterIsInstance<SongItem>()
@@ -1660,8 +1660,7 @@ is HomeSection.HomePageSection -> {
 
                 val isSongsOnlySection =
                   sectionData.items.isNotEmpty() &&
-                    sectionData.items.all { it is SongItem }
-
+                    sectionData.items.all { it is SongItem }               
                 item(key = "home_section_title_${section.index}") {
                   NavigationTitle(
                     title = sectionData.title,
