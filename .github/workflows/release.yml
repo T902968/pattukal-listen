@@ -84,7 +84,9 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleUniversalFossDebug
-          cp app/build/outputs/apk/universalFossDebug/*.apk pattukal.apk
+          APK_PATH=$(find app/build/outputs/apk -type f -name '*.apk' | head -n 1)
+          test -n "$APK_PATH"
+          cp "$APK_PATH" pattukal.apk
 
       - name: Publish latest downloadable APK
         if: github.ref == 'refs/heads/main'
