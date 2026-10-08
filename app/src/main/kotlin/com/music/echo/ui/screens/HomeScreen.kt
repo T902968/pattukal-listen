@@ -1,6 +1,5 @@
 package com.music.echo.ui.screens
 
-import com.music.echo.ui.component.PattukalAmbientGlow
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -1211,19 +1210,6 @@ fun HomeScreen(
                       Box(
     modifier =
         Modifier.fillMaxSize()
-            .maskClip(MaterialTheme.shapes.extraLarge)
-            .maskBorder(
-                BorderStroke(
-                    1.dp,
-                    MaterialTheme.colorScheme.outlineVariant
-                ),
-                MaterialTheme.shapes.extraLarge
-            )
-            .shadow(
-                elevation = 12.dp,
-                shape = MaterialTheme.shapes.extraLarge,
-                clip = false
-            )
             .focusable()
             .combinedClickable(
                 onClick = {
