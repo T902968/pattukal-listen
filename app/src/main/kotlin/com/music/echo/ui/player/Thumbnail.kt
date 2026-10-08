@@ -2,6 +2,7 @@ package echo.music.iad1tya.ui.player
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -49,6 +50,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -856,8 +859,46 @@ private fun ThumbnailImage(
   cropArtwork: Boolean,
   modifier: Modifier = Modifier
 ) {
+  val glowTransition = rememberInfiniteTransition(label = "artwork_ambient")
+  val glowScale by
+    glowTransition.animateFloat(
+      initialValue = 1.02f,
+      targetValue = 1.08f,
+      animationSpec =
+        infiniteRepeatable(
+          animation = tween(2200, easing = LinearEasing),
+          repeatMode = RepeatMode.Reverse,
+        ),
+      label = "artwork_ambient_scale",
+    )
+
   Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) {
     var currentUrl by remember(artworkUri) { mutableStateOf(artworkUri) }
+    // Lightweight album-art ambient light: the artwork is reused behind the card,
+    // softly enlarged and faded instead of applying heavy blur to the main image.
+    if (!currentUrl.isNullOrBlank()) {
+      AsyncImage(
+        model =
+          ImageRequest.Builder(LocalContext.current)
+            .data(currentUrl)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .networkCachePolicy(CachePolicy.ENABLED)
+            .build(),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier =
+          Modifier
+            .fillMaxSize()
+            .graphicsLayer {
+              scaleX = glowScale
+              scaleY = glowScale
+            }
+            .alpha(0.24f)
+            .blur(16.dp),
+      )
+    }
+
     AsyncImage(
       model =
         ImageRequest.Builder(LocalContext.current)
