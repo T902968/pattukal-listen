@@ -2,9 +2,14 @@
 package echo.music.iad1tya.ui.player
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -34,6 +39,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -122,6 +129,19 @@ fun FloatingMiniPlayer(
     mediaMetadata?.thumbnailUrl?.takeIf { it.isNotBlank() }
       ?: currentItem?.mediaMetadata?.artworkUri?.toString()
       ?: currentItem?.mediaMetadata?.extras?.getString("artwork_uri")
+
+  val glowTransition = rememberInfiniteTransition(label = "mini_player_ambient")
+  val glowScale by
+    glowTransition.animateFloat(
+      initialValue = 1f,
+      targetValue = 1.12f,
+      animationSpec =
+        infiniteRepeatable(
+          animation = tween(1900, easing = LinearEasing),
+          repeatMode = RepeatMode.Reverse,
+        ),
+      label = "mini_player_ambient_scale",
+    )
 
   val effectiveContentColor =
     if (contentColor.isSpecified && contentColor != Color.Transparent) {
@@ -228,18 +248,40 @@ fun FloatingMiniPlayer(
             vertical = if (isInline) 4.dp else 8.dp,
           ),
     ) {
-      AsyncImage(
-        model = resolvedArtwork,
-        placeholder = painterResource(R.drawable.music_note),
-        error = painterResource(R.drawable.music_note),
-        fallback = painterResource(R.drawable.music_note),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier =
-          Modifier.size(artSize)
-            .clip(RoundedCornerShape(artCornerRadius))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-      )
+      Box(
+        modifier = Modifier.size(artSize),
+        contentAlignment = Alignment.Center,
+      ) {
+        if (!resolvedArtwork.isNullOrBlank()) {
+          AsyncImage(
+            model = resolvedArtwork,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier =
+              Modifier
+                .size(artSize)
+                .graphicsLayer {
+                  scaleX = glowScale
+                  scaleY = glowScale
+                }
+                .alpha(0.26f)
+                .blur(10.dp)
+                .clip(RoundedCornerShape(artCornerRadius)),
+          )
+        }
+        AsyncImage(
+          model = resolvedArtwork,
+          placeholder = painterResource(R.drawable.music_note),
+          error = painterResource(R.drawable.music_note),
+          fallback = painterResource(R.drawable.music_note),
+          contentDescription = null,
+          contentScale = ContentScale.Crop,
+          modifier =
+            Modifier.size(artSize)
+              .clip(RoundedCornerShape(artCornerRadius))
+              .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+        )
+      }
 
       Spacer(Modifier.width(if (isInline) 8.dp else 12.dp))
 
