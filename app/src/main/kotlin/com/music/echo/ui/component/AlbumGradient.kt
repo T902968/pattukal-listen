@@ -19,74 +19,55 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.palette.graphics.Palette
 import coil3.imageLoader
 import coil3.request.ImageRequest
-import coil3.request.allowHardware
 import coil3.toBitmap
 import echo.music.iad1tya.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun AlbumGradient(
-  thumbnailUrl: String?,
-  modifier: Modifier = Modifier,
-) {
+fun AlbumGradient(thumbnailUrl: String?, modifier: Modifier = Modifier) {
   val context = LocalContext.current
   val surfaceColor = MaterialTheme.colorScheme.surface
   val fallbackColorInt = MaterialTheme.colorScheme.primaryContainer.toArgb()
-
   var extractedColors by remember { mutableStateOf<List<Color>>(emptyList()) }
 
   LaunchedEffect(thumbnailUrl) {
-    if (thumbnailUrl != null) {
-      withContext(Dispatchers.IO) {
-        try {
-          val request =
-            ImageRequest.Builder(context)
-              .data(thumbnailUrl)
-              .size(100, 100)
-              .allowHardware(false)
-              .build()
-          val result = context.imageLoader.execute(request)
-          val bitmap = result.image?.toBitmap()
-
-          if (bitmap != null) {
-            val palette =
-              withContext(Dispatchers.Default) {
-                Palette.from(bitmap).maximumColorCount(8).resizeBitmapArea(100 * 100).generate()
-              }
-            val colors =
-              PlayerColorExtractor.extractGradientColors(
-                palette = palette,
-                fallbackColor = fallbackColorInt
-              )
-            extractedColors = colors
+    if (thumbnailUrl == null) return@LaunchedEffect
+    withContext(Dispatchers.IO) {
+      try {
+        val request = ImageRequest.Builder(context).data(thumbnailUrl).size(96, 96).allowHardware(false).build()
+        val bitmap = context.imageLoader.execute(request).image?.toBitmap()
+        if (bitmap != null) {
+          val palette = withContext(Dispatchers.Default) {
+            Palette.from(bitmap).maximumColorCount(6).resizeBitmapArea(96 * 96).generate()
           }
-        } catch (e: Exception) {
-          e.printStackTrace()
+          extractedColors = PlayerColorExtractor.extractGradientColors(palette, fallbackColorInt)
         }
-      }
+      } catch (_: Exception) {}
     }
   }
 
-  val color1 by
-    animateColorAsState(
-      targetValue = extractedColors.getOrNull(0)?.copy(alpha = 0.5f) ?: surfaceColor,
-      animationSpec = tween(durationMillis = 800),
-      label = "AlbumGradientColor1"
-    )
-  val color2 by
-    animateColorAsState(
-      targetValue = extractedColors.getOrNull(1)?.copy(alpha = 0.3f) ?: surfaceColor,
-      animationSpec = tween(durationMillis = 800),
-      label = "AlbumGradientColor2"
-    )
+  val color1 by animateColorAsState(
+    extractedColors.getOrNull(0) ?: MaterialTheme.colorScheme.primary,
+    tween(700),
+    label = "ambientColor1"
+  )
+  val color2 by animateColorAsState(
+    extractedColors.getOrNull(1) ?: MaterialTheme.colorScheme.secondary,
+    tween(700),
+    label = "ambientColor2"
+  )
 
   Box(
-    modifier =
-      modifier.background(
-        Brush.verticalGradient(
-          colorStops = arrayOf(0.0f to color1, 0.5f to color2, 1.0f to surfaceColor)
+    modifier = modifier.background(
+      Brush.radialGradient(
+        colors = listOf(
+          color1.copy(alpha = 0.34f),
+          color2.copy(alpha = 0.18f),
+          surfaceColor.copy(alpha = 0.94f),
+          surfaceColor
         )
       )
+    )
   )
 }
