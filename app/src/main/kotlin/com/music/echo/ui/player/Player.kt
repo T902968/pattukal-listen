@@ -433,7 +433,7 @@ fun BottomSheetPlayer(
   val playerVolume by playerConnection.service.playerVolume.collectAsState()
 
   val (audioQuality) = rememberEnumPreference(AudioQualityKey, defaultValue = AudioQuality.OPUS)
-  val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
+  val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.WAVY)
   val squigglySlider by rememberPreference(SquigglySliderKey, defaultValue = false)
   val wavyPlayPause by rememberPreference(WavyPlayPauseKey, defaultValue = true)
 
