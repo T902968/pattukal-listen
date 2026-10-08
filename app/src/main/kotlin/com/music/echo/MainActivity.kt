@@ -197,7 +197,6 @@ import echo.music.iad1tya.ui.menu.YouTubeSongMenu
 import echo.music.iad1tya.ui.player.BottomSheetPlayer
 import echo.music.iad1tya.ui.screens.Screens
 import echo.music.iad1tya.ui.screens.SettingDialoge
-import echo.music.iad1tya.ui.screens.WelcomeDialog
 import echo.music.iad1tya.ui.screens.navigationBuilder
 import echo.music.iad1tya.ui.screens.settings.DarkMode
 import echo.music.iad1tya.ui.screens.settings.NavigationTab
@@ -1054,16 +1053,6 @@ class MainActivity : ComponentActivity() {
         val snackbarHostState = remember { SnackbarHostState() }
         var showSettingDialoge by remember { mutableStateOf(false) }
 
-        var showWelcomeDialog by remember { mutableStateOf(false) }
-
-        LaunchedEffect(Unit) {
-          val prefs = context.dataStore.data.first()
-          val lastOpened = prefs[echo.music.iad1tya.constants.LastOpenedVersionCodeKey] ?: -1
-          if (lastOpened < BuildConfig.VERSION_CODE) {
-            showWelcomeDialog = true
-          }
-        }
-
         LaunchedEffect(Unit) {
           val activeIntent = pendingIntent ?: intent
           if (activeIntent != null) {
@@ -1110,7 +1099,7 @@ class MainActivity : ComponentActivity() {
 
         val currentTitle =
           when (navBackStackEntry?.destination?.route) {
-            Screens.Home.route -> "Echo Music"
+            Screens.Home.route -> "Paattukal"
             Screens.Search.route -> stringResource(R.string.search)
             Screens.Library.route -> stringResource(R.string.filter_library)
             Screens.ListenTogether.route -> stringResource(R.string.together)
@@ -1726,19 +1715,6 @@ class MainActivity : ComponentActivity() {
             )
           }
 
-          if (showWelcomeDialog) {
-            WelcomeDialog(
-              onDismissRequest = {
-                showWelcomeDialog = false
-                coroutineScope.launch {
-                  context.dataStore.edit {
-                    it[echo.music.iad1tya.constants.LastOpenedVersionCodeKey] =
-                      BuildConfig.VERSION_CODE
-                  }
-                }
-              }
-            )
-          }
 
           var showPartyBomb by remember {
             val today = java.time.LocalDate.now()
