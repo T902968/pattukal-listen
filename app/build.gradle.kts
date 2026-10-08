@@ -33,7 +33,10 @@ android {
     applicationId = "echo.music.iad1tya"
     minSdk = 26
     targetSdk = 36
-    versionCode = 163
+    // Keep every CI release strictly newer so Android performs an in-place update.
+    // Local builds keep the existing baseline version code.
+    val ciRunNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0
+    versionCode = 163 + ciRunNumber
     versionName = "1.4.1"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
