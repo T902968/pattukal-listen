@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.border
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,6 +40,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.sp
 import echo.music.iad1tya.R
 import echo.music.iad1tya.ui.screens.Screens
@@ -237,14 +241,24 @@ fun AppNavigationBar(
   modifier: Modifier = Modifier,
   pureBlack: Boolean = false,
   slimNav: Boolean = false,
-  glassEnabled: Boolean = false,
+  glassEnabled: Boolean = true,
   onSearchLongClick: (() -> Unit)? = null
 ) {
-  val containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
+  val baseContainerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainerHigh
+  val containerColor = if (glassEnabled) baseContainerColor.copy(alpha = 0.88f) else baseContainerColor
   val contentColor = if (pureBlack) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
   val haptics = LocalHapticFeedback.current
   val viewConfiguration = LocalViewConfiguration.current
-  val navModifier = modifier
+  val navShape = RoundedCornerShape(28.dp)
+  val navModifier = if (glassEnabled) {
+    modifier
+      .padding(horizontal = 12.dp, vertical = 8.dp)
+      .shadow(12.dp, navShape)
+      .clip(navShape)
+      .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f), navShape)
+  } else {
+    modifier
+  }
 
   NavigationBar(
     modifier = navModifier,
