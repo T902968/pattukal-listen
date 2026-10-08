@@ -64,6 +64,10 @@ allprojects {
     configurations.all {
         resolutionStrategy {
             force("org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.20")
+            // Keep OkHttp on the API-36-compatible line. OkHttp 5.5.0 requires compileSdk 37.
+            force("com.squareup.okhttp3:okhttp:5.3.2")
+            force("com.squareup.okhttp3:okhttp-android:5.3.2")
+            force("com.squareup.okhttp3:okhttp-jvm:5.3.2")
         }
     }
 }
