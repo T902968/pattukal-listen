@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,6 +45,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.isSpecified
@@ -132,6 +134,30 @@ fun FloatingMiniPlayer(
       ?: currentItem?.mediaMetadata?.extras?.getString("artwork_uri")
 
   val glowTransition = rememberInfiniteTransition(label = "mini_player_ambient")
+  val wave1 by glowTransition.animateFloat(
+    initialValue = 0.35f,
+    targetValue = 1f,
+    animationSpec = infiniteRepeatable(tween(620, delayMillis = 0), RepeatMode.Reverse),
+    label = "wave_1",
+  )
+  val wave2 by glowTransition.animateFloat(
+    initialValue = 0.8f,
+    targetValue = 0.28f,
+    animationSpec = infiniteRepeatable(tween(710, delayMillis = 90), RepeatMode.Reverse),
+    label = "wave_2",
+  )
+  val wave3 by glowTransition.animateFloat(
+    initialValue = 0.45f,
+    targetValue = 0.95f,
+    animationSpec = infiniteRepeatable(tween(560, delayMillis = 160), RepeatMode.Reverse),
+    label = "wave_3",
+  )
+  val wave4 by glowTransition.animateFloat(
+    initialValue = 0.7f,
+    targetValue = 0.32f,
+    animationSpec = infiniteRepeatable(tween(760, delayMillis = 220), RepeatMode.Reverse),
+    label = "wave_4",
+  )
   val glowScale by
     glowTransition.animateFloat(
       initialValue = 1f,
@@ -247,7 +273,22 @@ fun FloatingMiniPlayer(
           .padding(
             horizontal = if (isInline) 8.dp else 12.dp,
             vertical = if (isInline) 4.dp else 8.dp,
-          ),
+          )
+          .drawBehind {
+            val corner = if (isInline) 14.dp.toPx() else 18.dp.toPx()
+            drawRoundRect(
+              brush =
+                Brush.horizontalGradient(
+                  listOf(
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.24f),
+                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.10f),
+                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f),
+                  )
+                ),
+              style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.2.dp.toPx()),
+              cornerRadius = androidx.compose.ui.geometry.CornerRadius(corner, corner),
+            )
+          },
     ) {
       Box(
         modifier = Modifier.size(artSize),
@@ -285,6 +326,33 @@ fun FloatingMiniPlayer(
       }
 
       Spacer(Modifier.width(if (isInline) 8.dp else 12.dp))
+
+      // Tiny live waveform: purely visual, driven by playback state.
+      if (isPlaying && !isInline) {
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(2.dp),
+          modifier = Modifier.padding(end = 9.dp),
+        ) {
+          listOf(wave1, wave2, wave3, wave4).forEach { level ->
+            Box(
+              modifier =
+                Modifier
+                  .width(2.dp)
+                  .height((7f + level * 11f).dp)
+                  .clip(RoundedCornerShape(3.dp))
+                  .background(
+                    Brush.verticalGradient(
+                      listOf(
+                        MaterialTheme.colorScheme.secondary,
+                        MaterialTheme.colorScheme.primary,
+                      )
+                    )
+                  ),
+            )
+          }
+        }
+      }
 
       if (isInline) {
         Text(
