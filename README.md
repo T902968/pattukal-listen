@@ -92,7 +92,9 @@ New Paattukal screenshots will be added here as the redesigned screens are compl
 
 ## ⚖️ Open Source & Attribution
 
-Paattukal is based on open-source work from the Echo Music project.
+Paattukal is based on open-source work from the **Echo Music** project. The existing music engine and playback foundation are derived from Echo Music, while the Paattukal interface and branding are being redesigned separately.
+
+Original Echo Music work by **Aditya Yadav (iad1tya)** is acknowledged here in a small attribution, in accordance with the applicable open-source license.
 
 The applicable **GPL-3.0** license and required legal notices remain part of the project.
 
@@ -113,5 +115,7 @@ Built with a focus on music, performance and a clean Android experience.
 <div align="center">
 
 **Paattukal — Your music. Your space.**
+
+<sub>UI by AKSHAYS UI · Music engine foundation inspired by Echo Music by Aditya Yadav</sub>
 
 </div>
