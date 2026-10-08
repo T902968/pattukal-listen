@@ -35,81 +35,38 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;28.2.13676358" || true
 
-      - name: Check release signing secrets
-        id: signing
+      - name: Check permanent release signing
         env:
           KEYSTORE: ${{ secrets.PATTUKAL_KEYSTORE_BASE64 }}
           STORE_PASSWORD: ${{ secrets.PATTUKAL_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.PATTUKAL_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.PATTUKAL_KEY_PASSWORD }}
         run: |
-          if [ -n "$KEYSTORE" ] && [ -n "$STORE_PASSWORD" ] && [ -n "$KEY_ALIAS" ] && [ -n "$KEY_PASSWORD" ]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
-          fi
+          set -euo pipefail
+          test -n "$KEYSTORE" || { echo "Missing PATTUKAL_KEYSTORE_BASE64"; exit 1; }
+          test -n "$STORE_PASSWORD" || { echo "Missing PATTUKAL_STORE_PASSWORD"; exit 1; }
+          test -n "$KEY_ALIAS" || { echo "Missing PATTUKAL_KEY_ALIAS"; exit 1; }
+          test -n "$KEY_PASSWORD" || { echo "Missing PATTUKAL_KEY_PASSWORD"; exit 1; }
+          echo "Permanent signing configuration is present."
 
-      - name: Prepare signing keystore
-        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass' && steps.signing.outputs.available == 'true'
+      - name: Prepare permanent signing keystore
         env:
           PATTUKAL_KEYSTORE_BASE64: ${{ secrets.PATTUKAL_KEYSTORE_BASE64 }}
         run: |
+          set -euo pipefail
           echo "$PATTUKAL_KEYSTORE_BASE64" | base64 --decode > keystore.jks
+          test -s keystore.jks
 
-      - name: Build signed release APK
-        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass' && steps.signing.outputs.available == 'true'
+      - name: Build permanently signed release APK
         env:
           STORE_PASSWORD: ${{ secrets.PATTUKAL_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.PATTUKAL_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.PATTUKAL_KEY_PASSWORD }}
         run: |
+          set -euo pipefail
           chmod +x gradlew
           ./gradlew assembleUniversalFossRelease
-          cp app/build/outputs/apk/universalFossRelease/*.apk pattukal.apk
-
-      - name: Prepare UI branch debug signing keystore
-        if: github.ref == 'refs/heads/ui/paattukal-liquid-glass'
-        run: |
-          mkdir -p "$HOME/.android"
-          keytool -genkeypair -v \
-            -keystore "$HOME/.android/debug.keystore" \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
-
-      - name: Build current UI branch APK
-        if: github.ref == 'refs/heads/ui/paattukal-liquid-glass'
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleUniversalFossDebug
-          APK_PATH=$(find app/build/outputs/apk -type f -name '*.apk' | head -n 1)
-          test -n "$APK_PATH"
-          cp "$APK_PATH" pattukal.apk
-
-      - name: Prepare debug signing keystore
-        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass' && steps.signing.outputs.available != 'true'
-        run: |
-          mkdir -p "$HOME/.android"
-          keytool -genkeypair -v \
-            -keystore "$HOME/.android/debug.keystore" \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
-
-      - name: Build downloadable debug APK
-        if: github.ref != 'refs/heads/ui/paattukal-liquid-glass' && steps.signing.outputs.available != 'true'
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleUniversalFossDebug
-          APK_PATH=$(find app/build/outputs/apk -type f -name '*.apk' | head -n 1)
+          APK_PATH=$(find app/build/outputs/apk/universalFossRelease -type f -name "*.apk" | head -n 1)
           test -n "$APK_PATH"
           cp "$APK_PATH" pattukal.apk
 
