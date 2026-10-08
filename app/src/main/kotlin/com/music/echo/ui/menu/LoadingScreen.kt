@@ -42,6 +42,10 @@ fun LoadingScreen(
 ) {
   if (!isVisible) return
 
+  val primaryColor = MaterialTheme.colorScheme.primary
+  val secondaryColor = MaterialTheme.colorScheme.secondary
+  val tertiaryColor = MaterialTheme.colorScheme.tertiary
+
   Dialog(onDismissRequest = {}) {
     val transition = rememberInfiniteTransition(label = "pattukal_loader")
     val rotation by
@@ -79,8 +83,8 @@ fun LoadingScreen(
                 Brush.radialGradient(
                   colors =
                     listOf(
-                      MaterialTheme.colorScheme.primary.copy(alpha = 0.34f),
-                      MaterialTheme.colorScheme.secondary.copy(alpha = 0.14f),
+                      primaryColor.copy(alpha = 0.34f),
+                      secondaryColor.copy(alpha = 0.14f),
                       Color.Transparent,
                     ),
                   center = center,
