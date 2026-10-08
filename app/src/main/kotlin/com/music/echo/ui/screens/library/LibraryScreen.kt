@@ -43,8 +43,6 @@ import echo.music.iad1tya.ui.component.ChipsRow
 import echo.music.iad1tya.ui.component.DefaultDialog
 import echo.music.iad1tya.ui.component.Material3SettingsGroup
 import echo.music.iad1tya.ui.component.Material3SettingsItem
-import echo.music.iad1tya.ui.component.PattukalGlassCard
-import echo.music.iad1tya.ui.component.PattukalScreenGlow
 import echo.music.iad1tya.ui.component.TextFieldDialog
 import echo.music.iad1tya.utils.rememberEnumPreference
 
@@ -108,25 +106,9 @@ fun LibraryScreen(navController: NavController) {
     }
 
   CompositionLocalProvider(LocalPlayerAwareWindowInsets provides newInsets) {
-    Box(modifier = Modifier.fillMaxSize()) {
-      PattukalScreenGlow(modifier = Modifier.matchParentSize())
-
-      Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-          text = "Your Library",
-          style = MaterialTheme.typography.displaySmall,
-          modifier = Modifier.padding(start = 20.dp, top = 22.dp, bottom = 8.dp)
-        )
-        PattukalGlassCard(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
-          Row(modifier = Modifier.padding(14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Songs", style = MaterialTheme.typography.labelLarge)
-            Text("•", color = MaterialTheme.colorScheme.primary)
-            Text("Albums", style = MaterialTheme.typography.labelLarge)
-            Text("•", color = MaterialTheme.colorScheme.primary)
-            Text("Playlists", style = MaterialTheme.typography.labelLarge)
-          }
-        }
-        Box(modifier = Modifier.weight(1f)) {
+    Box(
+      modifier = Modifier.fillMaxSize(),
+    ) {
       when (filterType) {
         LibraryFilter.LIBRARY -> LibraryMixScreen(navController, filterContent)
         LibraryFilter.PLAYLISTS -> LibraryPlaylistsScreen(navController, filterContent)
@@ -139,8 +121,6 @@ fun LibraryScreen(navController: NavController) {
         LibraryFilter.LOCAL ->
           LocalSongScreen(navController, { filterType = LibraryFilter.LIBRARY }, isEmbedded = true)
       }
-
-        }
 
       val bottomPadding = with(density) { currentInsets.getBottom(density).toDp() }
       Box(modifier = Modifier.fillMaxSize().padding(end = 16.dp, bottom = bottomPadding + 20.dp)) {
