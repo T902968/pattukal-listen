@@ -131,6 +131,7 @@ import echo.music.iad1tya.ui.component.ChipsRow
 import echo.music.iad1tya.ui.component.LocalBottomSheetPageState
 import echo.music.iad1tya.ui.component.LocalMenuState
 import echo.music.iad1tya.ui.component.NavigationTitle
+import echo.music.iad1tya.ui.component.PattukalGlassCard
 import echo.music.iad1tya.ui.component.RandomizeGridItem
 import echo.music.iad1tya.ui.component.SongGridItem
 import echo.music.iad1tya.ui.component.SongListItem
@@ -1047,13 +1048,6 @@ fun HomeScreen(
                 mutableListOf<HomeSection>()
 
             if (
-                showSpeedDial &&
-                speedDialItems.isNotEmpty()
-            ) {
-                list.add(HomeSection.SpeedDial)
-            }
-
-            if (
                 aiRecommendedPlaylist != null &&
                 aiRecommendedPlaylist!!.second.isNotEmpty()
             ) {
@@ -1288,6 +1282,44 @@ fun HomeScreen(
                             .current
                             .asPaddingValues()
                 ) {
+
+                    item(key = "paattukal_hero") {
+                        PattukalGlassCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 14.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(20.dp)) {
+                                Text(
+                                    text = "PAATTUKAL",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(Modifier.height(6.dp))
+                                Text(
+                                    text = "Your music. Your space.",
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = "Albums, playlists and songs — all in one place.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(Modifier.height(14.dp))
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    androidx.compose.material3.AssistChip(
+                                        onClick = { navController.navigate("library") },
+                                        label = { Text("Open Library") }
+                                    )
+                                    androidx.compose.material3.AssistChip(
+                                        onClick = { navController.navigate("search") },
+                                        label = { Text("Find music") }
+                                    )
+                                }
+                            }
+                        }
+                    }
 
                     item {
                         ChipsRow(
