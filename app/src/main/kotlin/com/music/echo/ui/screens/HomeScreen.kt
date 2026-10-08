@@ -1406,7 +1406,7 @@ fun HomeScreen(
                                                 160.dp
 
                                             val availableWidth =
-                                                maxWidth - 32.dp
+                                                this@BoxWithConstraints.maxWidth - 32.dp - 32.dp
 
                                             val columns =
                                                 (
