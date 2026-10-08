@@ -29,7 +29,9 @@ jobs:
       - name: Setup Android NDK
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;28.2.13676358" || true
+          rm -rf "$ANDROID_HOME/ndk/27.1.12297006"
+          rm -f "$ANDROID_HOME/ndk/27.1.12297006.zip"
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.1.12297006"
 
       - name: Prepare Debug Keystore
         run: |
