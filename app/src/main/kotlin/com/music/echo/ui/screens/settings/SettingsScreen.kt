@@ -41,6 +41,7 @@ import echo.music.iad1tya.echomusic.updater.getUpdateAvailableState
 import echo.music.iad1tya.ui.component.IconButton
 import echo.music.iad1tya.ui.component.Material3SettingsGroup
 import echo.music.iad1tya.ui.component.Material3SettingsItem
+import echo.music.iad1tya.ui.component.PattukalScreenGlow
 import echo.music.iad1tya.ui.screens.Screens
 import echo.music.iad1tya.ui.utils.backToMain
 
@@ -86,7 +87,9 @@ fun SettingsScreen(
   val aboutDesc = stringResource(R.string.setting_desc_about)
 
   val scrollState = rememberScrollState()
-  Column(
+  Box(modifier = Modifier.fillMaxSize()) {
+    PattukalScreenGlow(modifier = Modifier.matchParentSize())
+    Column(
     Modifier.windowInsetsPadding(
         LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal)
       )
@@ -442,6 +445,8 @@ fun SettingsScreen(
         LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom)
       )
     )
+  }
+
   }
 
   TopAppBar(
