@@ -1642,7 +1642,10 @@ fun HomeScreen(
                       WindowInsets.systemBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
                     modifier = Modifier.animateItem()
                   ) {
-                    items(recommendation.items.distinctBy { it.id }, key = { it.id }) { item ->
+                    items(
+    items = recommendation.items.distinctBy { it.id },
+    key = { it.id }
+) { item ->
                       ytGridItem(item)
                     }
                   }
