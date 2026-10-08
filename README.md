@@ -58,7 +58,7 @@ Customisation for the visual experience, including theme and appearance options.
 
 **App:** Paattukal  
 **UI direction:** Liquid Glass · 3D Depth · Ambient Light  
-**Creator branding:** AKSHAYS UI  
+**Creator branding:** AKSHAY'S UI  
 **Graphic Design:** Vyomakesh
 
 The interface is being designed to feel polished without relying on excessive blur or heavy visual effects.
@@ -103,7 +103,7 @@ This repository does not claim ownership of the original upstream project or its
 
 ## 👤 Paattukal
 
-**AKSHAYS UI**  
+**AKSHAY'S UI**  
 **Graphic Design: Vyomakesh**
 
 Built with a focus on music, performance and a clean Android experience.
@@ -114,6 +114,6 @@ Built with a focus on music, performance and a clean Android experience.
 
 **Paattukal — Your music. Your space.**
 
-<sub>UI by AKSHAYS UI · Graphic Design by Vyomakesh · Music engine foundation inspired by Echo Music by Aditya Yadav</sub>
+<sub>UI by AKSHAY'S UI · Graphic Design by Vyomakesh · Music engine foundation inspired by Echo Music by Aditya Yadav</sub>
 
 </div>
