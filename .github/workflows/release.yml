@@ -16,6 +16,11 @@ jobs:
     name: Publish APK from the same commit
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+
       - name: Wait for Android CI build for this exact commit
         id: build
         env:
@@ -88,4 +93,5 @@ jobs:
           gh release delete latest --yes 2>/dev/null || true
           gh release create latest pattukal.apk \
             --title "Pattukal Latest" \
+            --target "$GITHUB_SHA" \
             --notes "Latest Pattukal download.\n\nAPK built by Android CI run #${RUN_ID} from commit ${GITHUB_SHA}.\nRelease updated: ${UPDATED_AT}.\n\nThis release is published only from a successful build of the same commit."
