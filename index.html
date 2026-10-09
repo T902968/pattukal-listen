@@ -19,25 +19,33 @@
 <h1>Your music.<br>Your space.</h1>
 <p>Get the latest Pattukal Android build from the official release.</p>
 <a class="download" href="https://github.com/T902968/pattukal-listen/releases/download/latest/pattukal.apk">↓ &nbsp; Download latest APK</a>
-<p class="note" id="release-info" aria-live="polite">Checking latest APK build details…</p>
+<p class="note" id="release-info" aria-live="polite">Loading the latest APK release…</p><p class="note" id="live-time" aria-live="off">Current India time: loading…</p><button id="refresh" type="button" style="margin-top:10px;padding:9px 13px;border-radius:10px;border:1px solid #ffffff30;background:#ffffff0b;color:#f7f8ff;font:inherit;cursor:pointer">Refresh release details</button>
 <footer>© 2026 Pattukal · Made for music lovers</footer>
 </main>
 <script>
-(async()=>{
- const info=document.getElementById("release-info");
+const info=document.getElementById("release-info");
+const clock=document.getElementById("live-time");
+function updateClock(){
+  clock.textContent="Current India time: "+new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"medium",timeZone:"Asia/Kolkata"}).format(new Date())+" IST";
+}
+updateClock(); setInterval(updateClock,1000);
+async function loadRelease(){
+ info.textContent="Checking the latest published APK…";
  try {
-   const response=await fetch("https://api.github.com/repos/T902968/pattukal-listen/releases/tags/latest",{cache:"no-store"});
-   if(!response.ok) throw new Error("release unavailable");
+   const response=await fetch("https://api.github.com/repos/T902968/pattukal-listen/releases/tags/latest?refresh="+Date.now(),{cache:"no-store",headers:{"Accept":"application/vnd.github+json"}});
+   if(!response.ok) throw new Error("GitHub release API returned "+response.status);
    const release=await response.json();
    const asset=(release.assets||[]).find(a=>a.name==="pattukal.apk");
-   const date=release.published_at||release.created_at;
+   if(!asset) throw new Error("APK asset not found");
+   const date=release.published_at||release.updated_at||release.created_at;
    const formatted=date?new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Kolkata"}).format(new Date(date))+" IST":"time unavailable";
-   const version=(release.tag_name||"latest").replace(/^v/i,"");
-   info.textContent="Latest build: "+version+" · Updated "+formatted+(asset?" · APK "+(asset.size/1048576).toFixed(1)+" MB":"");
+   info.textContent="Latest published APK · Updated "+formatted+" · Size "+(asset.size/1048576).toFixed(1)+" MB";
  } catch(e) {
-   info.textContent="Latest APK download is available above. Build time will appear when release details can be loaded.";
+   info.textContent="Release time couldn't load just now. Tap “Refresh release details” to try again.";
  }
-})();
+}
+document.getElementById("refresh").addEventListener("click",loadRelease);
+loadRelease();
 </script>
 </body>
 </html>
