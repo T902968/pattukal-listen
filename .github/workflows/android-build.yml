@@ -31,18 +31,28 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;28.2.13676358" || true
 
-      - name: Prepare Debug Keystore
+      - name: Prepare stable signing keystore
+        env:
+          PATTUKAL_KEYSTORE_BASE64: ${{ secrets.PATTUKAL_KEYSTORE_BASE64 }}
+          PATTUKAL_STORE_PASSWORD: ${{ secrets.PATTUKAL_STORE_PASSWORD }}
+          PATTUKAL_KEY_ALIAS: ${{ secrets.PATTUKAL_KEY_ALIAS }}
+          PATTUKAL_KEY_PASSWORD: ${{ secrets.PATTUKAL_KEY_PASSWORD }}
         run: |
           mkdir -p "$HOME/.android"
-
-          keytool -genkeypair \
-            -keystore "$HOME/.android/debug.keystore" \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -dname "CN=Android Debug,O=Android,C=US" \
-            -keyalg RSA \
-            -validity 10000
+          if [ -n "$PATTUKAL_KEYSTORE_BASE64" ]; then
+            echo "$PATTUKAL_KEYSTORE_BASE64" | base64 --decode > "$HOME/.android/debug.keystore"
+            echo "Using the configured persistent Pattukal signing key."
+          else
+            echo "::warning::PATTUKAL_KEYSTORE_BASE64 is not configured; this build uses a temporary debug key and may not update an installed APK."
+            keytool -genkeypair \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA \
+              -validity 10000
+          fi
 
       - name: Build Debug APK
         run: |
