@@ -359,3 +359,11 @@ dependencies {
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.robolectric)
 }
+
+// FOSS releases do not ship Firebase Crashlytics. Disable its mapping upload task so a
+// transient Firebase HTTP 503 cannot fail an otherwise valid, installable APK build.
+tasks.configureEach {
+  if (name == "uploadCrashlyticsMappingFileUniversalFossRelease") {
+    enabled = false
+  }
+}
