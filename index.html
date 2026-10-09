@@ -29,6 +29,9 @@
 </section>
 <section class="download"><div><h2>Ready to listen?</h2><p>Open the release page to see whether the latest APK is available.</p></div><a class="btn primary" href="https://github.com/T902968/pattukal-listen/releases/tag/latest">Download page ↗</a></section>
 </main>
-<footer class="wrap"><span>© 2026 Pattukal · Community project</span><span><a href="https://github.com/T902968/pattukal-listen">Source code</a> · Check permissions and release notes before installing.</span></footer>
+<footer class="wrap"><span>© 2026 Pattukal · Community project<br><span class="small">Website updated: 9 October 2026 · Current time (India): <time id="india-clock">Loading…</time></span></span><span><a href="https://github.com/T902968/pattukal-listen">Source code</a> · Check permissions and release notes before installing.</span></footer>
+<script>
+(function(){const el=document.getElementById("india-clock");function tick(){el.textContent=new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"}).format(new Date());}tick();setInterval(tick,1000);})();
+</script>
 </body>
 </html>
