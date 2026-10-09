@@ -53,10 +53,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          APK_PATH="$(find app/build/outputs/apk/universal/foss/debug -maxdepth 1 -type f -name '*.apk' -print -quit)"
+          APK_PATH="$(find app/build/outputs/apk -type f -name '*.apk' -print -quit)"
           if [[ -z "$APK_PATH" || ! -s "$APK_PATH" ]]; then
             echo "Expected Universal FOSS debug APK was not produced."
-            find app/build/outputs/apk -maxdepth 5 -type f -print || true
+            find app/build/outputs -type f -print || true
             exit 1
           fi
           mkdir -p release-assets
