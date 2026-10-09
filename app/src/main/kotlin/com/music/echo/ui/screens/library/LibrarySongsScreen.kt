@@ -12,21 +12,16 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -148,39 +143,34 @@ fun LibrarySongsScreen(
         contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
       ) {
         item(
+          key = "songs_title",
+          contentType = CONTENT_TYPE_HEADER,
+        ) {
+          Text(
+            text = "പാട്ടുകൾ",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(start = 20.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+          )
+        }
+
+        item(
           key = "filter",
           contentType = CONTENT_TYPE_HEADER,
         ) {
-          Row(verticalAlignment = Alignment.CenterVertically) {
-            Spacer(Modifier.width(12.dp))
-            FilterChip(
-              label = { Text(stringResource(R.string.songs)) },
-              selected = true,
-              colors =
-                FilterChipDefaults.filterChipColors(
-                  containerColor = MaterialTheme.colorScheme.surface
-                ),
-              onClick = onDeselect,
-              shape = RoundedCornerShape(16.dp),
-              leadingIcon = {
-                Icon(painter = painterResource(R.drawable.close), contentDescription = "")
-              },
-              modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
-            )
-            ChipsRow(
-              chips =
-                listOf(
-                  SongFilter.LIKED to stringResource(R.string.filter_liked),
-                  SongFilter.LIBRARY to stringResource(R.string.filter_library),
-                  SongFilter.UPLOADED to stringResource(R.string.filter_uploaded),
-                  SongFilter.DOWNLOADED to stringResource(R.string.filter_downloaded),
-                  SongFilter.EXPORTED to stringResource(R.string.action_exported),
-                ),
-              currentValue = filter,
-              onValueUpdate = { filter = it },
-              modifier = Modifier.weight(1f),
-            )
-          }
+          ChipsRow(
+            chips =
+              listOf(
+                SongFilter.LIKED to stringResource(R.string.filter_liked),
+                SongFilter.LIBRARY to stringResource(R.string.filter_library),
+                SongFilter.UPLOADED to stringResource(R.string.filter_uploaded),
+                SongFilter.DOWNLOADED to stringResource(R.string.filter_downloaded),
+                SongFilter.EXPORTED to stringResource(R.string.action_exported),
+              ),
+            currentValue = filter,
+            onValueUpdate = { filter = it },
+            modifier = Modifier.fillMaxWidth(),
+          )
         }
 
         item(
@@ -293,7 +283,7 @@ fun LibrarySongsScreen(
                     }
                   }
                 )
-                .animateItem(),
+                ,
           )
         }
       }
