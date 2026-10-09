@@ -66,6 +66,6 @@ This repository includes code derived from Echo Music, which is licensed under *
 ---
 
 <div align="center">
-  <b>Pattukal — Listen 🎶</b><br/>
-  Built and customized by <a href="https://github.com/T902968">@T902968</a>
+  <p><b>AKSHAY UI CREATION 2026</b></p>
+  <p>UI customization and Pattukal branding by <a href="https://github.com/T902968">@T902968</a></p>
 </div>
