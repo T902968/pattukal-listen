@@ -31,6 +31,7 @@ jobs:
 
       - name: Setup Android NDK
         run: |
+          set -euo pipefail
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.1.12297006"
 
@@ -55,6 +56,8 @@ jobs:
           set -euo pipefail
           echo "$PATTUKAL_KEYSTORE_BASE64" | base64 --decode > keystore.jks
           test -s keystore.jks
+          keytool -list -keystore keystore.jks -storepass "${{ secrets.PATTUKAL_STORE_PASSWORD }}" -alias "${{ secrets.PATTUKAL_KEY_ALIAS }}" >/dev/null
+          echo "Keystore and configured alias verified."
 
       - name: Build permanently signed release APK
         env:
@@ -64,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           chmod +x gradlew
-          ./gradlew --no-daemon --stacktrace --console=plain --max-workers=2 assembleUniversalFossRelease
+          ./gradlew --no-daemon --stacktrace --console=plain --max-workers=2 assembleUniversalFossRelease -x uploadCrashlyticsMappingFileUniversalFossRelease
           APK_PATH=$(find app/build/outputs/apk/universalFossRelease -type f -name "*.apk" | head -n 1)
           test -n "$APK_PATH"
           cp "$APK_PATH" pattukal.apk
