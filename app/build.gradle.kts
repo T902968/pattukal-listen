@@ -363,6 +363,13 @@ dependencies {
 // FOSS releases do not ship Firebase Crashlytics. Disable its mapping upload task so a
 // transient Firebase HTTP 503 cannot fail an otherwise valid, installable APK build.
 tasks.configureEach {
+  // FOSS variants do not use Google Services; the checked-in JSON has a different app ID.
+  // Keep the Google Services plugin active for GMS variants.
+  if (name.contains("GoogleServices") && name.contains("Foss")) {
+    enabled = false
+  }
+
+  // FOSS releases do not ship Firebase Crashlytics, so skip its optional mapping upload.
   if (name == "uploadCrashlyticsMappingFileUniversalFossRelease") {
     enabled = false
   }
