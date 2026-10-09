@@ -198,53 +198,22 @@ sealed class HomeSection(val id: String, val baseWeight: Int) {
 private fun PattukalLiquidBackground(
     modifier: Modifier = Modifier
 ) {
+    // One static gradient layer instead of stacking three full-screen backgrounds.
+    // Keeps the liquid-glass identity while reducing overdraw during scroll.
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.20f),
-                            Color.Transparent
-                        ),
-                        radius = 850f
-                    )
+            .background(
+                Brush.radialGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
+                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.07f),
+                        MaterialTheme.colorScheme.background
+                    ),
+                    radius = 1050f
                 )
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.14f),
-                            Color.Transparent
-                        ),
-                        radius = 700f
-                    )
-                )
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
-                            Color.Transparent,
-                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.04f)
-                        )
-                    )
-                )
-        )
-    }
+            )
+    )
 }
 
 @Composable
