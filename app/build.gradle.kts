@@ -30,7 +30,7 @@ android {
   ndkVersion = "27.1.12297006"
 
   defaultConfig {
-    applicationId = "echo.music.iad1tya"
+    applicationId = "com.pattukal.listen"
     minSdk = 26
     targetSdk = 36
     // Keep every CI release strictly newer so Android performs an in-place update.
