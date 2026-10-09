@@ -240,11 +240,6 @@ If Echo Music has been useful to you, consider supporting its development.
 
 **AKSHAY'S UI** — Pattukal creator and UI design.
 
-<!-- readme: contributors -start -->
-<table>
-<tr><td align="center"><a href="https://github.com/T902968"><img src="https://avatars.githubusercontent.com/u/70646190?v=4" width="60" height="60" /></a></td></tr>
-</table>
-<!-- readme: contributors -end -->
 
 ## Special Thanks
 
