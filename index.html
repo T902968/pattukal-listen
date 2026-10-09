@@ -19,18 +19,20 @@
 <h1>Your music.<br>Your space.</h1>
 <p>Get the latest Pattukal Android build from the official release.</p>
 <a class="download" href="https://github.com/T902968/pattukal-listen/releases/download/latest/pattukal.apk">↓ &nbsp; Download latest APK</a>
-<p class="note" id="release-info" aria-live="polite">Loading the latest APK release…</p><p class="note" id="live-time" aria-live="off">Current India time: loading…</p><button id="refresh" type="button" style="margin-top:10px;padding:9px 13px;border-radius:10px;border:1px solid #ffffff30;background:#ffffff0b;color:#f7f8ff;font:inherit;cursor:pointer">Refresh release details</button>
+<p class="note" id="release-info" aria-live="polite">Loading the latest APK release…</p><p class="note" id="live-time" aria-live="off">Current India time: loading…</p><p class="note" id="checked-at">Release status checks automatically every minute.</p><button id="refresh" type="button" style="margin-top:10px;padding:9px 13px;border-radius:10px;border:1px solid #ffffff30;background:#ffffff0b;color:#f7f8ff;font:inherit;cursor:pointer">Check latest APK now</button>
 <footer>© 2026 Pattukal · Made for music lovers</footer>
 </main>
 <script>
 const info=document.getElementById("release-info");
 const clock=document.getElementById("live-time");
+const checkedAt=document.getElementById("checked-at");
 function updateClock(){
   clock.textContent="Current India time: "+new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"medium",timeZone:"Asia/Kolkata"}).format(new Date())+" IST";
 }
 updateClock(); setInterval(updateClock,1000);
 async function loadRelease(){
  info.textContent="Checking the latest published APK…";
+ checkedAt.textContent="Last checked: "+new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"medium",timeZone:"Asia/Kolkata"}).format(new Date())+" IST";
  try {
    const response=await fetch("https://api.github.com/repos/T902968/pattukal-listen/releases/tags/latest?refresh="+Date.now(),{cache:"no-store",headers:{"Accept":"application/vnd.github+json"}});
    if(!response.ok) throw new Error("GitHub release API returned "+response.status);
@@ -39,13 +41,15 @@ async function loadRelease(){
    if(!asset) throw new Error("APK asset not found");
    const date=release.published_at||release.updated_at||release.created_at;
    const formatted=date?new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Kolkata"}).format(new Date(date))+" IST":"time unavailable";
-   info.textContent="Latest published APK · Updated "+formatted+" · Size "+(asset.size/1048576).toFixed(1)+" MB";
+   info.textContent="Latest published APK · Released "+formatted+" · Size "+(asset.size/1048576).toFixed(1)+" MB";
+   checkedAt.textContent="Latest release: "+release.tag_name+" · Checked "+new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"medium",timeZone:"Asia/Kolkata"}).format(new Date())+" IST";
  } catch(e) {
    info.textContent="Release time couldn't load just now. Tap “Refresh release details” to try again.";
  }
 }
 document.getElementById("refresh").addEventListener("click",loadRelease);
 loadRelease();
+setInterval(loadRelease,60000);
 </script>
 </body>
 </html>
