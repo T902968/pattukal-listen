@@ -17,10 +17,27 @@
 <div class="icon" aria-hidden="true">♫</div>
 <div class="tag">Android app</div>
 <h1>Your music.<br>Your space.</h1>
-<p>Get the latest Pattukal Android build from the official GitHub release.</p>
+<p>Get the latest Pattukal Android build from the official release.</p>
 <a class="download" href="https://github.com/T902968/pattukal-listen/releases/download/latest/pattukal.apk">↓ &nbsp; Download latest APK</a>
-<p class="note">If the download does not start, tap the button again. Android may ask you to confirm installation from your browser.</p>
+<p class="note" id="release-info" aria-live="polite">Checking latest APK build details…</p>
 <footer>© 2026 Pattukal · Made for music lovers</footer>
 </main>
+<script>
+(async()=>{
+ const info=document.getElementById("release-info");
+ try {
+   const response=await fetch("https://api.github.com/repos/T902968/pattukal-listen/releases/tags/latest",{cache:"no-store"});
+   if(!response.ok) throw new Error("release unavailable");
+   const release=await response.json();
+   const asset=(release.assets||[]).find(a=>a.name==="pattukal.apk");
+   const date=release.published_at||release.created_at;
+   const formatted=date?new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Kolkata"}).format(new Date(date))+" IST":"time unavailable";
+   const version=(release.tag_name||"latest").replace(/^v/i,"");
+   info.textContent="Latest build: "+version+" · Updated "+formatted+(asset?" · APK "+(asset.size/1048576).toFixed(1)+" MB":"");
+ } catch(e) {
+   info.textContent="Latest APK download is available above. Build time will appear when release details can be loaded.";
+ }
+})();
+</script>
 </body>
 </html>
