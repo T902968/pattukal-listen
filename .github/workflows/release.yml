@@ -67,6 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           chmod +x gradlew
+          # Crashlytics mapping uploads can fail independently with HTTP 503; they are not required to produce the installable APK.
           ./gradlew --no-daemon --stacktrace --console=plain --max-workers=2 assembleUniversalFossRelease -x uploadCrashlyticsMappingFileUniversalFossRelease
           APK_PATH=$(find app/build/outputs/apk/universalFossRelease -type f -name "*.apk" | head -n 1)
           test -n "$APK_PATH"
