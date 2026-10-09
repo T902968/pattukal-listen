@@ -37,7 +37,7 @@ android {
     // Local builds keep the existing baseline version code.
     val ciRunNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0
     versionCode = 164 + ciRunNumber
-    versionName = "1.4.1"
+    versionName = "1.4.2"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
