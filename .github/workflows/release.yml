@@ -80,6 +80,14 @@ jobs:
           unzip -t pattukal.apk >/dev/null
           echo "APK archive verification passed."
 
+      - name: Upload installable APK artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Pattukal-Release-APK
+          path: pattukal.apk
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Publish latest downloadable APK
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ui/paattukal-liquid-glass'
         env:
