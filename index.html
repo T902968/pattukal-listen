@@ -19,7 +19,7 @@
 <header class="wrap nav"><div class="brand">PATTU<span>KAL</span></div><div class="pill">Android music app</div></header>
 <main class="wrap">
 <section class="hero">
-<div><div class="eyebrow">Find your rhythm</div><h1>Your music.<br><em>Your mood.</em></h1><p class="lead">Meet Pattukal — a music listening experience built around the songs and moments you love. Clean, immersive, and made for your everyday listening.</p><div class="actions"><a class="btn primary" href="https://github.com/T902968/pattukal-listen/releases/tag/latest">Get Pattukal APK ↗</a><a class="btn secondary" href="https://github.com/T902968/pattukal-listen">Explore project</a></div><p class="small">Android · Check release details before installing.</p></div>
+<div><div class="eyebrow">Find your rhythm</div><h1>Your music.<br><em>Your mood.</em></h1><p class="lead">Meet Pattukal — a music listening experience built around the songs and moments you love. Clean, immersive, and made for your everyday listening.</p><div class="actions"><a class="btn primary" id="apk-download-top" href="https://github.com/T902968/pattukal-listen/releases/download/latest/pattukal.apk">Download Latest Pattukal APK ↓</a><a class="btn secondary" href="https://github.com/T902968/pattukal-listen">Explore project</a></div><p class="small">Android · Check release details before installing.</p></div>
 <div class="art" aria-label="Abstract vinyl record artwork"><div class="disc"></div></div>
 </section>
 <section class="features" aria-label="Highlights">
@@ -27,11 +27,27 @@
 <article class="card"><h2>✨ Calm, modern design</h2><p>Dark surfaces, subtle colour, and a layout designed to feel at home on mobile.</p></article>
 <article class="card"><h2>📱 Built for Android</h2><p>Find the available APK and project updates from the official Pattukal repository.</p></article>
 </section>
-<section class="download"><div><h2>Ready to listen?</h2><p>Open the release page to see whether the latest APK is available.</p></div><a class="btn primary" href="https://github.com/T902968/pattukal-listen/releases/tag/latest">Download page ↗</a></section>
+<section class="download" id="latest-download"><div><div class="eyebrow">Latest Pattukal APK</div><h2>Ready to listen?</h2><p>Tap the button to download the newest APK directly.</p><p class="small">Last updated: <strong id="apk-updated">Checking latest release…</strong><br>File size: <strong id="apk-size">Checking…</strong></p><div style="margin-top:18px"><h3 style="margin:0 0 5px;font-size:1rem">What’s new</h3><p id="whats-new">Latest Pattukal release. The download button always points to the latest published APK.</p></div></div><a class="btn primary" id="apk-download-main" href="https://github.com/T902968/pattukal-listen/releases/download/latest/pattukal.apk">Download APK ↓</a></section>
 </main>
-<footer class="wrap"><span>© 2026 Pattukal · Community project<br><span class="small">Website updated: 9 October 2026 · Current time (India): <time id="india-clock">Loading…</time></span></span><span><a href="https://github.com/T902968/pattukal-listen">Source code</a> · Check permissions and release notes before installing.</span></footer>
+<footer class="wrap"><span>© 2026 Pattukal · Community project<br><span class="small">Website clock (India): <time id="india-clock">Loading…</time></span></span><span><a href="https://github.com/T902968/pattukal-listen">Source code</a> · Check permissions and release notes before installing.</span></footer>
 <script>
-(function(){const el=document.getElementById("india-clock");function tick(){el.textContent=new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"}).format(new Date());}tick();setInterval(tick,1000);})();
+(function(){
+ const clock=document.getElementById("india-clock");
+ function tick(){clock.textContent=new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"}).format(new Date());}
+ tick();setInterval(tick,1000);
+ const fallback="https://github.com/T902968/pattukal-listen/releases/download/latest/pattukal.apk";
+ fetch("https://api.github.com/repos/T902968/pattukal-listen/releases/tags/latest",{headers:{"Accept":"application/vnd.github+json"}})
+  .then(r=>{if(!r.ok)throw new Error("Release unavailable");return r.json();})
+  .then(data=>{
+   const asset=(data.assets||[]).find(a=>a.name==="pattukal.apk")||(data.assets||[]).find(a=>a.name.toLowerCase().endsWith(".apk"));
+   if(asset){document.getElementById("apk-download-top").href=asset.browser_download_url||fallback;document.getElementById("apk-download-main").href=asset.browser_download_url||fallback;document.getElementById("apk-size").textContent=(asset.size/1024/1024).toFixed(1)+" MB";}
+   const stamp=data.published_at||data.updated_at;
+   if(stamp)document.getElementById("apk-updated").textContent=new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"long",timeStyle:"short"}).format(new Date(stamp))+" IST";
+   const notes=(data.body||"").replace(/https?:\\/\\/\\S+/g,"").trim();
+   document.getElementById("whats-new").textContent=notes||"Latest Pattukal APK is available. This button downloads the newest published version.";
+  })
+  .catch(()=>{document.getElementById("apk-download-top").href=fallback;document.getElementById("apk-download-main").href=fallback;document.getElementById("apk-updated").textContent="Latest release time unavailable — download link is active";document.getElementById("apk-size").textContent="See download file";});
+})();
 </script>
 </body>
 </html>
