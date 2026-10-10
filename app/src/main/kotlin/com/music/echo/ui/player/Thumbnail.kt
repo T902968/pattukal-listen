@@ -643,20 +643,23 @@ private fun ThumbnailItem(
         },
     contentAlignment = Alignment.Center
   ) {
-    // Lightweight liquid-glass ambient rim: gradients only, no expensive blur.
+    // Neutral liquid-glass rim: lets the album artwork provide the colour.
+    // Uses a simple gradient only (no extra blur or image processing).
     if (isCurrentItem && playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
       Box(
         modifier =
-          Modifier.size(dimensions.thumbnailSize + 18.dp)
-            .clip(RoundedCornerShape(dimensions.cornerRadius + 10.dp))
+          Modifier.size(dimensions.thumbnailSize + 12.dp)
+            .clip(RoundedCornerShape(dimensions.cornerRadius + 7.dp))
             .background(
               Brush.linearGradient(
-                colors = listOf(
-                  Color(0xFF38E8FF).copy(alpha = 0.48f),
-                  Color(0xFF7865FF).copy(alpha = 0.52f),
-                  Color(0xFF28A8FF).copy(alpha = 0.42f),
-                  Color(0xFF38E8FF).copy(alpha = 0.48f)
-                )
+                colors =
+                  listOf(
+                    Color.White.copy(alpha = 0.42f),
+                    Color.White.copy(alpha = 0.10f),
+                    Color.White.copy(alpha = 0.24f),
+                    Color.White.copy(alpha = 0.06f),
+                    Color.White.copy(alpha = 0.34f)
+                  )
               )
             )
       )
