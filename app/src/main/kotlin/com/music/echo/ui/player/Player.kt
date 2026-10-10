@@ -1514,7 +1514,15 @@ fun BottomSheetPlayer(
                       style = androidx.compose.ui.graphics.drawscope.Stroke(width = 24.dp.toPx())
                     )
                   }
-                  Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.2f)))
+                  Box(
+                    modifier =
+                      Modifier.fillMaxSize()
+                        .background(
+                          Color.Black.copy(
+                            alpha = if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) 0.12f else 0.2f
+                          )
+                        )
+                  )
                   Box(
                     modifier =
                       Modifier.fillMaxSize()
