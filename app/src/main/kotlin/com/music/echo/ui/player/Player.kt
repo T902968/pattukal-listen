@@ -2270,7 +2270,13 @@ fun BottomSheetPlayer(
                       else textButtonColor.copy(alpha = 0.7f),
                     playerBackground = playerBackground,
                     useDarkTheme = useDarkTheme
-                  )
+                  ),
+                activeTrackBrush =
+                  if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
+                    Brush.horizontalGradient(
+                      colors = listOf(Color(0xFF67E8F9), Color(0xFF8B5CF6))
+                    )
+                  } else null
               )
             },
             modifier = Modifier.padding(horizontal = PlayerHorizontalPadding)
