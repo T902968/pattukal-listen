@@ -31,33 +31,31 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;28.2.13676358" || true
 
-      - name: Prepare stable signing keystore
+      - name: Require persistent Pattukal signing key
         env:
           PATTUKAL_KEYSTORE_BASE64: ${{ secrets.PATTUKAL_KEYSTORE_BASE64 }}
           PATTUKAL_STORE_PASSWORD: ${{ secrets.PATTUKAL_STORE_PASSWORD }}
           PATTUKAL_KEY_ALIAS: ${{ secrets.PATTUKAL_KEY_ALIAS }}
           PATTUKAL_KEY_PASSWORD: ${{ secrets.PATTUKAL_KEY_PASSWORD }}
         run: |
+          set -euo pipefail
+          if [ -z "$PATTUKAL_KEYSTORE_BASE64" ] || [ -z "$PATTUKAL_STORE_PASSWORD" ] || [ -z "$PATTUKAL_KEY_ALIAS" ] || [ -z "$PATTUKAL_KEY_PASSWORD" ]; then
+            echo "::error::Persistent signing secrets are missing. Refusing to build an APK that may not update existing installations."
+            exit 1
+          fi
           mkdir -p "$HOME/.android"
-          if [ -n "$PATTUKAL_KEYSTORE_BASE64" ]; then
-            echo "$PATTUKAL_KEYSTORE_BASE64" | base64 --decode > "$HOME/.android/debug.keystore"
+          printf '%s' "$PATTUKAL_KEYSTORE_BASE64" | base64 --decode > "$HOME/.android/debug.keystore"
+          if ! keytool -list -keystore "$HOME/.android/debug.keystore" -storepass "$PATTUKAL_STORE_PASSWORD" -alias "$PATTUKAL_KEY_ALIAS" >/dev/null 2>&1; then
+            echo "::error::Persistent signing key is invalid or the alias/password does not match. Refusing to publish an incompatible APK."
+            exit 1
           fi
-          if [ -f "$HOME/.android/debug.keystore" ] && keytool -list -keystore "$HOME/.android/debug.keystore" -storepass "${PATTUKAL_STORE_PASSWORD:-android}" -alias "${PATTUKAL_KEY_ALIAS:-androiddebugkey}" >/dev/null 2>&1; then
-            echo "Using the configured Pattukal signing key."
-          else
-            echo "::warning::Configured signing key is missing or invalid; generating a build key. This APK may not update an existing installation."
-            rm -f "$HOME/.android/debug.keystore"
-            keytool -genkeypair \
-              -keystore "$HOME/.android/debug.keystore" \
-              -storepass android \
-              -alias androiddebugkey \
-              -keypass android \
-              -dname "CN=Android Debug,O=Android,C=US" \
-              -keyalg RSA \
-              -validity 10000
-          fi
+          echo "Persistent signing key validated."
 
       - name: Build Debug APK
+        env:
+          PATTUKAL_STORE_PASSWORD: ${{ secrets.PATTUKAL_STORE_PASSWORD }}
+          PATTUKAL_KEY_ALIAS: ${{ secrets.PATTUKAL_KEY_ALIAS }}
+          PATTUKAL_KEY_PASSWORD: ${{ secrets.PATTUKAL_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
           ./gradlew assembleUniversalFossDebug
