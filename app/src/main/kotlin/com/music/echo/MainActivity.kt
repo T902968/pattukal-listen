@@ -375,6 +375,7 @@ class MainActivity : ComponentActivity() {
   @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
   @OptIn(ExperimentalMaterial3Api::class)
   override fun onCreate(savedInstanceState: Bundle?) {
+    echo.music.iad1tya.echomusic.UpdateNotificationHelper.clearLegacyUpdateNotification(this)
     installSplashScreen()
     super.onCreate(savedInstanceState)
 
