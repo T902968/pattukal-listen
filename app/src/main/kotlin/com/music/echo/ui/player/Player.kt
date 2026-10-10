@@ -2207,7 +2207,9 @@ fun BottomSheetPlayer(
                 colors =
                   PlayerSliderColors.getSliderColors(
                     activeColor =
-                      if (useNewPlayerDesign) textButtonColor
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
+                        Color.White.copy(alpha = 0.96f)
+                      else if (useNewPlayerDesign) textButtonColor
                       else textButtonColor.copy(alpha = 0.7f),
                     playerBackground = playerBackground,
                     useDarkTheme = useDarkTheme
@@ -2516,8 +2518,14 @@ fun BottomSheetPlayer(
                 interactionSource = backInteractionSource,
                 colors =
                   IconButtonDefaults.filledIconButtonColors(
-                    containerColor = sideButtonContainerColor,
-                    contentColor = sideButtonContentColor,
+                    containerColor =
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
+                        Color.White.copy(alpha = 0.16f)
+                      else sideButtonContainerColor,
+                    contentColor =
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
+                        Color.White.copy(alpha = 0.96f)
+                      else sideButtonContentColor,
                   ),
                 modifier =
                   Modifier.size(68.dp).graphicsLayer {
@@ -2578,11 +2586,23 @@ fun BottomSheetPlayer(
                 interactionSource = playPauseInteractionSource,
                 colors =
                   IconButtonDefaults.filledIconButtonColors(
-                    containerColor = textButtonColor,
-                    contentColor = iconButtonColor,
+                    containerColor =
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
+                        Color.White.copy(alpha = 0.94f)
+                      else textButtonColor,
+                    contentColor =
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
+                        Color(0xFF171717)
+                      else iconButtonColor,
                   ),
                 modifier =
-                  Modifier.size(84.dp).graphicsLayer {
+                  Modifier.size(84.dp)
+                    .then(
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
+                        Modifier.border(1.dp, Color.White.copy(alpha = 0.42f), CircleShape)
+                      else Modifier
+                    )
+                    .graphicsLayer {
                     scaleX = playPauseScale
                     scaleY = playPauseScale
                   }
@@ -2622,8 +2642,14 @@ fun BottomSheetPlayer(
                 interactionSource = nextInteractionSource,
                 colors =
                   IconButtonDefaults.filledIconButtonColors(
-                    containerColor = sideButtonContainerColor,
-                    contentColor = sideButtonContentColor,
+                    containerColor =
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
+                        Color.White.copy(alpha = 0.16f)
+                      else sideButtonContainerColor,
+                    contentColor =
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
+                        Color.White.copy(alpha = 0.96f)
+                      else sideButtonContentColor,
                   ),
                 modifier =
                   Modifier.size(68.dp).graphicsLayer {
