@@ -1444,88 +1444,70 @@ fun BottomSheetPlayer(
                       }
                   )
 
-                  // Animated liquid flow: a few GPU-friendly gradient ribbons drift
-                  // slowly across the screen; no extra blur passes are used for the motion.
-                  val liquidFlow by
-                    rememberInfiniteTransition(label = "pattukalLiquidFlow").animateFloat(
-                      initialValue = -0.22f,
-                      targetValue = 0.22f,
+                  // Album-art-driven ambient reflections: neutral highlights only.
+                  // The artwork beneath supplies the changing colours naturally.
+                  val reflectionTravel by
+                    rememberInfiniteTransition(label = "pattukalAlbumReflection").animateFloat(
+                      initialValue = -0.35f,
+                      targetValue = 0.35f,
                       animationSpec =
                         infiniteRepeatable(
-                          animation = tween(durationMillis = 9000, easing = LinearEasing),
+                          animation = tween(durationMillis = 11000, easing = LinearEasing),
                           repeatMode = RepeatMode.Reverse
                         ),
-                      label = "liquidFlowOffset"
+                      label = "albumReflectionTravel"
                     )
 
                   androidx.compose.foundation.Canvas(
-                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = 0.9f }
+                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = 0.72f }
                   ) {
                     val w = size.width
                     val h = size.height
-                    val shift = liquidFlow * w
-                    val cyan = Color(0xFF25E8FF)
-                    val blue = Color(0xFF178CFF)
-                    val violet = Color(0xFF8064FF)
-                    val teal = Color(0xFF00BFAF)
+                    val travel = reflectionTravel * w
 
-                    val upperRibbon = Path().apply {
-                      moveTo(-w * 0.25f + shift, h * 0.08f)
-                      cubicTo(w * 0.18f + shift, h * 0.20f, w * 0.30f - shift, h * 0.02f, w * 0.62f - shift, h * 0.15f)
-                      cubicTo(w * 0.84f - shift, h * 0.24f, w * 1.02f + shift, h * 0.08f, w * 1.28f + shift, h * 0.18f)
-                      lineTo(w * 1.28f + shift, h * 0.32f)
-                      cubicTo(w * 0.88f + shift, h * 0.22f, w * 0.50f - shift, h * 0.36f, -w * 0.25f + shift, h * 0.23f)
-                      close()
+                    val upperReflection = Path().apply {
+                      moveTo(-w * 0.2f + travel, h * 0.14f)
+                      cubicTo(w * 0.12f + travel, h * 0.04f, w * 0.32f - travel, h * 0.23f, w * 0.58f - travel, h * 0.14f)
+                      cubicTo(w * 0.8f - travel, h * 0.06f, w * 1.02f + travel, h * 0.19f, w * 1.2f + travel, h * 0.11f)
+                      cubicTo(w * 0.9f + travel, h * 0.28f, w * 0.46f - travel, h * 0.22f, -w * 0.2f + travel, h * 0.14f)
                     }
                     drawPath(
-                      path = upperRibbon,
+                      path = upperReflection,
                       brush = Brush.linearGradient(
-                        colors = listOf(cyan.copy(alpha = 0.20f), blue.copy(alpha = 0.08f), violet.copy(alpha = 0.17f)),
-                        start = Offset(0f, 0f),
-                        end = Offset(w, h * 0.38f)
-                      )
-                    )
-
-                    val lowerRibbon = Path().apply {
-                      moveTo(-w * 0.2f - shift, h * 0.68f)
-                      cubicTo(w * 0.18f - shift, h * 0.54f, w * 0.32f + shift, h * 0.83f, w * 0.63f + shift, h * 0.72f)
-                      cubicTo(w * 0.87f + shift, h * 0.62f, w * 1.03f - shift, h * 0.84f, w * 1.22f - shift, h * 0.70f)
-                      lineTo(w * 1.22f - shift, h * 0.94f)
-                      cubicTo(w * 0.78f - shift, h * 0.86f, w * 0.35f + shift, h * 1.02f, -w * 0.2f - shift, h * 0.88f)
-                      close()
-                    }
-                    drawPath(
-                      path = lowerRibbon,
-                      brush = Brush.linearGradient(
-                        colors = listOf(teal.copy(alpha = 0.12f), cyan.copy(alpha = 0.18f), violet.copy(alpha = 0.14f)),
-                        start = Offset(0f, h * 0.58f),
-                        end = Offset(w, h)
-                      )
-                    )
-
-                    // Fine reflective edge makes the flowing shapes read as liquid glass.
-                    drawPath(
-                      path = upperRibbon,
-                      brush = Brush.linearGradient(
-                        colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.18f), cyan.copy(alpha = 0.28f), Color.Transparent),
-                        start = Offset(0f, h * 0.08f),
-                        end = Offset(w, h * 0.3f)
+                        colors = listOf(
+                          Color.Transparent,
+                          Color.White.copy(alpha = 0.035f),
+                          Color.White.copy(alpha = 0.14f),
+                          Color.White.copy(alpha = 0.025f),
+                          Color.Transparent
+                        ),
+                        start = Offset(0f, h * 0.05f),
+                        end = Offset(w, h * 0.28f)
                       ),
-                      style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.4.dp.toPx())
+                      style = androidx.compose.ui.graphics.drawscope.Stroke(width = 18.dp.toPx())
+                    )
+
+                    val lowerReflection = Path().apply {
+                      moveTo(-w * 0.18f - travel, h * 0.76f)
+                      cubicTo(w * 0.16f - travel, h * 0.62f, w * 0.34f + travel, h * 0.87f, w * 0.62f + travel, h * 0.75f)
+                      cubicTo(w * 0.84f + travel, h * 0.66f, w * 1.02f - travel, h * 0.84f, w * 1.2f - travel, h * 0.73f)
+                    }
+                    drawPath(
+                      path = lowerReflection,
+                      brush = Brush.linearGradient(
+                        colors = listOf(
+                          Color.Transparent,
+                          Color.White.copy(alpha = 0.02f),
+                          Color.White.copy(alpha = 0.09f),
+                          Color.White.copy(alpha = 0.02f),
+                          Color.Transparent
+                        ),
+                        start = Offset(0f, h * 0.62f),
+                        end = Offset(w, h * 0.9f)
+                      ),
+                      style = androidx.compose.ui.graphics.drawscope.Stroke(width = 24.dp.toPx())
                     )
                   }
-
-                  Box(
-                    modifier =
-                      Modifier.fillMaxSize()
-                        .background(
-                          Brush.verticalGradient(
-                            0.0f to Color(0xFF00D9FF).copy(alpha = 0.08f),
-                            0.48f to Color(0xFF7657FF).copy(alpha = 0.07f),
-                            1.0f to Color.Transparent
-                          )
-                        )
-                  )
                   Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.2f)))
                   Box(
                     modifier =
