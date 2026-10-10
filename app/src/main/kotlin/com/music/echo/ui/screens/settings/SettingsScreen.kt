@@ -73,7 +73,7 @@ fun SettingsScreen(
   val privacyText = stringResource(R.string.privacy)
   val storageText = stringResource(R.string.storage)
   val backupText = stringResource(R.string.backup_restore)
-  val systemUpdateText = stringResource(R.string.system_update)
+  val systemUpdateText = "Update App"
   val aboutText = stringResource(R.string.about)
 
   val accountDesc = stringResource(R.string.setting_desc_account)
