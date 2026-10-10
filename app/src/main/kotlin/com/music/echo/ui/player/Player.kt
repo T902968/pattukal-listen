@@ -1474,6 +1474,17 @@ fun BottomSheetPlayer(
                         ),
                       label = "liquidReflectionOpacity"
                     )
+                  val reflectionTint by
+                    animateColorAsState(
+                      targetValue =
+                        if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
+                          gradientColors.firstOrNull() ?: Color.White
+                        } else {
+                          Color.White
+                        },
+                      animationSpec = tween(durationMillis = 1200, easing = LinearOutSlowInEasing),
+                      label = "albumReflectionTint"
+                    )
 
                   androidx.compose.foundation.Canvas(
                     modifier =
@@ -1489,13 +1500,6 @@ fun BottomSheetPlayer(
                     val w = size.width
                     val h = size.height
                     val travel = reflectionTravel * w
-                    val reflectionTint =
-                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
-                        gradientColors.firstOrNull() ?: Color.White
-                      } else {
-                        Color.White
-                      }
-
                     val upperReflection = Path().apply {
                       moveTo(-w * 0.2f + travel, h * 0.14f)
                       cubicTo(w * 0.12f + travel, h * 0.04f, w * 0.32f - travel, h * 0.23f, w * 0.58f - travel, h * 0.14f)
