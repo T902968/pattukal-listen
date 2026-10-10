@@ -659,6 +659,7 @@ private fun ThumbnailItem(
                 )
               )
             )
+      )
     }
     Box(
       modifier =
