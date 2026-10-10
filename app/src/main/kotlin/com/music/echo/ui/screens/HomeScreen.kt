@@ -1283,6 +1283,21 @@ fun HomeScreen(
                             .asPaddingValues()
                 ) {
 
+                    item(key = "pattukal_home_brand") {
+                        Text(
+                            text = "Pattukal",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            maxLines = 1,
+                            modifier = Modifier.padding(
+                                start = 20.dp,
+                                end = 20.dp,
+                                top = 18.dp,
+                                bottom = 10.dp
+                            )
+                        )
+                    }
+
                     item {
                         ChipsRow(
                             chips =
