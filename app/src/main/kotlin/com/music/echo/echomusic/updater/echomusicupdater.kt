@@ -682,8 +682,16 @@ suspend fun checkForUpdate(
       val targetTagName = targetRelease.getString("tag_name")
       val releaseBody = targetRelease.optString("body", "")
       val versionMatch = Regex("(?im)^Pattukal version:\\s*([0-9]+(?:\\.[0-9]+)+(?:[-+][A-Za-z0-9.-]+)?)\\s*$").find(releaseBody)
-      val displayTag = versionMatch?.groupValues?.get(1) ?: targetTagName
-      val shouldShow = isNewerVersion(displayTag, currentVersion)
+      val displayVersion = versionMatch?.groupValues?.get(1) ?: targetTagName
+      val buildMatch = Regex("(?im)^Pattukal build:\\s*(\\d+)\\s*$").find(releaseBody)
+      val targetBuildNumber = buildMatch?.groupValues?.get(1)?.toIntOrNull()
+      // Version names can stay the same between app updates; use the increasing CI build number.
+      val shouldShow =
+        if (targetBuildNumber != null) targetBuildNumber > BuildConfig.VERSION_CODE
+        else isNewerVersion(displayVersion, currentVersion)
+      val displayTag =
+        if (targetBuildNumber != null) "$displayVersion (build $targetBuildNumber)"
+        else displayVersion
 
       if (shouldShow) {
         val tagWithPrefix = targetRelease.getString("tag_name")

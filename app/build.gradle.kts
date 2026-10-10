@@ -33,7 +33,9 @@ android {
     applicationId = "echo.music.iad1tya"
     minSdk = 26
     targetSdk = 36
-    versionCode = 162
+    // Use the Android CI run number so every published APK can update existing installs.
+    // Local builds keep the current baseline version code.
+    versionCode = (System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 162).coerceAtLeast(162)
     versionName = "1.4.1"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
