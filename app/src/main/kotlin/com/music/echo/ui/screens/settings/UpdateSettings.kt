@@ -1,7 +1,5 @@
 package echo.music.iad1tya.ui.screens.settings
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -86,7 +84,7 @@ fun UpdateSettings(
     kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
       try {
         val url =
-          java.net.URL("https://api.github.com/repos/EchoMusicApp/Echo-Music/releases/latest")
+          java.net.URL("https://api.github.com/repos/T902968/pattukal-listen/releases/latest")
         val json = url.openStream().bufferedReader().use { it.readText() }
         val targetRelease = JSONObject(json)
         releaseNotes = targetRelease.getString("body")
@@ -132,10 +130,7 @@ fun UpdateSettings(
                 Text(stringResource(R.string.version, BuildConfig.VERSION_NAME))
               }
             },
-            onClick = {
-              val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://echomusic.fun"))
-              context.startActivity(intent)
-            }
+            onClick = { navController.navigate("update") }
           )
         )
     )
