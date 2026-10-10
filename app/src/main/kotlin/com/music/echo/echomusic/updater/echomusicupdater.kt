@@ -91,7 +91,9 @@ import echo.music.iad1tya.ui.utils.parseMarkdownToSections
 import echo.music.iad1tya.ui.utils.parseSimpleMarkdown
 import java.io.File
 import java.net.URL
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import kotlinx.coroutines.Dispatchers
@@ -623,10 +625,8 @@ fun saveBetaUpdatesSetting(context: Context, enabled: Boolean) {
 
 private fun formatGitHubDate(githubDate: String): String =
   try {
-    val githubFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
     val displayFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy, h:mm a")
-    val dateTime = LocalDateTime.parse(githubDate, githubFormatter)
-    dateTime.format(displayFormatter)
+    Instant.parse(githubDate).atZone(ZoneId.systemDefault()).format(displayFormatter)
   } catch (e: Exception) {
     githubDate
   }
