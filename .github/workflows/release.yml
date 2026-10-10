@@ -90,8 +90,10 @@ jobs:
           set -euo pipefail
           UPDATED_AT="$(date -u +'%Y-%m-%d %H:%M UTC')"
           RUN_ID="${{ steps.build.outputs.run_id }}"
+          APP_VERSION="$(sed -n 's/^[[:space:]]*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n1)"
+          if [ -z "$APP_VERSION" ]; then echo "Could not determine app version."; exit 1; fi
           gh release delete latest --yes 2>/dev/null || true
           gh release create latest pattukal.apk \
             --title "Pattukal Latest" \
             --target "$GITHUB_SHA" \
-            --notes "Latest Pattukal download.\n\nAPK built by Android CI run #${RUN_ID} from commit ${GITHUB_SHA}.\nRelease updated: ${UPDATED_AT}.\n\nThis release is published only from a successful build of the same commit."
+            --notes "Pattukal version: ${APP_VERSION}\n\nLatest Pattukal download.\n\nAPK built by Android CI run #${RUN_ID} from commit ${GITHUB_SHA}.\nRelease updated: ${UPDATED_AT}.\n\nThis release is published only from a successful build of the same commit."
