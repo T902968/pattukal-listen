@@ -16,6 +16,7 @@ import echo.music.iad1tya.R
 object UpdateNotificationHelper {
   private const val CHANNEL_ID = "updates"
   private const val NOTIFICATION_ID = 1001
+  private const val UPDATE_PENDING_INTENT_REQUEST_CODE = 20701
 
   fun showUpdateNotification(context: Context, versionName: String) {
     val nm = context.getSystemService(NotificationManager::class.java)
@@ -32,11 +33,12 @@ object UpdateNotificationHelper {
 
     val intent = Intent(context, echo.music.iad1tya.MainActivity::class.java).apply {
       action = echo.music.iad1tya.MainActivity.ACTION_UPDATE_APP
+      setPackage(context.packageName)
       flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
     }
 
     val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    val pending = PendingIntent.getActivity(context, NOTIFICATION_ID, intent, flags)
+    val pending = PendingIntent.getActivity(context, UPDATE_PENDING_INTENT_REQUEST_CODE, intent, flags)
 
     val notif =
       NotificationCompat.Builder(context, CHANNEL_ID)
