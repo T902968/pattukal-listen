@@ -11,6 +11,11 @@ permissions:
   contents: write
   actions: read
 
+# Serialize publication so older queued commits cannot overwrite the newest APK.
+concurrency:
+  group: pattukal-latest-release
+  cancel-in-progress: false
+
 jobs:
   release:
     name: Publish APK from the same commit
