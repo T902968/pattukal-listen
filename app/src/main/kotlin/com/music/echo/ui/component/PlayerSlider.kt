@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -24,7 +25,8 @@ fun PlayerSliderTrack(
   sliderState: SliderState,
   modifier: Modifier = Modifier,
   colors: SliderColors = SliderDefaults.colors(),
-  trackHeight: Dp = 10.dp
+  trackHeight: Dp = 10.dp,
+  activeTrackBrush: Brush? = null
 ) {
   val inactiveTrackColor = colors.inactiveTrackColor
   val activeTrackColor = colors.activeTrackColor
@@ -44,7 +46,8 @@ fun PlayerSliderTrack(
       activeTrackColor,
       inactiveTickColor,
       activeTickColor,
-      trackHeight
+      trackHeight,
+      activeTrackBrush
     )
   }
 }
@@ -57,7 +60,8 @@ private fun DrawScope.drawTrack(
   activeTrackColor: Color,
   inactiveTickColor: Color,
   activeTickColor: Color,
-  trackHeight: Dp = 2.dp
+  trackHeight: Dp = 2.dp,
+  activeTrackBrush: Brush? = null
 ) {
   val isRtl = layoutDirection == LayoutDirection.Rtl
   val sliderLeft = Offset(0f, center.y)
@@ -71,7 +75,11 @@ private fun DrawScope.drawTrack(
     Offset(sliderStart.x + (sliderEnd.x - sliderStart.x) * activeRangeEnd, center.y)
   val sliderValueStart =
     Offset(sliderStart.x + (sliderEnd.x - sliderStart.x) * activeRangeStart, center.y)
-  drawLine(activeTrackColor, sliderValueStart, sliderValueEnd, trackStrokeWidth, StrokeCap.Round)
+  if (activeTrackBrush != null) {
+    drawLine(activeTrackBrush, sliderValueStart, sliderValueEnd, trackStrokeWidth, StrokeCap.Round)
+  } else {
+    drawLine(activeTrackColor, sliderValueStart, sliderValueEnd, trackStrokeWidth, StrokeCap.Round)
+  }
   for (tick in tickFractions) {
     val outsideFraction = tick > activeRangeEnd || tick < activeRangeStart
     drawCircle(
