@@ -310,7 +310,7 @@ fun BottomSheetPlayer(
   val playerBackgroundPref by
     rememberEnumPreference(
       key = PlayerBackgroundStyleKey,
-      defaultValue = PlayerBackgroundStyle.GRADIENT
+      defaultValue = PlayerBackgroundStyle.LIQUID_GLASS
     )
   val playerBackground = playerBackgroundPref
   val playerButtonsStyle by
