@@ -626,9 +626,9 @@ fun saveBetaUpdatesSetting(context: Context, enabled: Boolean) {
 private fun formatGitHubDate(githubDate: String): String =
   try {
     val displayFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy, h:mm a")
-    Instant.parse(githubDate).atZone(ZoneId.systemDefault()).format(displayFormatter)
+    Instant.parse(githubDate).atZone(ZoneId.of("Asia/Kolkata")).format(displayFormatter) + " IST"
   } catch (e: Exception) {
-    githubDate
+    githubDate.removeSuffix(" UTC").removeSuffix("Z") + " (time zone unavailable)"
   }
 
 fun isNewerVersion(latestVersion: String, currentVersion: String): Boolean {
