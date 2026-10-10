@@ -2242,7 +2242,11 @@ fun BottomSheetPlayer(
       ) {
         Text(
           text = makeTimeString(sliderPosition ?: effectivePosition),
-          style = MaterialTheme.typography.labelMedium,
+          style =
+            MaterialTheme.typography.labelMedium.copy(
+              fontWeight = FontWeight.Medium,
+              letterSpacing = 0.1.sp
+            ),
           color = TextBackgroundColor,
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
@@ -2468,7 +2472,11 @@ fun BottomSheetPlayer(
 
         Text(
           text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
-          style = MaterialTheme.typography.labelMedium,
+          style =
+            MaterialTheme.typography.labelMedium.copy(
+              fontWeight = FontWeight.Medium,
+              letterSpacing = 0.1.sp
+            ),
           color = TextBackgroundColor,
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
