@@ -1489,6 +1489,12 @@ fun BottomSheetPlayer(
                     val w = size.width
                     val h = size.height
                     val travel = reflectionTravel * w
+                    val reflectionTint =
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
+                        gradientColors.firstOrNull() ?: Color.White
+                      } else {
+                        Color.White
+                      }
 
                     val upperReflection = Path().apply {
                       moveTo(-w * 0.2f + travel, h * 0.14f)
@@ -1502,7 +1508,7 @@ fun BottomSheetPlayer(
                         colors = listOf(
                           Color.Transparent,
                           Color.White.copy(alpha = 0.035f),
-                          Color.White.copy(alpha = 0.14f),
+                          reflectionTint.copy(alpha = 0.14f),
                           Color.White.copy(alpha = 0.025f),
                           Color.Transparent
                         ),
@@ -1523,7 +1529,7 @@ fun BottomSheetPlayer(
                         colors = listOf(
                           Color.Transparent,
                           Color.White.copy(alpha = 0.02f),
-                          Color.White.copy(alpha = 0.09f),
+                          reflectionTint.copy(alpha = 0.09f),
                           Color.White.copy(alpha = 0.02f),
                           Color.Transparent
                         ),
