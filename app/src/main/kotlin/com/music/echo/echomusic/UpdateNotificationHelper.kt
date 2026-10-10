@@ -11,7 +11,6 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import echo.music.iad1tya.R
 
 object UpdateNotificationHelper {
@@ -31,8 +30,10 @@ object UpdateNotificationHelper {
       nm.createNotificationChannel(channel)
     }
 
-    val apkUrl = "https://t902968.github.io/pattukal-listen/"
-    val intent = Intent(Intent.ACTION_VIEW, apkUrl.toUri())
+    val intent = Intent(context, echo.music.iad1tya.MainActivity::class.java).apply {
+      action = echo.music.iad1tya.MainActivity.ACTION_UPDATE_APP
+      flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+    }
 
     val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     val pending = PendingIntent.getActivity(context, NOTIFICATION_ID, intent, flags)
