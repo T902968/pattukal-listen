@@ -44,7 +44,8 @@ jobs:
             exit 1
           fi
           mkdir -p "$HOME/.android"
-          printf '%s' "$PATTUKAL_KEYSTORE_BASE64" | base64 --decode > "$HOME/.android/debug.keystore"
+          # Ignore accidental whitespace/newlines when the Base64 value is copied into GitHub Secrets.
+          printf '%s' "$PATTUKAL_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode > "$HOME/.android/debug.keystore"
           if ! keytool -list -keystore "$HOME/.android/debug.keystore" -storepass "$PATTUKAL_STORE_PASSWORD" -alias "$PATTUKAL_KEY_ALIAS" >/dev/null 2>&1; then
             echo "::error::Persistent signing key is invalid or the alias/password does not match. Refusing to publish an incompatible APK."
             exit 1
