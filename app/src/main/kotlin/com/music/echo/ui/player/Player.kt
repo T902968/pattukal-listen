@@ -2542,10 +2542,20 @@ fun BottomSheetPlayer(
                       else sideButtonContentColor,
                   ),
                 modifier =
-                  Modifier.size(68.dp).graphicsLayer {
-                    scaleX = backButtonScale
-                    scaleY = backButtonScale
-                  }
+                  Modifier.size(68.dp)
+                    .graphicsLayer {
+                      scaleX = backButtonScale
+                      scaleY = backButtonScale
+                    }
+                    .then(
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
+                        Modifier.border(
+                          width = 1.dp,
+                          color = Color.White.copy(alpha = 0.28f),
+                          shape = CircleShape
+                        )
+                      } else Modifier
+                    )
               ) {
                 Icon(
                   painter = painterResource(R.drawable.skip_previous),
@@ -2666,10 +2676,20 @@ fun BottomSheetPlayer(
                       else sideButtonContentColor,
                   ),
                 modifier =
-                  Modifier.size(68.dp).graphicsLayer {
-                    scaleX = nextButtonScale
-                    scaleY = nextButtonScale
-                  }
+                  Modifier.size(68.dp)
+                    .graphicsLayer {
+                      scaleX = nextButtonScale
+                      scaleY = nextButtonScale
+                    }
+                    .then(
+                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
+                        Modifier.border(
+                          width = 1.dp,
+                          color = Color.White.copy(alpha = 0.28f),
+                          shape = CircleShape
+                        )
+                      } else Modifier
+                    )
               ) {
                 Icon(
                   painter = painterResource(R.drawable.skip_next),
