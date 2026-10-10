@@ -680,13 +680,13 @@ suspend fun checkForUpdate(
 
       val currentVersion = BuildConfig.VERSION_NAME
       val targetTagName = targetRelease.getString("tag_name")
-      val currentClean = currentVersion.removePrefix("b").removePrefix("v").trim()
-      val targetClean = targetTagName.removePrefix("b").removePrefix("v").trim()
-      val shouldShow = currentClean != targetClean
+      val releaseBody = targetRelease.optString("body", "")
+      val versionMatch = Regex("(?im)^Pattukal version:\\s*([0-9]+(?:\\.[0-9]+)+(?:[-+][A-Za-z0-9.-]+)?)\\s*$").find(releaseBody)
+      val displayTag = versionMatch?.groupValues?.get(1) ?: targetTagName
+      val shouldShow = isNewerVersion(displayTag, currentVersion)
 
       if (shouldShow) {
         val tagWithPrefix = targetRelease.getString("tag_name")
-        val displayTag = tagWithPrefix
 
         val changelogList = mutableListOf<ChangelogSection>()
         var description: String? = null
