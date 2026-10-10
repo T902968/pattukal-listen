@@ -36,6 +36,7 @@ import echo.music.iad1tya.LocalPlayerAwareWindowInsets
 import echo.music.iad1tya.R
 import echo.music.iad1tya.echomusic.component.UpdateInfoDialog
 import echo.music.iad1tya.echomusic.updater.autoClearOldApks
+import echo.music.iad1tya.echomusic.updater.clearDownloadedApks
 import echo.music.iad1tya.echomusic.updater.getAutoUpdateCheckSetting
 import echo.music.iad1tya.echomusic.updater.getBetaUpdatesSetting
 import echo.music.iad1tya.echomusic.updater.getDownloadedApkCount
@@ -131,6 +132,28 @@ fun UpdateSettings(
               }
             },
             onClick = { navController.navigate("update") }
+          )
+        )
+    )
+
+    Material3SettingsGroup(
+      title = "Downloaded update files",
+      items =
+        listOf(
+          Material3SettingsItem(
+            icon = painterResource(R.drawable.update),
+            title = { Text("Clear downloaded APKs") },
+            description = {
+              Text(
+                if (apkCount == 0) "No downloaded APK files to clear"
+                else "$apkCount downloaded APK file(s) — free up storage"
+              )
+            },
+            onClick = {
+              clearDownloadedApks(context)
+              apkCount = getDownloadedApkCount(context)
+            },
+            enabled = apkCount > 0
           )
         )
     )
