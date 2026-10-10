@@ -1403,7 +1403,7 @@ fun BottomSheetPlayer(
                     contentScale = ContentScale.Crop,
                     colorFilter = colorFilter,
                     modifier =
-                      Modifier.fillMaxSize().blur(100.dp).graphicsLayer {
+                      Modifier.fillMaxSize().blur(36.dp).graphicsLayer {
                         rotationZ = anchorRotation
                       }
                   )
@@ -1420,7 +1420,7 @@ fun BottomSheetPlayer(
                     colorFilter = colorFilter,
                     alignment = Alignment.TopStart,
                     modifier =
-                      Modifier.fillMaxSize().blur(120.dp).graphicsLayer {
+                      Modifier.fillMaxSize().blur(44.dp).graphicsLayer {
                         rotationZ = fastRotation
                         alpha = 0.6f
                       }
@@ -1438,19 +1438,32 @@ fun BottomSheetPlayer(
                     colorFilter = colorFilter,
                     alignment = Alignment.BottomEnd,
                     modifier =
-                      Modifier.fillMaxSize().blur(120.dp).graphicsLayer {
+                      Modifier.fillMaxSize().blur(44.dp).graphicsLayer {
                         rotationZ = slowRotation
                         alpha = 0.5f
                       }
                   )
 
+                  // Lightweight liquid-glass ambient lighting: layered gradients instead of
+                  // multiple full-screen, high-radius blur passes.
+                  Box(
+                    modifier =
+                      Modifier.fillMaxSize()
+                        .background(
+                          Brush.verticalGradient(
+                            0.0f to Color(0xFF00D9FF).copy(alpha = 0.10f),
+                            0.48f to Color(0xFF7657FF).copy(alpha = 0.08f),
+                            1.0f to Color.Transparent
+                          )
+                        )
+                  )
                   Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.2f)))
                   Box(
                     modifier =
                       Modifier.fillMaxSize()
                         .background(
                           Brush.verticalGradient(
-                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.25f))
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.32f))
                           )
                         )
                   )
