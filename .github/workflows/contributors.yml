@@ -82,22 +82,22 @@ jobs:
               readme = f.read()
 
           if start not in readme or end not in readme:
-              raise RuntimeError(
-                  "Contributor markers not found in README.md"
+              # Older README versions may not have the managed section yet.
+              # Add it once at the end without deleting or rewriting existing content.
+              readme = readme.rstrip() + "\n\n## Contributors\n\n" + start + "\n" + html + "\n" + end + "\n"
+          else:
+              before = readme.split(start, 1)[0]
+              after = readme.split(end, 1)[1]
+
+              readme = (
+                  before
+                  + start
+                  + "\n"
+                  + html
+                  + "\n"
+                  + end
+                  + after
               )
-
-          before = readme.split(start, 1)[0]
-          after = readme.split(end, 1)[1]
-
-          readme = (
-              before
-              + start
-              + "\n"
-              + html
-              + "\n"
-              + end
-              + after
-          )
 
           with open("README.md", "w", encoding="utf-8") as f:
               f.write(readme)
