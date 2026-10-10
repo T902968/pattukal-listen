@@ -2088,7 +2088,9 @@ fun BottomSheetPlayer(
             colors =
               PlayerSliderColors.getSliderColors(
                 activeColor =
-                  if (useNewPlayerDesign) textButtonColor else textButtonColor.copy(alpha = 0.7f),
+                  if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) Color.White.copy(alpha = 0.96f)
+                  else if (useNewPlayerDesign) textButtonColor
+                  else textButtonColor.copy(alpha = 0.7f),
                 playerBackground = playerBackground,
                 useDarkTheme = useDarkTheme
               ),
@@ -2117,7 +2119,9 @@ fun BottomSheetPlayer(
               colors =
                 PlayerSliderColors.getSliderColors(
                   activeColor =
-                    if (useNewPlayerDesign) textButtonColor else textButtonColor.copy(alpha = 0.7f),
+                    if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) Color.White.copy(alpha = 0.96f)
+                  else if (useNewPlayerDesign) textButtonColor
+                  else textButtonColor.copy(alpha = 0.7f),
                   playerBackground = playerBackground,
                   useDarkTheme = useDarkTheme
                 ),
@@ -2143,7 +2147,9 @@ fun BottomSheetPlayer(
               colors =
                 PlayerSliderColors.getSliderColors(
                   activeColor =
-                    if (useNewPlayerDesign) textButtonColor else textButtonColor.copy(alpha = 0.7f),
+                    if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) Color.White.copy(alpha = 0.96f)
+                  else if (useNewPlayerDesign) textButtonColor
+                  else textButtonColor.copy(alpha = 0.7f),
                   playerBackground = playerBackground,
                   useDarkTheme = useDarkTheme
                 ),
