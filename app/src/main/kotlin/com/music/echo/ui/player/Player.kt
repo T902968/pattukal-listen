@@ -2862,8 +2862,14 @@ fun BottomSheetPlayer(
                       sliderState = sliderState,
                       colors =
                         SliderDefaults.colors(
-                          activeTrackColor = textButtonColor.copy(alpha = 0.7f),
-                          inactiveTrackColor = textButtonColor.copy(alpha = 0.15f)
+                          activeTrackColor =
+                            textButtonColor.copy(
+                              alpha = if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) 0.78f else 0.7f
+                            ),
+                          inactiveTrackColor =
+                            textButtonColor.copy(
+                              alpha = if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) 0.22f else 0.15f
+                            )
                         ),
                       trackHeight = volumeTrackHeight
                     )
