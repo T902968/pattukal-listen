@@ -646,9 +646,21 @@ private fun ThumbnailItem(
     // Neutral liquid-glass rim: lets the album artwork provide the colour.
     // Uses a simple gradient only (no extra blur or image processing).
     if (isCurrentItem && playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
+      val rimOpacity by
+        rememberInfiniteTransition(label = "pattukalGlassRim").animateFloat(
+          initialValue = 0.72f,
+          targetValue = 1f,
+          animationSpec =
+            infiniteRepeatable(
+              animation = tween(durationMillis = 4200, easing = LinearEasing),
+              repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+            ),
+          label = "glassRimOpacity"
+        )
       Box(
         modifier =
           Modifier.size(dimensions.thumbnailSize + 12.dp)
+            .graphicsLayer { alpha = rimOpacity }
             .clip(RoundedCornerShape(dimensions.cornerRadius + 7.dp))
             .background(
               Brush.linearGradient(
