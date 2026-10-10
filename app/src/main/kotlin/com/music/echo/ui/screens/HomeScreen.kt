@@ -231,19 +231,6 @@ private fun PattukalLiquidBackground(
                 )
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
-                            Color.Transparent,
-                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.04f)
-                        )
-                    )
-                )
-        )
     }
 }
 
