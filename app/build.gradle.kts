@@ -141,10 +141,23 @@ android {
       keyPassword = System.getenv("KEY_PASSWORD")
     }
     getByName("debug") {
-      keyAlias = "androiddebugkey"
-      keyPassword = "android"
-      storePassword = "android"
-      storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
+      // Use the CI-provided persistent key when present; otherwise use the normal local debug key.
+      val ciStorePassword = System.getenv("PATTUKAL_STORE_PASSWORD")
+      val ciKeyAlias = System.getenv("PATTUKAL_KEY_ALIAS")
+      val ciKeyPassword = System.getenv("PATTUKAL_KEY_PASSWORD")
+      val ciKeystore = file("${System.getProperty("user.home")}/.android/debug.keystore")
+
+      if (ciStorePassword != null && ciKeyAlias != null && ciKeyPassword != null && ciKeystore.exists()) {
+        storeFile = ciKeystore
+        storePassword = ciStorePassword
+        keyAlias = ciKeyAlias
+        keyPassword = ciKeyPassword
+      } else {
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
+        storePassword = "android"
+        storeFile = ciKeystore
+      }
     }
   }
 
