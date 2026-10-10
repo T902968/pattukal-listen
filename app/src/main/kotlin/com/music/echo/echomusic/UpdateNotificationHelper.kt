@@ -15,8 +15,13 @@ import echo.music.iad1tya.R
 
 object UpdateNotificationHelper {
   private const val CHANNEL_ID = "updates"
-  private const val NOTIFICATION_ID = 1001
-  private const val UPDATE_PENDING_INTENT_REQUEST_CODE = 20701
+  private const val LEGACY_NOTIFICATION_ID = 1001
+  private const val NOTIFICATION_ID = 1002
+  private const val UPDATE_PENDING_INTENT_REQUEST_CODE = 20702
+
+  fun clearLegacyUpdateNotification(context: Context) {
+    context.getSystemService(NotificationManager::class.java).cancel(LEGACY_NOTIFICATION_ID)
+  }
 
   fun showUpdateNotification(context: Context, versionName: String) {
     val nm = context.getSystemService(NotificationManager::class.java)
@@ -31,9 +36,12 @@ object UpdateNotificationHelper {
       nm.createNotificationChannel(channel)
     }
 
+    nm.cancel(LEGACY_NOTIFICATION_ID)
+
     val intent = Intent(context, echo.music.iad1tya.MainActivity::class.java).apply {
       action = echo.music.iad1tya.MainActivity.ACTION_UPDATE_APP
-      setPackage(context.packageName)
+      data = android.net.Uri.parse("pattukal://update/${System.currentTimeMillis()}")
+      setClassName(context, "echo.music.iad1tya.MainActivity")
       flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
     }
 
