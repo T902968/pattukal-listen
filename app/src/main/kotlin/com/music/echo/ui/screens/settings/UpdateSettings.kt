@@ -117,9 +117,9 @@ fun UpdateSettings(
       items =
         listOf(
           Material3SettingsItem(
-            isHighlighted = (highlightKey == stringResource(R.string.system_update)),
+            isHighlighted = (highlightKey == "Update App"),
             icon = painterResource(R.drawable.update),
-            title = { Text(stringResource(R.string.system_update)) },
+            title = { Text("Update App") },
             description = {
               if (isUpdateAvailable) {
                 Text(
@@ -137,7 +137,7 @@ fun UpdateSettings(
 
     Text(
       text =
-        "To download updates, you will be redirected to our official site containing ads. This helps fund the app's development. Thank you for your support!",
+        "Check for the latest Pattukal version and install updates directly from this screen.",
       style = MaterialTheme.typography.bodySmall,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
       modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp)
