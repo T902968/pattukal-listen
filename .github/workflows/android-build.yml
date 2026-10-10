@@ -58,8 +58,17 @@ jobs:
           PATTUKAL_KEY_ALIAS: ${{ secrets.PATTUKAL_KEY_ALIAS }}
           PATTUKAL_KEY_PASSWORD: ${{ secrets.PATTUKAL_KEY_PASSWORD }}
         run: |
+          set +e
           chmod +x gradlew
-          ./gradlew assembleUniversalFossDebug
+          ./gradlew assembleUniversalFossDebug --console=plain > "$RUNNER_TEMP/pattukal-gradle.log" 2>&1
+          build_status=$?
+          if [ "$build_status" -ne 0 ]; then
+            echo "::error::Gradle build failed. Showing the final 160 log lines to keep Actions output readable."
+            tail -n 160 "$RUNNER_TEMP/pattukal-gradle.log"
+            exit "$build_status"
+          fi
+          echo "Gradle build succeeded. Repetitive compiler/D8 warnings are kept in the runner log to avoid flooding the Actions page."
+          grep -E 'BUILD SUCCESSFUL|BUILD FAILED|warning:|Warning:' "$RUNNER_TEMP/pattukal-gradle.log" | tail -n 40 || true
 
       - name: Upload Pattukal APK
         uses: actions/upload-artifact@v7
