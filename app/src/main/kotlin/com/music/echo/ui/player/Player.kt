@@ -1637,8 +1637,12 @@ fun BottomSheetPlayer(
           ) { title ->
             Text(
               text = title,
-              style = MaterialTheme.typography.titleLarge,
-              fontWeight = FontWeight.Bold,
+              style =
+                MaterialTheme.typography.titleLarge.copy(
+                  fontWeight = FontWeight.Bold,
+                  letterSpacing = (-0.25).sp,
+                  lineHeight = 30.sp
+                ),
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
               color = TextBackgroundColor,
@@ -1721,7 +1725,17 @@ fun BottomSheetPlayer(
                 var clickOffset by remember { mutableStateOf<Offset?>(null) }
                 Text(
                   text = annotatedString,
-                  style = MaterialTheme.typography.titleMedium.copy(color = TextBackgroundColor),
+                  style =
+                    MaterialTheme.typography.titleMedium.copy(
+                      color =
+                        if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
+                          TextBackgroundColor.copy(alpha = 0.78f)
+                        else TextBackgroundColor,
+                      fontSize = 14.sp,
+                      fontWeight = FontWeight.Medium,
+                      letterSpacing = 0.1.sp,
+                      lineHeight = 20.sp
+                    ),
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis,
                   onTextLayout = { layoutResult = it },
