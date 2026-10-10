@@ -1062,9 +1062,6 @@ class MainActivity : ComponentActivity() {
           val activeIntent = pendingIntent ?: intent
           if (activeIntent != null) {
             handleWidgetAction(activeIntent)
-            if (activeIntent.action == ACTION_UPDATE_APP) {
-              navController.navigate("update") { launchSingleTop = true }
-            }
           }
           if (pendingIntent != null) {
             if (pendingIntent!!.action == ACTION_UPDATE_APP) {
@@ -1080,6 +1077,8 @@ class MainActivity : ComponentActivity() {
               (intent.action == Intent.ACTION_VIEW || intent.action == Intent.ACTION_SEND)
           ) {
             handleDeepLinkIntent(intent, navController)
+          } else if (intent != null && intent.action == ACTION_UPDATE_APP) {
+            navController.navigate("update") { launchSingleTop = true }
           } else if (intent != null && intent.action == ACTION_RECOGNITION) {
             handleRecognitionIntent(intent, navController)
           } else if (
