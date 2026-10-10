@@ -88,7 +88,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          UPDATED_AT="$(date -u +'%Y-%m-%d %H:%M UTC')"
+          UPDATED_AT="$(TZ=Asia/Kolkata date +'%Y-%m-%d %H:%M IST')"
           RUN_ID="${{ steps.build.outputs.run_id }}"
           BUILD_NUMBER="$(gh api -H "Accept: application/vnd.github+json" "/repos/${GITHUB_REPOSITORY}/actions/runs/$RUN_ID" | jq -r '.run_number')"
           APP_VERSION="$(sed -n 's/^[[:space:]]*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n1)"
