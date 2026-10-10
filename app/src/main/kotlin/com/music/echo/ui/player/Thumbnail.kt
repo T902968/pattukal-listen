@@ -50,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
@@ -271,7 +272,7 @@ fun Thumbnail(
   val playerBackgroundPref by
     rememberEnumPreference(
       key = PlayerBackgroundStyleKey,
-      defaultValue = PlayerBackgroundStyle.GRADIENT
+      defaultValue = PlayerBackgroundStyle.LIQUID_GLASS
     )
   val isLocalMedia = mediaMetadata?.id?.isLocalMediaId() == true
   val playerBackground = playerBackgroundPref
@@ -642,6 +643,23 @@ private fun ThumbnailItem(
         },
     contentAlignment = Alignment.Center
   ) {
+    // Lightweight liquid-glass ambient rim: gradients only, no expensive blur.
+    if (isCurrentItem && playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
+      Box(
+        modifier =
+          Modifier.size(dimensions.thumbnailSize + 18.dp)
+            .clip(RoundedCornerShape(dimensions.cornerRadius + 10.dp))
+            .background(
+              Brush.linearGradient(
+                colors = listOf(
+                  Color(0xFF38E8FF).copy(alpha = 0.48f),
+                  Color(0xFF7865FF).copy(alpha = 0.52f),
+                  Color(0xFF28A8FF).copy(alpha = 0.42f),
+                  Color(0xFF38E8FF).copy(alpha = 0.48f)
+                )
+              )
+            )
+    }
     Box(
       modifier =
         Modifier.size(dimensions.thumbnailSize)
