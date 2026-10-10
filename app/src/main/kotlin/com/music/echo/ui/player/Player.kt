@@ -1463,9 +1463,28 @@ fun BottomSheetPlayer(
                         ),
                       label = "albumReflectionTravel"
                     )
+                  val reflectionOpacity by
+                    rememberInfiniteTransition(label = "pattukalLiquidReflection").animateFloat(
+                      initialValue = 0.12f,
+                      targetValue = 0.62f,
+                      animationSpec =
+                        infiniteRepeatable(
+                          animation = tween(durationMillis = 6500, easing = LinearEasing),
+                          repeatMode = RepeatMode.Reverse
+                        ),
+                      label = "liquidReflectionOpacity"
+                    )
 
                   androidx.compose.foundation.Canvas(
-                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = 0.72f }
+                    modifier =
+                      Modifier.fillMaxSize().graphicsLayer {
+                        alpha =
+                          if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
+                            reflectionOpacity
+                          } else {
+                            0.72f
+                          }
+                      }
                   ) {
                     val w = size.width
                     val h = size.height
