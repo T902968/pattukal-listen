@@ -249,6 +249,7 @@ class MainActivity : ComponentActivity() {
     const val ACTION_OUTPUT_SWITCHER = "echo.music.iad1tya.action.OUTPUT_SWITCHER"
     const val ACTION_SONG_OPTIONS = "echo.music.iad1tya.action.SONG_OPTIONS"
     const val ACTION_LYRICS = "echo.music.iad1tya.action.LYRICS"
+    const val ACTION_UPDATE_APP = "echo.music.iad1tya.action.UPDATE_APP"
     const val ACTION_MEDIA_OUTPUT = "com.android.settings.panel.action.MEDIA_OUTPUT"
     const val EXTRA_MEDIA_OUTPUT_PACKAGE_NAME = "com.android.settings.panel.extra.PACKAGE_NAME"
     const val EXTRA_AUTO_START_RECOGNITION = "auto_start_recognition"
@@ -341,9 +342,13 @@ class MainActivity : ComponentActivity() {
     super.onNewIntent(intent)
     setIntent(intent)
     if (::navController.isInitialized) {
-      handleDeepLinkIntent(intent, navController)
+      if (intent.action == ACTION_UPDATE_APP) {
+        navController.navigate("update") { launchSingleTop = true }
+      } else {
+        handleDeepLinkIntent(intent, navController)
       handleRecognitionIntent(intent, navController)
       handleAssistantSearchIntent(intent, navController)
+      }
     } else {
       pendingIntent = intent
     }
@@ -1057,11 +1062,18 @@ class MainActivity : ComponentActivity() {
           val activeIntent = pendingIntent ?: intent
           if (activeIntent != null) {
             handleWidgetAction(activeIntent)
+            if (activeIntent.action == ACTION_UPDATE_APP) {
+              navController.navigate("update") { launchSingleTop = true }
+            }
           }
           if (pendingIntent != null) {
-            handleDeepLinkIntent(pendingIntent!!, navController)
+            if (pendingIntent!!.action == ACTION_UPDATE_APP) {
+              navController.navigate("update") { launchSingleTop = true }
+            } else {
+              handleDeepLinkIntent(pendingIntent!!, navController)
             handleRecognitionIntent(pendingIntent!!, navController)
             handleAssistantSearchIntent(pendingIntent!!, navController)
+            }
             pendingIntent = null
           } else if (
             intent != null &&
@@ -1082,7 +1094,9 @@ class MainActivity : ComponentActivity() {
           val listener =
             Consumer<Intent> { newIntent ->
               handleWidgetAction(newIntent)
-              if (newIntent.action == Intent.ACTION_VIEW || newIntent.action == Intent.ACTION_SEND) {
+              if (newIntent.action == ACTION_UPDATE_APP) {
+                navController.navigate("update") { launchSingleTop = true }
+              } else if (newIntent.action == Intent.ACTION_VIEW || newIntent.action == Intent.ACTION_SEND) {
                 handleDeepLinkIntent(newIntent, navController)
               } else if (newIntent.action == ACTION_RECOGNITION) {
                 handleRecognitionIntent(newIntent, navController)
