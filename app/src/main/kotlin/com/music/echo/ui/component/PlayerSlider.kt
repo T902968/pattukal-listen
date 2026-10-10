@@ -99,6 +99,20 @@ private fun DrawScope.drawTrack(
       radius = tickSize / 2f
     )
   }
+  // A small glass bead marks the live position without adding a draggable thumb
+  // or changing the Slider's existing seek handling.
+  if (activeTrackBrush != null && activeRangeEnd > activeRangeStart) {
+    drawCircle(
+      color = Color.White.copy(alpha = 0.28f),
+      radius = 4.dp.toPx(),
+      center = sliderValueEnd
+    )
+    drawCircle(
+      color = Color.White,
+      radius = 1.8.dp.toPx(),
+      center = sliderValueEnd
+    )
+  }
 }
 
 private fun stepsToTickFractions(steps: Int): FloatArray {
