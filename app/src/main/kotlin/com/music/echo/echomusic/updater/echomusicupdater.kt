@@ -674,7 +674,7 @@ suspend fun checkForUpdate(
 ) {
   withContext(Dispatchers.IO) {
     try {
-      val url = URL("https://api.github.com/repos/EchoMusicApp/Echo-Music/releases/latest")
+      val url = URL("https://api.github.com/repos/T902968/pattukal-listen/releases/tags/latest")
       val json = url.openStream().bufferedReader().use { it.readText() }
       val targetRelease = JSONObject(json)
 
@@ -694,7 +694,7 @@ suspend fun checkForUpdate(
         try {
           val changelogUrl =
             URL(
-              "https://github.com/EchoMusicApp/Echo-Music/releases/download/$tagWithPrefix/changelog.json"
+              "https://github.com/T902968/pattukal-listen/releases/download/$tagWithPrefix/changelog.json"
             )
           val changelogJson = changelogUrl.openStream().bufferedReader().use { it.readText() }
           val changelogData = JSONObject(changelogJson)
@@ -737,10 +737,7 @@ suspend fun checkForUpdate(
         for (j in 0 until assets.length()) {
           val asset = assets.getJSONObject(j)
           val assetName = asset.getString("name")
-          if (
-            assetName.endsWith(".apk", ignoreCase = true) &&
-              !assetName.lowercase().contains("debug")
-          ) {
+          if (assetName.equals("pattukal.apk", ignoreCase = true)) {
             val apkSizeInBytes = asset.getLong("size")
             apkSizeInMB = String.format("%.1f", apkSizeInBytes / (1024.0 * 1024.0))
             apkDownloadUrl = asset.getString("browser_download_url")
