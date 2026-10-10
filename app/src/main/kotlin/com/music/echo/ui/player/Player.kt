@@ -1403,9 +1403,11 @@ fun BottomSheetPlayer(
                     contentScale = ContentScale.Crop,
                     colorFilter = colorFilter,
                     modifier =
-                      Modifier.fillMaxSize().blur(36.dp).graphicsLayer {
-                        rotationZ = anchorRotation
-                      }
+                      Modifier.fillMaxSize()
+                        .blur(if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) 18.dp else 36.dp)
+                        .graphicsLayer {
+                          rotationZ = anchorRotation
+                        }
                   )
 
                   AsyncImage(
@@ -1420,10 +1422,12 @@ fun BottomSheetPlayer(
                     colorFilter = colorFilter,
                     alignment = Alignment.TopStart,
                     modifier =
-                      Modifier.fillMaxSize().blur(44.dp).graphicsLayer {
-                        rotationZ = fastRotation
-                        alpha = 0.6f
-                      }
+                      Modifier.fillMaxSize()
+                        .blur(if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) 22.dp else 44.dp)
+                        .graphicsLayer {
+                          rotationZ = fastRotation
+                          alpha = 0.6f
+                        }
                   )
 
                   AsyncImage(
@@ -1438,10 +1442,12 @@ fun BottomSheetPlayer(
                     colorFilter = colorFilter,
                     alignment = Alignment.BottomEnd,
                     modifier =
-                      Modifier.fillMaxSize().blur(44.dp).graphicsLayer {
-                        rotationZ = slowRotation
-                        alpha = 0.5f
-                      }
+                      Modifier.fillMaxSize()
+                        .blur(if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) 22.dp else 44.dp)
+                        .graphicsLayer {
+                          rotationZ = slowRotation
+                          alpha = 0.5f
+                        }
                   )
 
                   // Album-art-driven ambient reflections: neutral highlights only.
