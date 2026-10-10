@@ -77,6 +77,17 @@ private fun DrawScope.drawTrack(
     Offset(sliderStart.x + (sliderEnd.x - sliderStart.x) * activeRangeStart, center.y)
   if (activeTrackBrush != null) {
     drawLine(activeTrackBrush, sliderValueStart, sliderValueEnd, trackStrokeWidth, StrokeCap.Round)
+    // A tiny top-edge reflection gives the Liquid Glass progress track a glossy finish.
+    if (activeRangeEnd > activeRangeStart) {
+      val highlightY = center.y - trackStrokeWidth * 0.22f
+      drawLine(
+        color = Color.White.copy(alpha = 0.28f),
+        start = Offset(sliderValueStart.x, highlightY),
+        end = Offset(sliderValueEnd.x, highlightY),
+        strokeWidth = 1.dp.toPx(),
+        cap = StrokeCap.Round
+      )
+    }
   } else {
     drawLine(activeTrackColor, sliderValueStart, sliderValueEnd, trackStrokeWidth, StrokeCap.Round)
   }
