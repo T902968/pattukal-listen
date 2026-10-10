@@ -34,7 +34,7 @@ fun AboutScreen(
     contentWindowInsets = WindowInsets(0, 0, 0, 0),
     topBar = {
       TopAppBar(
-        title = { Text("About Paattukal", fontWeight = FontWeight.Bold) },
+        title = { Text("About Pattukal", fontWeight = FontWeight.Bold) },
         navigationIcon = {
           IconButton(
             onClick = { onBack?.invoke() ?: navController.navigateUp() },
@@ -107,13 +107,13 @@ fun AboutScreen(
           Spacer(Modifier.height(18.dp))
 
           Text(
-            "Paattukal",
+            "Pattukal",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.ExtraBold
           )
 
           Text(
-            "AKSHAYS UI",
+            "Pattukal",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold
@@ -140,11 +140,6 @@ fun AboutScreen(
             "A premium, lightweight music experience focused on your library, albums and playlists.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
-          )
-          Text(
-            "Inspired by Echo Music",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.62f)
           )
         }
       }
