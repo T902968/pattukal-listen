@@ -150,12 +150,17 @@ object AiRecommendationHelper {
       onLog?.invoke("Found $totalSongs songs. Searching InnerTube...")
 
       for (i in 0 until totalSongs) {
+        // Keep the generated playlist bounded even if a provider returns an oversized array.
+        if (resolvedSongs.size >= 20) break
+
         val item = jsonArray.optJSONObject(i) ?: continue
-        val title = item.optString("title")
-        val artist = item.optString("artist")
-        if (title.isNotEmpty()) {
+        val title = item.optString("title").trim()
+        val artist = item.optString("artist").trim()
+        if (title.isNotEmpty() && title != "null") {
           onLog?.invoke("Searching [${i + 1}/$totalSongs]: $title - $artist")
-          val searchQuery = "$title $artist"
+          val searchQuery = listOf(title, artist.takeUnless { it.isEmpty() || it == "null" })
+            .filterNotNull()
+            .joinToString(" ")
           val result = YouTube.search(searchQuery, YouTube.SearchFilter.FILTER_SONG).getOrNull()
           val topResult = result?.items?.firstOrNull() as? SongItem
           if (topResult != null && resolvedSongs.none { it.id == topResult.id }) {
