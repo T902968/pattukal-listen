@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import echo.music.iad1tya.utils.launchSafely
 import echo.music.iad1tya.LocalPlayerAwareWindowInsets
 import echo.music.iad1tya.R
 import echo.music.iad1tya.db.entities.Song
@@ -158,7 +159,7 @@ fun BackupAndRestore(
                   icon = painterResource(R.drawable.backup),
                   onClick = {
                     val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-                    backupLauncher.launch(
+                    backupLauncher.launchSafely(
                       "${context.getString(R.string.app_name)}_${
                                             LocalDateTime.now().format(formatter)
                                         }.backup"
@@ -191,18 +192,18 @@ fun BackupAndRestore(
                 Material3SettingsItem(
                   title = { Text("Import from local file") },
                   icon = painterResource(R.drawable.restore),
-                  onClick = { restoreLauncher.launch(arrayOf("application/octet-stream")) }
+                  onClick = { restoreLauncher.launchSafely(arrayOf("application/octet-stream")) }
                 ),
                 Material3SettingsItem(
                   title = { Text("Import 'm3u' Playlist") },
                   icon = painterResource(R.drawable.playlist_add),
-                  onClick = { importM3uLauncherOnline.launch(arrayOf("audio/*")) }
+                  onClick = { importM3uLauncherOnline.launchSafely(arrayOf("audio/*")) }
                 ),
                 Material3SettingsItem(
                   title = { Text("Import 'csv' Playlist") },
                   icon = painterResource(R.drawable.playlist_add),
                   onClick = {
-                    importPlaylistFromCsv.launch(
+                    importPlaylistFromCsv.launchSafely(
                       arrayOf(
                         "text/csv",
                         "text/comma-separated-values",
