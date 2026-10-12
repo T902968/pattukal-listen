@@ -954,5 +954,6 @@
     <string name="import_custom_font">Import Custom Font</string>
     <string name="typography_preview">Typography Preview</string>
     <string name="preview_text_quote">The quick brown fox jumps over the lazy dog</string>
+    <string name="system_picker_unavailable">This system picker is unavailable on this device.</string>
 </resources>
 
