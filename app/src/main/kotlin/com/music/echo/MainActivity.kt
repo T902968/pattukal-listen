@@ -1134,7 +1134,7 @@ class MainActivity : ComponentActivity() {
           rememberPreference(LiquidGlassGlobalEnabledKey, defaultValue = false)
         val (liquidGlassVibrancy) = rememberPreference(LiquidGlassVibrancyKey, defaultValue = 1f)
         val (liquidGlassBlurRadius) =
-          rememberPreference(LiquidGlassBlurRadiusKey, defaultValue = 8f)
+          rememberPreference(LiquidGlassBlurRadiusKey, defaultValue = 3f)
         val (liquidGlassLensHeight) =
           rememberPreference(LiquidGlassLensHeightKey, defaultValue = 0.5f)
         val (liquidGlassLensAmount) =
