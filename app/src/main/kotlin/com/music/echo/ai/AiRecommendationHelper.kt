@@ -14,6 +14,7 @@ import echo.music.iad1tya.db.entities.Song
 import echo.music.iad1tya.db.entities.SongEntity
 import echo.music.iad1tya.utils.dataStore
 import echo.music.iad1tya.utils.get
+import java.io.IOException
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
@@ -118,16 +119,21 @@ object AiRecommendationHelper {
               .post(requestBody)
               .build()
 
-          client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-              onLog?.invoke("AI Request failed: ${response.code}")
-              return@withContext
-            }
+          try {
+            client.newCall(request).execute().use { response ->
+              if (!response.isSuccessful) {
+                onLog?.invoke("AI Request failed: ${response.code}")
+                return@withContext
+              }
 
-            val responseString = response.body?.string() ?: return@withContext
-            val responseJson = JSONObject(responseString)
-            val choices = responseJson.optJSONArray("choices") ?: return@withContext
-            choices.optJSONObject(0)?.optJSONObject("message")?.optString("content") ?: "[]"
+              val responseString = response.body?.string() ?: return@withContext
+              val responseJson = JSONObject(responseString)
+              val choices = responseJson.optJSONArray("choices") ?: return@withContext
+              choices.optJSONObject(0)?.optJSONObject("message")?.optString("content") ?: "[]"
+            }
+          } catch (e: IOException) {
+            onLog?.invoke("Unable to reach the AI provider. Check your connection and try again.")
+            return@withContext
           }
         }
 
