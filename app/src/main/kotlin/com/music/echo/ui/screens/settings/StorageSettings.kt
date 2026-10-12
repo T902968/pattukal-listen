@@ -133,7 +133,7 @@ fun StorageSettings(
       {
         if (isPickerSupported) {
           try {
-            exportDirectoryLauncher.launchSafely(null)
+            exportDirectoryLauncher.launch(null)
           } catch (e: android.content.ActivityNotFoundException) {
             Timber.e(e, "Document picker launch failed despite resolveActivity check")
             val fallbackDir = context.getExternalFilesDir(null)
