@@ -188,6 +188,17 @@ fun SettingsScreen(
         )
       }
 
+      if ("pattukal extensions".contains(searchLower) || "extension sources".contains(searchLower)) {
+        add(
+          Material3SettingsItem(
+            icon = painterResource(R.drawable.info),
+            title = { Text("Pattukal Extensions 🔌") },
+            description = { Text("Manage optional music sources") },
+            onClick = { navController.navigate("settings/extensions") }
+          )
+        )
+      }
+
       if (
         appearanceText.lowercase().contains(searchLower) ||
           appearanceDesc.lowercase().contains(searchLower)
