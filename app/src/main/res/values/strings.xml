@@ -663,7 +663,7 @@
     <string name="display_density_desc">Manage Display density settings</string>
     <string name="download_quality_title_desc">Manage Download Quality settings</string>
     <string name="downloaded_songs_desc">Manage Downloaded songs settings</string>
-    <string name="echomusic_1_desc">Manage Vivi Music (Fluid) settings</string>
+    <string name="echomusic_1_desc">Manage Pattukal appearance settings</string>
     <string name="enable_desc">Enable or disable</string>
     <string name="enable_authentication_desc">Enable or disable authentication</string>
     <string name="enable_dynamic_theme_desc">Enable or disable dynamic theme</string>
