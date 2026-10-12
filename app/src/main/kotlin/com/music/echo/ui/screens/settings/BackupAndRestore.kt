@@ -192,12 +192,12 @@ fun BackupAndRestore(
                 Material3SettingsItem(
                   title = { Text("Import from local file") },
                   icon = painterResource(R.drawable.restore),
-                  onClick = { restoreLauncher.launchSafely(arrayOf("application/octet-stream")) }
+                  onClick = { restoreLauncher.launchSafely(arrayOf("application/octet-stream"), context) }
                 ),
                 Material3SettingsItem(
                   title = { Text("Import 'm3u' Playlist") },
                   icon = painterResource(R.drawable.playlist_add),
-                  onClick = { importM3uLauncherOnline.launchSafely(arrayOf("audio/*")) }
+                  onClick = { importM3uLauncherOnline.launchSafely(arrayOf("audio/*"), context) }
                 ),
                 Material3SettingsItem(
                   title = { Text("Import 'csv' Playlist") },
