@@ -131,7 +131,7 @@
     <string name="search_online">Search online</string>
     <string name="action_sync">Sync</string>
     <string name="advanced">Advanced</string>
-    <string name="tempo_and_pitch">Tempo and Pitch</string>
+    <string name="tempo_and_pitch">Pattukal Speed &amp; Pitch</string>
 
     <!-- Create Playlist -->
     <string name="create_playlist_normally">Normally</string>
@@ -305,8 +305,8 @@
     <string name="apple_music">Apple Music</string>
     <string name="squiggly">Squiggly</string>
     <string name="misc">Misc</string>
-    <string name="haptics">Haptics</string>
-    <string name="haptics_desc">Configure vibration and tactile feedback</string>
+    <string name="haptics">Touch Feedback</string>
+    <string name="haptics_desc">Customize Pattukal touch and vibration feedback</string>
 
     <string name="enable_haptics">Enable haptics</string>
     <string name="enable_haptics_desc">Provide haptic feedback while scrolling, clicking, and interacting with the app</string>
@@ -903,7 +903,7 @@
     <string name="blacklisted_folders_description">Folders that will be ignored</string>
     <string name="cannot_skip_next">Cannot skip to next</string>
     <string name="cannot_skip_previous">Cannot skip to previous</string>
-    <string name="clear_queue">Clear queue</string>
+    <string name="clear_queue">Clear Queue</string>
     <string name="download_all">Download all</string>
     <string name="download_cancelled">Download cancelled</string>
     <string name="download_completed">Download completed</string>
