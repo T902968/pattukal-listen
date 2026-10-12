@@ -175,7 +175,7 @@ fun SettingsScreen(
         )
       }
 
-      if ("listening summary".contains(searchLower)) {
+      if ("pattukal listening insights".contains(searchLower) || "explore your listening stats and habits".contains(searchLower)) {
         add(
           Material3SettingsItem(
             icon = painterResource(echo.music.iad1tya.R.drawable.history),
