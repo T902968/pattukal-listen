@@ -158,7 +158,7 @@ object AiRecommendationHelper {
           val searchQuery = "$title $artist"
           val result = YouTube.search(searchQuery, YouTube.SearchFilter.FILTER_SONG).getOrNull()
           val topResult = result?.items?.firstOrNull() as? SongItem
-          if (topResult != null) {
+          if (topResult != null && resolvedSongs.none { it.id == topResult.id }) {
             resolvedSongs.add(topResult)
           }
         }
