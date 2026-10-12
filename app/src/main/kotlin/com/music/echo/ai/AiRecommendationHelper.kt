@@ -147,7 +147,11 @@ object AiRecommendationHelper {
       // 3. Resolve with InnerTube and Save
       val resolvedSongs = mutableListOf<SongItem>()
       val totalSongs = jsonArray.length()
-      onLog?.invoke("Found $totalSongs songs. Searching InnerTube...")
+      if (totalSongs == 0) {
+        onLog?.invoke("Pattukal Brain returned no songs. Try again or check your AI provider settings.")
+        return@withContext
+      }
+      onLog?.invoke("Found ${minOf(totalSongs, 20)} recommendations to check. Searching InnerTube...")
 
       for (i in 0 until totalSongs) {
         // Keep the generated playlist bounded even if a provider returns an oversized array.
