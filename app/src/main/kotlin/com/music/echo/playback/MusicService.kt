@@ -2,6 +2,7 @@
 
 package echo.music.iad1tya.playback
 
+import echo.music.iad1tya.playback.crossfade.EqualPowerCurve
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -4773,12 +4774,11 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
             // so they overlap only through the middle where both sit well below full.
             // Old track leaves, new one arrives — no sudden level match, no boost.
             // Both curves are cosine/sine eased, so the ramp stays click-free.
-            val fadeOut = equalPowerOut(0f, 0.6f, progress)
-            val fadeIn = equalPowerIn(0.4f, 1f, progress)
+            val gains = EqualPowerCurve.calculateGains(progress)
 
             try {
-              player.volume = startVolume * fadeIn
-              fadingPlayer?.volume = startVolume * fadeOut
+              player.volume = startVolume * gains.incomingGain
+              fadingPlayer?.volume = startVolume * gains.outgoingGain
             } catch (e: Exception) {
               break
             }
