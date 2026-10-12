@@ -159,7 +159,7 @@ fun BackupAndRestore(
                   icon = painterResource(R.drawable.backup),
                   onClick = {
                     val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-                    backupLauncher.launchSafely(
+                    backupLauncher.launch(
                       "${context.getString(R.string.app_name)}_${
                                             LocalDateTime.now().format(formatter)
                                         }.backup"
@@ -203,7 +203,7 @@ fun BackupAndRestore(
                   title = { Text("Import 'csv' Playlist") },
                   icon = painterResource(R.drawable.playlist_add),
                   onClick = {
-                    importPlaylistFromCsv.launchSafely(
+                    importPlaylistFromCsv.launch(
                       arrayOf(
                         "text/csv",
                         "text/comma-separated-values",
