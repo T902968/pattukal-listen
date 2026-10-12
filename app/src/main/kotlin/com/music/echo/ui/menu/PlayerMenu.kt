@@ -53,6 +53,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -2333,6 +2334,7 @@ fun ListenTogetherDialog(visible: Boolean, mediaMetadata: MediaMetadata?, onDism
 }
 
 
+@Composable
 fun SpeedDialog(onDismiss: () -> Unit) {
   val playerConnection = LocalPlayerConnection.current ?: return
   var speed by remember { mutableFloatStateOf(playerConnection.player.playbackParameters.speed) }
@@ -2356,7 +2358,7 @@ fun SpeedDialog(onDismiss: () -> Unit) {
         modifier = Modifier.padding(24.dp)
       ) {
         Text(
-          text = stringResource(R.string.speed),
+          text = "Speed",
           style = androidx.compose.material3.MaterialTheme.typography.headlineSmall,
           fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
           color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
