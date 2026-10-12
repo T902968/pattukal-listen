@@ -43,6 +43,7 @@ import coil3.SingletonImageLoader
 import coil3.annotation.DelicateCoilApi
 import coil3.annotation.ExperimentalCoilApi
 import coil3.imageLoader
+import echo.music.iad1tya.utils.launchSafely
 import echo.music.iad1tya.LocalDatabase
 import echo.music.iad1tya.LocalPlayerAwareWindowInsets
 import echo.music.iad1tya.LocalPlayerConnection
@@ -132,7 +133,7 @@ fun StorageSettings(
       {
         if (isPickerSupported) {
           try {
-            exportDirectoryLauncher.launch(null)
+            exportDirectoryLauncher.launchSafely(null)
           } catch (e: android.content.ActivityNotFoundException) {
             Timber.e(e, "Document picker launch failed despite resolveActivity check")
             val fallbackDir = context.getExternalFilesDir(null)
