@@ -70,13 +70,13 @@ fun GlassEffectSettings(
 ) {
   val (globalEnabled, onGlobalEnabledChange) =
     rememberPreference(LiquidGlassGlobalEnabledKey, defaultValue = true)
-  val (vibrancy, onVibrancyChange) = rememberPreference(LiquidGlassVibrancyKey, defaultValue = 1.25f)
+  val (vibrancy, onVibrancyChange) = rememberPreference(LiquidGlassVibrancyKey, defaultValue = 2f)
   val (blurRadius, onBlurRadiusChange) =
-    rememberPreference(LiquidGlassBlurRadiusKey, defaultValue = 1.5f)
+    rememberPreference(LiquidGlassBlurRadiusKey, defaultValue = 1f)
   val (lensHeight, onLensHeightChange) =
     rememberPreference(LiquidGlassLensHeightKey, defaultValue = 0.5f)
   val (lensAmount, onLensAmountChange) =
-    rememberPreference(LiquidGlassLensAmountKey, defaultValue = 0.7f)
+    rememberPreference(LiquidGlassLensAmountKey, defaultValue = 1f)
   val (chromaticAberration, onChromaticAberrationChange) =
     rememberPreference(LiquidGlassChromaticAberrationKey, defaultValue = true)
   val (depthEffect, onDepthEffectChange) =
