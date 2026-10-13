@@ -109,9 +109,27 @@ fun AppIconSettingsScreen(
       listOf(
         AppIconOption(
           AppIconType.DEFAULT,
-          "New Icon",
-          "Pattukal official icon",
+          "Pattukal Official",
+          "Default Pattukal launcher icon",
           R.mipmap.ic_launcher
+        ),
+        AppIconOption(
+          AppIconType.BILLIE_EILISH,
+          "Billie Eilish",
+          "Artist icon",
+          R.mipmap.billie_eilish_icon
+        ),
+        AppIconOption(
+          AppIconType.SABRINA_CARPENTER,
+          "Sabrina Carpenter",
+          "Artist icon",
+          R.mipmap.ic_launcher_sabrina
+        ),
+        AppIconOption(
+          AppIconType.SABRINA_CARPENTER_2,
+          "Sabrina Carpenter · Style 2",
+          "Alternate artist icon",
+          R.mipmap.ic_launcher_sabrina2
         )
       )
 
