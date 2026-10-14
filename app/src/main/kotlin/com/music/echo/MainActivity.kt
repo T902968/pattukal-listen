@@ -378,7 +378,10 @@ class MainActivity : ComponentActivity() {
   @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
   @OptIn(ExperimentalMaterial3Api::class)
   override fun onCreate(savedInstanceState: Bundle?) {
-    installSplashScreen()
+    // Remove the platform splash immediately instead of running its exit animation.
+    installSplashScreen().setOnExitAnimationListener { splashScreenViewProvider ->
+      splashScreenViewProvider.remove()
+    }
     super.onCreate(savedInstanceState)
     echo.music.iad1tya.echomusic.UpdateNotificationHelper.clearLegacyUpdateNotification(this)
 
