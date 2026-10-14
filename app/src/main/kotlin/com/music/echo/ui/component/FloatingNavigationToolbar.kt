@@ -104,11 +104,7 @@ fun FloatingNavigationToolbar(
 ) {
   val toolbarContainerColor =
     if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainerHigh
-  android.util.Log.d(
-    "COLOR_MATCH",
-    "NavBar - pureBlack parameter: $pureBlack, toolbarContainerColor: $toolbarContainerColor"
-  )
-  val toolbarColors =
+val toolbarColors =
     FloatingToolbarDefaults.standardFloatingToolbarColors(
       toolbarContainerColor = androidx.compose.ui.graphics.Color.Transparent,
     )
