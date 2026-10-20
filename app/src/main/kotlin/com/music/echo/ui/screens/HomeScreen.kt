@@ -111,6 +111,11 @@ import echo.music.iad1tya.constants.GridItemSize
 import echo.music.iad1tya.constants.GridItemsSizeKey
 import echo.music.iad1tya.constants.GridThumbnailHeight
 import echo.music.iad1tya.constants.InnerTubeCookieKey
+import echo.music.iad1tya.constants.ContentLanguageKey
+import echo.music.iad1tya.constants.LanguageCodeToName
+import echo.music.iad1tya.constants.LanguagePromptShownKey
+import echo.music.iad1tya.constants.SYSTEM_DEFAULT
+import echo.music.iad1tya.ui.component.EnumDialog
 import echo.music.iad1tya.constants.ListItemHeight
 import echo.music.iad1tya.constants.ListThumbnailSize
 import echo.music.iad1tya.constants.RandomizeHomeOrderKey
@@ -711,6 +716,35 @@ fun HomeScreen(
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
     val haptic = LocalHapticFeedback.current
+
+    // Ask once for music/recommendation language without changing the app's UI language.
+    val (languagePromptShown, onLanguagePromptShownChange) =
+        rememberPreference(LanguagePromptShownKey, defaultValue = false)
+    val (contentLanguage, onContentLanguageChange) =
+        rememberPreference(ContentLanguageKey, defaultValue = SYSTEM_DEFAULT)
+    var showLanguagePrompt by rememberSaveable { mutableStateOf(!languagePromptShown) }
+    LaunchedEffect(languagePromptShown) {
+        if (languagePromptShown) showLanguagePrompt = false
+    }
+    if (showLanguagePrompt) {
+        EnumDialog(
+            onDismiss = {
+                onLanguagePromptShownChange(true)
+                showLanguagePrompt = false
+            },
+            onSelect = { language ->
+                onContentLanguageChange(language)
+                onLanguagePromptShownChange(true)
+                showLanguagePrompt = false
+            },
+            title = "Choose your music language",
+            current = contentLanguage,
+            values = listOf(SYSTEM_DEFAULT) + LanguageCodeToName.keys.toList(),
+            valueText = {
+                LanguageCodeToName.getOrElse(it) { stringResource(echo.music.iad1tya.R.string.system_default) }
+            }
+        )
+    }
 
     val isPlaying by playerConnection.isEffectivelyPlaying.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
