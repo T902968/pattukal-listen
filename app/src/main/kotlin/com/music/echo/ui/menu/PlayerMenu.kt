@@ -368,8 +368,9 @@ fun PlayerMenu(
       current = menuPlayerBackground,
       values =
         echo.music.iad1tya.constants.PlayerBackgroundStyle.entries.filter {
-          it != echo.music.iad1tya.constants.PlayerBackgroundStyle.BLUR ||
-            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
+          it != echo.music.iad1tya.constants.PlayerBackgroundStyle.BLUR &&
+            it != echo.music.iad1tya.constants.PlayerBackgroundStyle.GRADIENT &&
+            it != echo.music.iad1tya.constants.PlayerBackgroundStyle.GLOW_ANIMATED
         },
       valueText = {
         when (it) {
@@ -378,7 +379,7 @@ fun PlayerMenu(
           echo.music.iad1tya.constants.PlayerBackgroundStyle.BLUR -> "Blur"
           echo.music.iad1tya.constants.PlayerBackgroundStyle.GLOW_ANIMATED -> "Glow animated"
           echo.music.iad1tya.constants.PlayerBackgroundStyle.APPLE_MUSIC -> "Apple Music"
-          echo.music.iad1tya.constants.PlayerBackgroundStyle.LIVE_MESH -> "Live mesh"
+          echo.music.iad1tya.constants.PlayerBackgroundStyle.LIVE_MESH -> "Snowland"
           echo.music.iad1tya.constants.PlayerBackgroundStyle.LIQUID_GLASS -> "Liquid glass"
           echo.music.iad1tya.constants.PlayerBackgroundStyle.NATURE -> "Nature"
           echo.music.iad1tya.constants.PlayerBackgroundStyle.LAVA -> "Lava flow"
