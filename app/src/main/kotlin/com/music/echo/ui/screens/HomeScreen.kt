@@ -1877,7 +1877,7 @@ fun HomeScreen(
                                     ?.let { quickPicks ->
 
                                         item(key = "music_cube") {
-                                            echo.music.iad1tya.ui.immersive.MusicCubeHomeCard(navController, quickPicks.distinctBy { it.id }.take(6))
+                                            echo.music.iad1tya.ui.immersive.MusicCubeHomeCard(navController, quickPicks.distinctBy { it.id }.take(40))
                                         }
 
                                         item(
