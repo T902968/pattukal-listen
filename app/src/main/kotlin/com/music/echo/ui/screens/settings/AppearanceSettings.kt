@@ -197,7 +197,7 @@ fun AppearanceSettings(
   val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
     rememberPreference(HidePlayerThumbnailKey, defaultValue = false)
   val (cropAlbumArt, onCropAlbumArtChange) =
-    rememberPreference(CropAlbumArtKey, defaultValue = false)
+    rememberPreference(CropAlbumArtKey, defaultValue = true)
   val (playerBackground, onPlayerBackgroundChange) =
     rememberEnumPreference(PlayerBackgroundStyleKey, defaultValue = PlayerBackgroundStyle.LIQUID_GLASS)
   val (miniPlayerBackground, onMiniPlayerBackgroundChange) =
