@@ -1686,11 +1686,10 @@ fun BottomSheetPlayer(
                       .background(MaterialTheme.colorScheme.surfaceVariant),
                   contentAlignment = Alignment.Center
                 ) {
-                  Icon(
+                  Image(
                     painter = painterResource(R.drawable.ic_launcher_nobg),
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = textButtonColor.copy(alpha = 0.7f)
+                    contentDescription = "Pattukal app icon",
+                    modifier = Modifier.size(32.dp)
                   )
                 }
               } else {
