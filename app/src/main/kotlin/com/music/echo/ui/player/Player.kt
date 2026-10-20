@@ -2715,8 +2715,6 @@ fun BottomSheetPlayer(
             Spacer(modifier = Modifier.height(14.dp))
             echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true })
           } else {
-            Spacer(modifier = Modifier.height(12.dp))
-            echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true })
             Row(
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
@@ -2794,6 +2792,9 @@ fun BottomSheetPlayer(
                 )
               }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true })
 
             if (!hidePlayerSlider) {
               Spacer(modifier = Modifier.height(8.dp))
