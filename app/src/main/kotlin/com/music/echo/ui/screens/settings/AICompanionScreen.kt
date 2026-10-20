@@ -445,8 +445,24 @@ private fun BuddyMain(
 
   if (showSettings) {
     ModalBottomSheet(onDismissRequest = { showSettings = false }, containerColor = Color(0xFF0B0F1C), contentColor = Color.White) {
-      Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 20.dp).padding(bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+      Column(
+        Modifier.fillMaxWidth()
+          .verticalScroll(rememberScrollState())
+          .navigationBarsPadding()
+          .padding(horizontal = 20.dp)
+          .padding(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+      ) {
         Text("Companion settings", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+        TextButton(
+          onClick = {
+            showSettings = false
+            navController.navigate("settings/appearance")
+          },
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Text("Appearance settings", color = buddy.accent2)
+        }
         BuddySwitchRow("Show companion", "Turn ${buddy.displayName} on or off", enabled, onEnabledChange, buddy)
         BuddySwitchRow("Floating companion", "${buddy.displayName} walks around the app and the player, and reacts to your taps", floating, onFloatingChange, buddy)
         BuddySwitchRow("Stay where I place it", "Drag the companion anywhere and it stays there on every screen. Turn off to let it walk around again (or double-tap it)", pinned, onPinnedChange, buddy)
