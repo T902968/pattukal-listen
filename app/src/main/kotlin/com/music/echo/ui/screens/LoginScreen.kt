@@ -65,7 +65,7 @@ fun LoginScreen(
   var savedAccountsJson by rememberPreference(SavedAccountsKey, "[]")
   var hasCompletedLogin by remember { mutableStateOf(false) }
 
-  var webView: WebView? = null
+  var webView by remember { mutableStateOf<WebView?>(null) }
 
   AndroidView(
     modifier = Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current).fillMaxSize(),
