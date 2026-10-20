@@ -19,6 +19,9 @@ import com.music.innertube.pages.HomePage
 import com.music.innertube.utils.completed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import echo.music.iad1tya.constants.ContentCountryKey
+import echo.music.iad1tya.constants.ContentLanguageKey
+import echo.music.iad1tya.constants.SYSTEM_DEFAULT
 import echo.music.iad1tya.constants.HideExplicitKey
 import echo.music.iad1tya.constants.HideVideoSongsKey
 import echo.music.iad1tya.constants.HideYoutubeShortsKey
@@ -607,6 +610,21 @@ constructor(
   }
 
   private suspend fun loadNetworkDataPhase() {
+    // Apply the saved discovery language/region before the home and explore requests start.
+    // This changes music recommendations, not the app's interface language.
+    val savedLanguage = context.dataStore.get(ContentLanguageKey, SYSTEM_DEFAULT)
+    val savedCountry = context.dataStore.get(ContentCountryKey, SYSTEM_DEFAULT)
+    val deviceLocale = java.util.Locale.getDefault()
+    val language =
+      if (savedLanguage.isBlank() || savedLanguage.equals("system", ignoreCase = true) || savedLanguage == SYSTEM_DEFAULT) {
+        deviceLocale.language.ifBlank { "en" }
+      } else savedLanguage
+    val country =
+      if (savedCountry.isBlank() || savedCountry.equals("system", ignoreCase = true) || savedCountry == SYSTEM_DEFAULT) {
+        deviceLocale.country.ifBlank { "US" }
+      } else savedCountry
+    YouTube.locale = YouTube.locale.copy(hl = language, gl = country)
+
     val hideExplicit = context.dataStore.get(HideExplicitKey, false)
     val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
     val hideYoutubeShorts = context.dataStore.get(HideYoutubeShortsKey, false)
