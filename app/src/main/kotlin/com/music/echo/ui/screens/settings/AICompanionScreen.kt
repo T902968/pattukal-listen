@@ -463,6 +463,20 @@ private fun BuddyMain(
         ) {
           Text("Appearance settings", color = buddy.accent2)
         }
+        TextButton(
+          onClick = {
+            showSettings = false
+            navController.navigate("settings/content?highlightKey=Content%20language")
+          },
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Text("Music language & AI Feed", color = buddy.accent2)
+        }
+        Text(
+          "Choose a preferred music language for discovery and recommendations. The app interface stays in English.",
+          color = Color.White.copy(alpha = 0.68f),
+          fontSize = 12.sp,
+        )
         BuddySwitchRow("Show companion", "Turn ${buddy.displayName} on or off", enabled, onEnabledChange, buddy)
         BuddySwitchRow("Floating companion", "${buddy.displayName} walks around the app and the player, and reacts to your taps", floating, onFloatingChange, buddy)
         BuddySwitchRow("Stay where I place it", "Drag the companion anywhere and it stays there on every screen. Turn off to let it walk around again (or double-tap it)", pinned, onPinnedChange, buddy)
