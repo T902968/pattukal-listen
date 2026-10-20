@@ -146,6 +146,7 @@ fun LoginScreen(
           }
         settings.apply {
           javaScriptEnabled = true
+          domStorageEnabled = true
           setSupportZoom(true)
           builtInZoomControls = true
           displayZoomControls = false
@@ -170,7 +171,9 @@ fun LoginScreen(
         )
         webView = this
 
-        CookieManager.getInstance().removeAllCookies(null)
+        // Keep the user's existing Google/YouTube session. Clearing every cookie on each
+        // screen creation can force repeated sign-in redirects and cause visible flicker.
+        CookieManager.getInstance().setAcceptCookie(true)
         CookieManager.getInstance().flush()
         loadUrl("https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fmusic.youtube.com")
       }
