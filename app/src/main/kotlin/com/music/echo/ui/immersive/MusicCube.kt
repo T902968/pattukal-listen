@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -225,7 +227,7 @@ fun MusicCubeHomeCard(navController: NavController, songs: List<Song>, modifier:
       onDismissRequest = { showCustomize = false },
       title = { Text("Choose 6 songs") },
       text = {
-        Column {
+        Column(Modifier.verticalScroll(rememberScrollState())) {
           Text(
             "Selected: ${draftSongIds.size}/6",
             style = MaterialTheme.typography.labelMedium,
@@ -254,7 +256,7 @@ fun MusicCubeHomeCard(navController: NavController, songs: List<Song>, modifier:
               )
               Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
                 Text(song.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(song.artists, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(song.artists.joinToString { it.name }, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
               }
               Text(if (selected) "✓" else "+", color = MaterialTheme.colorScheme.primary)
             }
