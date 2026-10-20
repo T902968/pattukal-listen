@@ -236,7 +236,7 @@ fun AppearanceSettings(
   val (sliderStyle, onSliderStyleChange) =
     rememberEnumPreference(SliderStyleKey, defaultValue = SliderStyle.SLIM)
   val (squigglySlider, onSquigglySliderChange) =
-    rememberPreference(SquigglySliderKey, defaultValue = false)
+    rememberPreference(SquigglySliderKey, defaultValue = true)
   val (wavyPlayPause, onWavyPlayPauseChange) =
     rememberPreference(WavyPlayPauseKey, defaultValue = true)
   val (swipeThumbnail, onSwipeThumbnailChange) =
