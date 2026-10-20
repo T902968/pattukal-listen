@@ -1096,17 +1096,7 @@ fun Queue(
                     Modifier.animateItem()
                       .padding(horizontal = 10.dp, vertical = 3.dp)
                       .glassSurface(androidx.compose.foundation.shape.RoundedCornerShape(24.dp), androidx.compose.ui.graphics.Color.White)
-                      .then(
-                        if (isActive)
-                          Modifier.border(
-                            1.5.dp,
-                            androidx.compose.ui.graphics.Brush.linearGradient(
-                              listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary)
-                            ),
-                            androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
-                          )
-                        else Modifier
-                      ),
+,
                 ) {
                   MediaMetadataListItem(
                     mediaMetadata = window.mediaItem.metadata!!,
