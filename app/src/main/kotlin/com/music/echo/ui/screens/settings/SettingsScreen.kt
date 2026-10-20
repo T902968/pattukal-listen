@@ -198,6 +198,21 @@ fun SettingsScreen(
         )
       }
 
+      if (
+        appearanceText.lowercase().contains(searchLower) ||
+          appearanceDesc.lowercase().contains(searchLower)
+      ) {
+        add(
+          Material3SettingsItem(
+            isHighlighted = (highlightKey == appearanceText),
+            icon = painterResource(R.drawable.palette),
+            title = { Text(appearanceText) },
+            description = { Text(appearanceDesc) },
+            onClick = { navController.navigate("settings/appearance") }
+          )
+        )
+      }
+
       if ("pattukal listening insights".contains(searchLower) || "explore your listening stats and habits".contains(searchLower)) {
         add(
           Material3SettingsItem(
@@ -222,20 +237,6 @@ fun SettingsScreen(
         )
       }
 
-      if (
-        appearanceText.lowercase().contains(searchLower) ||
-          appearanceDesc.lowercase().contains(searchLower)
-      ) {
-        add(
-          Material3SettingsItem(
-            isHighlighted = (highlightKey == appearanceText),
-            icon = painterResource(R.drawable.palette),
-            title = { Text(appearanceText) },
-            description = { Text(appearanceDesc) },
-            onClick = { navController.navigate("settings/appearance") }
-          )
-        )
-      }
       if (
         playerText.lowercase().contains(searchLower) || playerDesc.lowercase().contains(searchLower)
       ) {
