@@ -165,7 +165,7 @@ fun PlayerSettings(
   val (similarContentEnabled, similarContentEnabledChange) =
     rememberPreference(key = SimilarContent, defaultValue = true)
   val (autoSkipNextOnError, onAutoSkipNextOnErrorChange) =
-    rememberPreference(AutoSkipNextOnErrorKey, defaultValue = false)
+    rememberPreference(AutoSkipNextOnErrorKey, defaultValue = true)
   val (persistentShuffleAcrossQueues, onPersistentShuffleAcrossQueuesChange) =
     rememberPreference(PersistentShuffleAcrossQueuesKey, defaultValue = false)
   val (rememberShuffleAndRepeat, onRememberShuffleAndRepeatChange) =
