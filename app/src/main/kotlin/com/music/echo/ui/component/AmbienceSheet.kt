@@ -72,15 +72,15 @@ fun AmbienceButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
           shape
         )
         .clickable(onClick = onClick)
-        .padding(horizontal = 10.dp, vertical = 4.dp),
+        .padding(horizontal = 12.dp, vertical = 7.dp),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(4.dp)
   ) {
-    Text(if (active) "🌿" else "🍃", fontSize = 10.sp)
+    Text(if (active) "🌿" else "🍃", fontSize = 13.sp)
     Text(
       "AMBIENCE",
       color = Color.White.copy(alpha = 0.92f),
-      fontSize = 9.sp,
+      fontSize = 11.sp,
       fontWeight = FontWeight.Bold,
       letterSpacing = 1.4.sp,
       maxLines = 1
