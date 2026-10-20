@@ -1369,7 +1369,12 @@ fun BottomSheetPlayer(
               }
             }
           }
-          PlayerBackgroundStyle.LIVE_MESH,
+          PlayerBackgroundStyle.LIVE_MESH -> {
+            echo.music.iad1tya.ui.component.SnowlandPlayerBackground(
+              modifier = Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() },
+              visible = !state.isCollapsed,
+            )
+          }
           PlayerBackgroundStyle.LIQUID_GLASS -> {
             val infiniteTransition = rememberInfiniteTransition(label = "liveMeshRotation")
 
