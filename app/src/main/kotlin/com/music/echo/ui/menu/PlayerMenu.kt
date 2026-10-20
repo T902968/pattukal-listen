@@ -385,6 +385,9 @@ fun PlayerMenu(
           echo.music.iad1tya.constants.PlayerBackgroundStyle.LAVA -> "Lava flow"
           echo.music.iad1tya.constants.PlayerBackgroundStyle.LIQUID_SOUND -> "Liquid Sound"
           echo.music.iad1tya.constants.PlayerBackgroundStyle.BEAT_CITY -> "Beat City"
+          echo.music.iad1tya.constants.PlayerBackgroundStyle.TOKYO -> "Tokyo"
+          echo.music.iad1tya.constants.PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
+          echo.music.iad1tya.constants.PlayerBackgroundStyle.CAR_DRIFT -> "Car Drift 4K"
         }
       }
     )
