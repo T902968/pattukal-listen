@@ -1232,8 +1232,8 @@ private fun BuddySprite(
                 // the face slides toward whatever Buddy is looking at
                 translationX = lookX() * 5.dp.toPx()
                 translationY = lookY() * 4.dp.toPx()
-                scaleX = 1.14f
-                scaleY = 1.14f
+                scaleX = if (buddy == BuddyCharacter.KAI) 1.06f else 1.14f
+                scaleY = if (buddy == BuddyCharacter.KAI) 1.06f else 1.14f
               }
           )
         }
@@ -1243,7 +1243,7 @@ private fun BuddySprite(
           drawCircle(
             Brush.radialGradient(
               0.55f to Color.Transparent,
-              1f to Color.Black.copy(alpha = 0.38f),
+              1f to Color.Black.copy(alpha = if (buddy == BuddyCharacter.KAI) 0.24f else 0.38f),
               center = center,
               radius = r
             ),
@@ -1259,8 +1259,8 @@ private fun BuddySprite(
           val hx = size.width * (0.32f - lookX() * 0.08f)
           val hy = size.height * (0.24f - lookY() * 0.06f)
           drawCircle(
-            Brush.radialGradient(listOf(Color.White.copy(alpha = 0.34f), Color.Transparent), center = Offset(hx, hy), radius = r * 0.55f),
-            radius = r * 0.55f,
+            Brush.radialGradient(listOf(Color.White.copy(alpha = if (buddy == BuddyCharacter.KAI) 0.18f else 0.34f), Color.Transparent), center = Offset(hx, hy), radius = r * 0.45f),
+            radius = r * 0.45f,
             center = Offset(hx, hy)
           )
         }
