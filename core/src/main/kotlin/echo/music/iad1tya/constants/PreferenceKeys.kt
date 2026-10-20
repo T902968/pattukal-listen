@@ -909,6 +909,7 @@ val CinemaParallaxKey = bk("cinema_parallax")
 val MusicCubeEnabledKey = bk("music_cube_enabled")
 val MusicCubeReducedMotionKey = bk("music_cube_reduced_motion")
 val MusicCubeGridKey = bk("music_cube_grid")
+val MusicCubeSelectedSongIdsKey = stringPreferencesKey("music_cube_selected_song_ids")
 val MiniPlayerPitchKey = bk("mini_player_pitch")
 
 /** Buddy brain & personality. */
