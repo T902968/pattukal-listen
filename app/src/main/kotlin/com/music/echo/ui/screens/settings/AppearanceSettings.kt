@@ -293,9 +293,13 @@ fun AppearanceSettings(
   val (showCommentButton, onShowCommentButtonChange) =
     rememberPreference(ShowCommentButtonKey, defaultValue = false)
 
+  // Keep the appearance picker focused on the supported Pattukal styles.
+  // Legacy values remain readable so existing saved preferences don't break.
   val availableBackgroundStyles =
     PlayerBackgroundStyle.entries.filter {
-      it != PlayerBackgroundStyle.BLUR || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+      it != PlayerBackgroundStyle.BLUR &&
+        it != PlayerBackgroundStyle.GRADIENT &&
+        it != PlayerBackgroundStyle.GLOW_ANIMATED
     }
 
   val availableMiniPlayerBackgroundStyles =
@@ -522,7 +526,7 @@ fun AppearanceSettings(
           PlayerBackgroundStyle.BLUR -> stringResource(R.string.player_background_blur)
           PlayerBackgroundStyle.GLOW_ANIMATED -> stringResource(R.string.glow_animated)
           PlayerBackgroundStyle.APPLE_MUSIC -> stringResource(R.string.apple_music)
-          PlayerBackgroundStyle.LIVE_MESH -> stringResource(R.string.live_mesh)
+          PlayerBackgroundStyle.LIVE_MESH -> "Snowland"
           PlayerBackgroundStyle.NATURE -> "Nature"
           PlayerBackgroundStyle.LAVA -> "Lava flow"
           PlayerBackgroundStyle.LIQUID_SOUND -> "Liquid Sound"
