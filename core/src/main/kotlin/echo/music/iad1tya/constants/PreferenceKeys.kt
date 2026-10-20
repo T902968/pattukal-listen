@@ -454,6 +454,9 @@ enum class PlayerBackgroundStyle {
   LAVA,
   LIQUID_SOUND,
   BEAT_CITY,
+  TOKYO,
+  FIREWORKS,
+  CAR_DRIFT,
 }
 
 val TopSize = stringPreferencesKey("topSize")
