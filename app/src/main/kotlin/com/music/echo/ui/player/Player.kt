@@ -342,6 +342,9 @@ fun BottomSheetPlayer(
         PlayerBackgroundStyle.LAVA,
         PlayerBackgroundStyle.LIQUID_SOUND,
         PlayerBackgroundStyle.BEAT_CITY,
+        PlayerBackgroundStyle.TOKYO,
+        PlayerBackgroundStyle.FIREWORKS,
+        PlayerBackgroundStyle.CAR_DRIFT,
         PlayerBackgroundStyle.LIQUID_GLASS -> true
         PlayerBackgroundStyle.DEFAULT -> useDarkTheme
       }
@@ -395,7 +398,10 @@ fun BottomSheetPlayer(
               PlayerBackgroundStyle.GRADIENT,
               PlayerBackgroundStyle.GLOW_ANIMATED,
               PlayerBackgroundStyle.APPLE_MUSIC,
-              PlayerBackgroundStyle.LIVE_MESH
+              PlayerBackgroundStyle.LIVE_MESH,
+              PlayerBackgroundStyle.TOKYO,
+              PlayerBackgroundStyle.FIREWORKS,
+              PlayerBackgroundStyle.CAR_DRIFT
             )
       ) {
         insetsController.isAppearanceLightStatusBars = false
@@ -787,6 +793,9 @@ fun BottomSheetPlayer(
         playerBackground == PlayerBackgroundStyle.LAVA ||
         playerBackground == PlayerBackgroundStyle.LIQUID_SOUND ||
         playerBackground == PlayerBackgroundStyle.BEAT_CITY ||
+        playerBackground == PlayerBackgroundStyle.TOKYO ||
+        playerBackground == PlayerBackgroundStyle.FIREWORKS ||
+        playerBackground == PlayerBackgroundStyle.CAR_DRIFT ||
         playerBackground == PlayerBackgroundStyle.LIQUID_GLASS -> {
         when (playerButtonsStyle) {
           PlayerButtonsStyle.DEFAULT -> Pair(Color.White, Color.Black)
@@ -1055,6 +1064,9 @@ fun BottomSheetPlayer(
         playerBackground == PlayerBackgroundStyle.LAVA ||
         playerBackground == PlayerBackgroundStyle.LIQUID_SOUND ||
         playerBackground == PlayerBackgroundStyle.BEAT_CITY ||
+        playerBackground == PlayerBackgroundStyle.TOKYO ||
+        playerBackground == PlayerBackgroundStyle.FIREWORKS ||
+        playerBackground == PlayerBackgroundStyle.CAR_DRIFT ||
         playerBackground == PlayerBackgroundStyle.LIQUID_GLASS -> Color.Black
       else -> if (useBlackBackground) Color.Black else MaterialTheme.colorScheme.surfaceContainer
     }
@@ -1643,6 +1655,9 @@ fun BottomSheetPlayer(
               visible = !state.isCollapsed,
             )
           }
+          PlayerBackgroundStyle.TOKYO -> echo.music.iad1tya.ui.component.TokyoPlayerBackground(Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() })
+          PlayerBackgroundStyle.FIREWORKS -> echo.music.iad1tya.ui.component.FireworksPlayerBackground(Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() })
+          PlayerBackgroundStyle.CAR_DRIFT -> echo.music.iad1tya.ui.component.CarDriftPlayerBackground(Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() })
           PlayerBackgroundStyle.DEFAULT -> {}
         }
       }
