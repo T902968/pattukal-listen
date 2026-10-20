@@ -25,9 +25,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -74,6 +76,7 @@ import androidx.navigation.NavController
 import echo.music.iad1tya.R
 import echo.music.iad1tya.constants.MusicCubeEnabledKey
 import echo.music.iad1tya.constants.MusicCubeGridKey
+import echo.music.iad1tya.constants.MusicCubeSelectedSongIdsKey
 import echo.music.iad1tya.constants.MusicCubeReducedMotionKey
 import echo.music.iad1tya.utils.rememberPreference
 import kotlin.math.PI
@@ -157,6 +160,17 @@ fun MusicCubeHomeCard(navController: NavController, songs: List<Song>, modifier:
   if (!enabled || songs.isEmpty()) return
   val (reducedPref, _) = rememberPreference(MusicCubeReducedMotionKey, false)
   val (gridPref, _) = rememberPreference(MusicCubeGridKey, false)
+  val (savedSongIds, onSavedSongIdsChange) = rememberPreference(MusicCubeSelectedSongIdsKey, "")
+  var showCustomize by remember { mutableStateOf(false) }
+  var draftSongIds by remember(songs, savedSongIds) {
+    mutableStateOf(
+      (savedSongIds.split(",").filter(String::isNotBlank).take(6).ifEmpty { songs.take(6).map { it.id } }).toSet()
+    )
+  }
+  val displayedSongs = remember(songs, savedSongIds) {
+    val chosen = savedSongIds.split(",").filter(String::isNotBlank).mapNotNull { id -> songs.find { it.id == id } }.take(6)
+    if (chosen.isEmpty()) songs.take(6) else chosen
+  }
   val context = LocalContext.current
   val screenReader =
     remember {
@@ -192,7 +206,74 @@ fun MusicCubeHomeCard(navController: NavController, songs: List<Song>, modifier:
       )
       .padding(12.dp)
   ) {
-    if (useGrid) CubeGrid(songs) else CubeBody(songs, reduced)
+    Row(
+      Modifier.fillMaxWidth().padding(bottom = 8.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+      Text("Magic Cube", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+      TextButton(onClick = {
+        draftSongIds = displayedSongs.map { it.id }.toSet()
+        showCustomize = true
+      }) { Text("Customize 6") }
+    }
+    if (useGrid) CubeGrid(displayedSongs) else CubeBody(displayedSongs, reduced)
+  }
+
+  if (showCustomize) {
+    AlertDialog(
+      onDismissRequest = { showCustomize = false },
+      title = { Text("Choose 6 songs") },
+      text = {
+        Column {
+          Text(
+            "Selected: ${draftSongIds.size}/6",
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+          )
+          songs.take(40).forEach { song ->
+            val selected = song.id in draftSongIds
+            Row(
+              Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .clickable {
+                  draftSongIds = if (selected) {
+                    draftSongIds - song.id
+                  } else if (draftSongIds.size < 6) {
+                    draftSongIds + song.id
+                  } else draftSongIds
+                }
+                .padding(vertical = 8.dp, horizontal = 4.dp),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              AsyncImage(
+                model = song.thumbnailUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp))
+              )
+              Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
+                Text(song.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(song.artists, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+              }
+              Text(if (selected) "✓" else "+", color = MaterialTheme.colorScheme.primary)
+            }
+          }
+        }
+      },
+      confirmButton = {
+        TextButton(
+          enabled = draftSongIds.size == 6,
+          onClick = {
+            onSavedSongIdsChange(songs.filter { it.id in draftSongIds }.map { it.id }.joinToString(","))
+            showCustomize = false
+          }
+        ) { Text("Save") }
+      },
+      dismissButton = {
+        TextButton(onClick = { showCustomize = false }) { Text("Cancel") }
+      }
+    )
   }
 }
 
