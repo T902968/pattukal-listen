@@ -122,9 +122,9 @@ object BuddyMemory {
 object BuddyBrain {
   private val client =
     OkHttpClient.Builder()
-      .connectTimeout(6, TimeUnit.SECONDS)
-      .readTimeout(12, TimeUnit.SECONDS)
-      .callTimeout(60, TimeUnit.SECONDS)
+      .connectTimeout(4, TimeUnit.SECONDS)
+      .readTimeout(8, TimeUnit.SECONDS)
+      .callTimeout(16, TimeUnit.SECONDS)
       .build()
 
   /** True when the user added their own AI key (Settings → AI). Otherwise the free keyless service is tried. */
@@ -144,7 +144,7 @@ object BuddyBrain {
 
   private suspend fun providers(context: Context): List<AiProvider> {
     val key = context.dataStore.get(OpenRouterApiKey, "")
-    return if (key.isNotBlank()) {
+    val configured = if (key.isNotBlank()) {
       listOf(
         AiProvider(
           context.dataStore.get(OpenRouterBaseUrlKey, "https://openrouter.ai/api/v1/chat/completions"),
@@ -153,14 +153,15 @@ object BuddyBrain {
           "your AI key",
         )
       )
-    } else {
-      // Best-effort free service that needs no key. Availability is outside the app's control.
-      listOf(
-        AiProvider("https://text.pollinations.ai/openai", "openai-fast", null, "free AI"),
-        AiProvider("https://text.pollinations.ai/openai", "openai", null, "free AI"),
-        AiProvider("https://text.pollinations.ai/openai", "mistral", null, "free AI"),
-      )
-    }
+    } else emptyList()
+
+    // Always retain independent fallbacks. A saved key/provider can be unavailable or rate-limited;
+    // do not make the companion completely offline just because its preferred source failed.
+    return configured + listOf(
+      AiProvider("https://text.pollinations.ai/openai", "openai-fast", null, "free AI"),
+      AiProvider("https://text.pollinations.ai/openai", "openai", null, "free AI"),
+      AiProvider("https://text.pollinations.ai/openai", "mistral", null, "free AI"),
+    )
   }
 
   private fun toneLine(tone: Int) =
