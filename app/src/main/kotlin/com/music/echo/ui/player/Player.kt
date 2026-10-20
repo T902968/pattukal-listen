@@ -2533,15 +2533,7 @@ fun BottomSheetPlayer(
                       scaleX = backButtonScale
                       scaleY = backButtonScale
                     }
-                    .then(
-                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
-                        Modifier.border(
-                          width = 1.dp,
-                          color = Color.White.copy(alpha = 0.28f),
-                          shape = CircleShape
-                        )
-                      } else Modifier
-                    )
+                    
               ) {
                 Icon(
                   painter = painterResource(R.drawable.skip_previous),
@@ -2623,11 +2615,6 @@ fun BottomSheetPlayer(
                   Modifier.size(84.dp)
                     .liquidPlayHalo(effectiveIsPlaying)
                     .androidxDrawBehindGlow(effectiveIsPlaying, playGlowColor) { playGlow }
-                    .then(
-                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
-                        Modifier.border(1.dp, Color.White.copy(alpha = 0.42f), CircleShape)
-                      else Modifier
-                    )
                     .graphicsLayer {
                     scaleX = playPauseScale
                     scaleY = playPauseScale
