@@ -304,7 +304,10 @@ fun AppearanceSettings(
 
   val availableMiniPlayerBackgroundStyles =
     availableBackgroundStyles.filter {
-      it != PlayerBackgroundStyle.APPLE_MUSIC && it != PlayerBackgroundStyle.GRADIENT
+      it != PlayerBackgroundStyle.APPLE_MUSIC && it != PlayerBackgroundStyle.GRADIENT &&
+        it != PlayerBackgroundStyle.TOKYO &&
+        it != PlayerBackgroundStyle.FIREWORKS &&
+        it != PlayerBackgroundStyle.CAR_DRIFT
     }
 
   val (defaultChip, onDefaultChipChange) =
@@ -531,6 +534,9 @@ fun AppearanceSettings(
           PlayerBackgroundStyle.LAVA -> "Lava flow"
           PlayerBackgroundStyle.LIQUID_SOUND -> "Liquid Sound"
           PlayerBackgroundStyle.BEAT_CITY -> "Beat City"
+          PlayerBackgroundStyle.TOKYO -> "Tokyo"
+          PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
+          PlayerBackgroundStyle.CAR_DRIFT -> "Car Drift 4K"
           PlayerBackgroundStyle.LIQUID_GLASS ->
             stringResource(R.string.player_background_liquid_glass)
         }
@@ -1149,6 +1155,9 @@ fun AppearanceSettings(
                   PlayerBackgroundStyle.LAVA -> "Lava flow"
                   PlayerBackgroundStyle.LIQUID_SOUND -> "Liquid Sound"
                   PlayerBackgroundStyle.BEAT_CITY -> "Beat City"
+                  PlayerBackgroundStyle.TOKYO -> "Tokyo"
+                  PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
+                  PlayerBackgroundStyle.CAR_DRIFT -> "Car Drift 4K"
                   PlayerBackgroundStyle.LIQUID_GLASS ->
                     stringResource(R.string.player_background_liquid_glass)
                 }
