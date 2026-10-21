@@ -445,7 +445,7 @@ fun BottomSheetPlayer(
   val playerVolume by playerConnection.service.playerVolume.collectAsState()
 
   val (audioQuality) = rememberEnumPreference(AudioQualityKey, defaultValue = AudioQuality.OPUS)
-  val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
+  val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.DEFAULT)
   val squigglySlider by rememberPreference(SquigglySliderKey, defaultValue = true)
   val wavyPlayPause by rememberPreference(WavyPlayPauseKey, defaultValue = true)
 
@@ -1619,6 +1619,10 @@ fun BottomSheetPlayer(
                   )
                 }
               }
+              echo.music.iad1tya.ui.component.LiquidWaveLines(
+                tint = gradientColors.firstOrNull() ?: Color.White,
+                modifier = Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() }
+              )
             }
           }
           PlayerBackgroundStyle.NATURE -> {
@@ -1931,26 +1935,13 @@ fun BottomSheetPlayer(
         Spacer(modifier = Modifier.width(12.dp))
 
         if (useNewPlayerDesign) {
-          val shareShape =
-            RoundedCornerShape(
-              topStart = 50.dp,
-              bottomStart = 50.dp,
-              topEnd = 3.dp,
-              bottomEnd = 3.dp
-            )
-
-          val favShape =
-            RoundedCornerShape(
-              topStart = 3.dp,
-              bottomStart = 3.dp,
-              topEnd = 50.dp,
-              bottomEnd = 50.dp
-            )
+          val shareShape = CircleShape
+          val favShape = CircleShape
 
           val middleShape = RoundedCornerShape(3.dp)
 
           Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically
           ) {
             AnimatedContent(targetState = showInlineLyrics, label = "DownloadButton") { showLyrics
@@ -1961,10 +1952,10 @@ fun BottomSheetPlayer(
                   shape = shareShape,
                   colors =
                     IconButtonDefaults.filledIconButtonColors(
-                      containerColor = textButtonColor,
-                      contentColor = iconButtonColor,
+                      containerColor = textButtonColor.copy(alpha = 0.2f),
+                      contentColor = textButtonColor,
                     ),
-                  modifier = Modifier.size(42.dp),
+                  modifier = Modifier.size(46.dp),
                 ) {
                   Icon(
                     painter =
@@ -2013,10 +2004,10 @@ fun BottomSheetPlayer(
                   shape = shareShape,
                   colors =
                     IconButtonDefaults.filledIconButtonColors(
-                      containerColor = textButtonColor,
-                      contentColor = iconButtonColor,
+                      containerColor = textButtonColor.copy(alpha = 0.2f),
+                      contentColor = textButtonColor,
                     ),
-                  modifier = Modifier.size(42.dp),
+                  modifier = Modifier.size(46.dp),
                 ) {
                   when (download?.state) {
                     Download.STATE_COMPLETED -> {
@@ -2066,10 +2057,10 @@ fun BottomSheetPlayer(
                   shape = favShape,
                   colors =
                     IconButtonDefaults.filledIconButtonColors(
-                      containerColor = textButtonColor,
-                      contentColor = iconButtonColor,
+                      containerColor = textButtonColor.copy(alpha = 0.2f),
+                      contentColor = textButtonColor,
                     ),
-                  modifier = Modifier.size(42.dp),
+                  modifier = Modifier.size(46.dp),
                 ) {
                   Icon(
                     painter = painterResource(R.drawable.more_horiz),
@@ -2083,15 +2074,15 @@ fun BottomSheetPlayer(
                   shape = favShape,
                   colors =
                     IconButtonDefaults.filledIconButtonColors(
-                      containerColor = textButtonColor,
-                      contentColor = iconButtonColor,
+                      containerColor = textButtonColor.copy(alpha = 0.2f),
+                      contentColor = textButtonColor,
                     ),
-                  modifier = Modifier.size(42.dp),
+                  modifier = Modifier.size(46.dp),
                 ) {
                   HeartBurstIcon(
                     isLiked = currentSong?.song?.liked == true,
                     iconSize = 24.dp,
-                    unlikedColor = iconButtonColor
+                    unlikedColor = textButtonColor
                   )
                 }
               }
@@ -2229,6 +2220,8 @@ fun BottomSheetPlayer(
         },
         enabled = !isListenTogetherGuest,
         playing = effectiveIsPlaying,
+        style = sliderStyle,
+        squiggly = squigglySlider,
         modifier = Modifier.padding(horizontal = PlayerHorizontalPadding),
       )
       Spacer(Modifier.height(4.dp))
@@ -2695,15 +2688,6 @@ fun BottomSheetPlayer(
                       scaleX = nextButtonScale
                       scaleY = nextButtonScale
                     }
-                    .then(
-                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
-                        Modifier.border(
-                          width = 1.dp,
-                          color = Color.White.copy(alpha = 0.28f),
-                          shape = CircleShape
-                        )
-                      } else Modifier
-                    )
               ) {
                 Icon(
                   painter = painterResource(R.drawable.skip_next),
@@ -2713,7 +2697,9 @@ fun BottomSheetPlayer(
               }
             }
             Spacer(modifier = Modifier.height(14.dp))
-            echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true })
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+              echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true })
+            }
           } else {
             Row(
               verticalAlignment = Alignment.CenterVertically,
@@ -2794,7 +2780,9 @@ fun BottomSheetPlayer(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true })
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+              echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true })
+            }
 
             if (!hidePlayerSlider) {
               Spacer(modifier = Modifier.height(8.dp))

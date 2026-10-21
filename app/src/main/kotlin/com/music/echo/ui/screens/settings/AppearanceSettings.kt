@@ -234,7 +234,7 @@ fun AppearanceSettings(
     rememberPreference(HideStatusBarOnFullscreenKey, defaultValue = false)
 
   val (sliderStyle, onSliderStyleChange) =
-    rememberEnumPreference(SliderStyleKey, defaultValue = SliderStyle.SLIM)
+    rememberEnumPreference(SliderStyleKey, defaultValue = SliderStyle.DEFAULT)
   val (squigglySlider, onSquigglySliderChange) =
     rememberPreference(SquigglySliderKey, defaultValue = true)
   val (wavyPlayPause, onWavyPlayPauseChange) =

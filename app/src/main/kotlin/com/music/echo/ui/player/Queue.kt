@@ -130,6 +130,7 @@ import echo.music.iad1tya.extensions.move
 import echo.music.iad1tya.extensions.toggleRepeatMode
 import echo.music.iad1tya.models.MediaMetadata
 import echo.music.iad1tya.ui.component.glassSurface
+import echo.music.iad1tya.ui.component.liquidPanel
 import echo.music.iad1tya.ui.component.GlassIconButton
 import echo.music.iad1tya.ui.component.ActionPromptDialog
 import echo.music.iad1tya.ui.component.BottomSheet
@@ -1095,7 +1096,7 @@ fun Queue(
                   modifier =
                     Modifier.animateItem()
                       .padding(horizontal = 10.dp, vertical = 3.dp)
-                      .glassSurface(androidx.compose.foundation.shape.RoundedCornerShape(24.dp), androidx.compose.ui.graphics.Color.White),
+                      .liquidPanel(androidx.compose.foundation.shape.RoundedCornerShape(24.dp)),
                 ) {
                   MediaMetadataListItem(
                     mediaMetadata = window.mediaItem.metadata!!,

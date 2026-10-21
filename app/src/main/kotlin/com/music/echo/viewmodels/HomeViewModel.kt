@@ -9,6 +9,7 @@ import com.music.innertube.models.Artist
 import com.music.innertube.models.BrowseEndpoint
 import com.music.innertube.models.PlaylistItem
 import com.music.innertube.models.SongItem
+import echo.music.iad1tya.models.toMediaMetadata
 import com.music.innertube.models.WatchEndpoint
 import com.music.innertube.models.YTItem
 import com.music.innertube.models.filterExplicit
@@ -318,7 +319,44 @@ constructor(
     dailyDiscover.value = items.toList().distinctBy { it.recommendation.id }.shuffled()
   }
 
+  /** Songs in the language the listener picked, so the first rows (and the Music Cube) match it. */
+  private suspend fun languageSongs(): List<Song> {
+    return try {
+      val code = context.dataStore.get(ContentLanguageKey, SYSTEM_DEFAULT)
+      if (code.isBlank() || code == SYSTEM_DEFAULT || code.equals("system", true) || code.startsWith("en")) {
+        return emptyList()
+      }
+      val name = java.util.Locale.forLanguageTag(code).getDisplayLanguage(java.util.Locale.ENGLISH)
+      if (name.isBlank()) return emptyList()
+      val hits =
+        YouTube.search("$name new hit songs", YouTube.SearchFilter.FILTER_SONG)
+          .getOrNull()
+          ?.items
+          ?.filterIsInstance<SongItem>()
+          ?.take(24)
+          .orEmpty()
+      val missing = hits.filter { database.song(it.id).first() == null }
+      if (missing.isNotEmpty()) {
+        database.transaction { missing.forEach { insert(it.toMediaMetadata()) } }
+        kotlinx.coroutines.delay(700)
+      }
+      val out = ArrayList<Song>()
+      for (item in hits) database.song(item.id).first()?.let { out.add(it) }
+      out
+    } catch (_: Exception) {
+      emptyList()
+    }
+  }
+
   private suspend fun getQuickPicks() {
+    getQuickPicksBase()
+    val lang = languageSongs()
+    if (lang.isNotEmpty()) {
+      quickPicks.value = (lang + quickPicks.value.orEmpty()).distinctBy { it.id }
+    }
+  }
+
+  private suspend fun getQuickPicksBase() {
     val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
     when (quickPicksEnum.first()) {
       QuickPicks.QUICK_PICKS -> {

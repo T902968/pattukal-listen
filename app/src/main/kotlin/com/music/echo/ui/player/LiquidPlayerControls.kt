@@ -14,6 +14,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import echo.music.iad1tya.ui.component.liquidPanel
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import echo.music.iad1tya.ui.component.glassSurface
@@ -56,6 +58,8 @@ fun LiquidSeekBar(
   enabled: Boolean,
   playing: Boolean,
   modifier: Modifier = Modifier,
+  style: echo.music.iad1tya.constants.SliderStyle = echo.music.iad1tya.constants.SliderStyle.DEFAULT,
+  squiggly: Boolean = false,
 ) {
   val accent = MaterialTheme.colorScheme.primary
   val accent2 = MaterialTheme.colorScheme.tertiary
@@ -99,6 +103,39 @@ fun LiquidSeekBar(
         val r = tube / 2f
         val frac = (value / safeMax).coerceIn(0f, 1f)
         val fillX = size.width * frac
+        if (style != echo.music.iad1tya.constants.SliderStyle.DEFAULT) {
+          val wavy = style == echo.music.iad1tya.constants.SliderStyle.WAVY
+          val thick = (if (wavy) 4.dp.toPx() else 3.dp.toPx()) + 1.5.dp.toPx() * grow
+          val br = (if (wavy) 9.dp.toPx() else 7.dp.toPx()) + 3.dp.toPx() * grow
+          // inactive track
+          drawLine(Color.White.copy(alpha = 0.22f), Offset(0f, cy), Offset(size.width, cy), thick, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+          if (fillX > 0f) {
+            val activeBrush = Brush.horizontalGradient(listOf(accent, lerp(accent, Color.White, 0.65f)), 0f, fillX.coerceAtLeast(1f))
+            if (wavy) {
+              val amp = (if (squiggly) 5.dp.toPx() else 3.dp.toPx()) * (if (playing) (0.7f + live.floatValue * 0.9f) else 0.25f) * (1f - 0.5f * grow)
+              val len = (if (squiggly) 18.dp.toPx() else 28.dp.toPx())
+              val path = androidx.compose.ui.graphics.Path()
+              var x = 0f
+              while (x <= fillX) {
+                val y = cy + sin(x / len * 2f * PI.toFloat() - flow * 2f * PI.toFloat()) * amp
+                if (x == 0f) path.moveTo(x, y) else path.lineTo(x, y)
+                x += 3.dp.toPx()
+              }
+              drawPath(path, activeBrush, style = Stroke(thick, cap = androidx.compose.ui.graphics.StrokeCap.Round))
+              drawPath(path, accent.copy(alpha = 0.25f), style = Stroke(thick * 2.6f, cap = androidx.compose.ui.graphics.StrokeCap.Round))
+            } else {
+              drawLine(accent.copy(alpha = 0.25f), Offset(0f, cy), Offset(fillX, cy), thick * 2.4f, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+              drawLine(activeBrush, Offset(0f, cy), Offset(fillX, cy), thick, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+            }
+          }
+          val bx = fillX.coerceIn(br, size.width - br)
+          val by = if (wavy && fillX > 0f) cy + sin(fillX / (if (squiggly) 18.dp.toPx() else 28.dp.toPx()) * 2f * PI.toFloat() - flow * 2f * PI.toFloat()) *
+            (if (squiggly) 5.dp.toPx() else 3.dp.toPx()) * (if (playing) (0.7f + live.floatValue * 0.9f) else 0.25f) * (1f - 0.5f * grow) else cy
+          drawCircle(accent.copy(alpha = 0.22f + 0.25f * grow + 0.2f * live.floatValue), br * 1.7f, Offset(bx, by))
+          drawCircle(Color.White, br, Offset(bx, by))
+          drawCircle(accent, br * 0.45f, Offset(bx, by))
+          return@drawBehind
+        }
         // glass tube
         drawRoundRect(Color.White.copy(alpha = 0.12f), Offset(0f, cy - r), Size(size.width, tube), CornerRadius(r))
         drawRoundRect(
@@ -201,8 +238,8 @@ fun GlassPill(
   androidx.compose.foundation.layout.Row(
     modifier
       .height(54.dp)
-      .glassSurface(shape, if (checked) accent else Color.White)
-      .then(if (checked) Modifier.border(1.5.dp, accent.copy(alpha = 0.9f), shape) else Modifier)
+      .liquidPanel(shape)
+      .then(if (checked) Modifier.background(accent.copy(alpha = 0.22f), shape) else Modifier)
       .clickable(enabled = enabled, onClick = onClick),
     horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
     verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,

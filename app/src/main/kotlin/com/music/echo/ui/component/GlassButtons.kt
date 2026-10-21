@@ -73,16 +73,6 @@ private fun DrawScope.drawGlass(
       ),
     )
   }
-  // bright rim: light from the top-left, accent from the bottom-right
-  drawOutline(
-    outline,
-    Brush.linearGradient(
-      listOf(Color.White.copy(alpha = if (solid) 0.9f else 0.7f), Color.White.copy(alpha = 0.06f), accent.copy(alpha = 0.65f)),
-      start = Offset.Zero,
-      end = Offset(w, h),
-    ),
-    style = Stroke(width = 1.3.dp.toPx()),
-  )
   // bubble look for round buttons: inner depth, curved window highlight and a lower reflection
   if (shape == CircleShape && !solid) {
     val r = minOf(w, h) / 2f
@@ -94,19 +84,7 @@ private fun DrawScope.drawGlass(
       ),
       r, Offset(w / 2f, h / 2f),
     )
-    drawArc(
-      Color.White.copy(alpha = 0.55f), startAngle = 200f, sweepAngle = 70f, useCenter = false,
-      topLeft = Offset(w * 0.14f, h * 0.14f), size = Size(w * 0.72f, h * 0.72f),
-      style = Stroke(width = 2.2.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round),
-    )
   }
-  // specular streak (flat shapes only; round bubbles use the curved highlight)
-  if (shape != CircleShape) drawRoundRect(
-    Color.White.copy(alpha = if (solid) 0.40f else 0.50f),
-    topLeft = Offset(w * 0.2f, h * 0.08f),
-    size = Size(w * 0.6f, max(2f, h * 0.09f)),
-    cornerRadius = CornerRadius(h * 0.05f),
-  )
   if (ringDeg != null) {
     rotate(ringDeg) {
       drawOutline(
