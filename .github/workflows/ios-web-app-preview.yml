@@ -38,7 +38,7 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const html = fs.readFileSync('ios/index.html', 'utf8');
-          const scripts = [...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)];
+          const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)];
           if (!scripts.length) throw new Error('No embedded script found in ios/index.html');
           for (const [index, match] of scripts.entries()) {
             new Function(match[1]);
@@ -55,10 +55,10 @@ jobs:
           cp -R ios/. preview/ios/
           cat > preview/README.txt <<'EOF'
           Pattukal iOS web-app preview
-          
+
           This artifact is built from the ios-web-app branch and does not deploy
           to or modify the production GitHub Pages site.
-          
+
           For a live URL, use a separate preview host or configure a separate
           Pages project/site. Do not deploy this artifact to the production
           Pages environment while testing.
