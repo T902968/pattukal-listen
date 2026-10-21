@@ -95,7 +95,10 @@ import kotlinx.coroutines.launch
 /** Global open/close state for Cinema Mode. The overlay is hosted at the app root, above the player. */
 object CinemaState {
   var visible by mutableStateOf(false)
+  /** When set, the next open starts in this mode (e.g. 1 = Lyrics for karaoke). */
+  var pendingMode by mutableStateOf<Int?>(null)
   fun open() { visible = true }
+  fun openLyrics() { pendingMode = 1; visible = true }
   fun close() { visible = false }
 }
 
@@ -151,7 +154,8 @@ private fun CinemaContent(navController: NavController) {
 
   val (defaultMode, _) = rememberPreference(CinemaDefaultModeKey, 0)
   val (parallaxOn, _) = rememberPreference(CinemaParallaxKey, true)
-  var mode by remember { mutableIntStateOf(defaultMode.coerceIn(0, 3)) }
+  var mode by remember { mutableIntStateOf((CinemaState.pendingMode ?: defaultMode).coerceIn(0, 3)) }
+  LaunchedEffect(Unit) { CinemaState.pendingMode = null }
   var cityVisual by remember { mutableStateOf(false) }
 
   val motion = rememberMotionSettings()

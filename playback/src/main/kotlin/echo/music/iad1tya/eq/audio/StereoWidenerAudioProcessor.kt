@@ -89,7 +89,7 @@ class StereoWidenerAudioProcessor : AudioProcessor {
           if (karaoke) {
             // keep ~200 Hz and below of the centre (kick / bass), drop the rest of it
             bassState += 0.03 * (mid - bassState)
-            mid = bassState + (mid - bassState) * 0.08
+            mid = bassState + (mid - bassState) * 0.03
             side *= 1.5
           }
 

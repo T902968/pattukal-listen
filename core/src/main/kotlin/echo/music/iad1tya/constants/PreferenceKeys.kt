@@ -962,3 +962,6 @@ val MusicLanguageOptions: List<MusicLanguageOption> =
 
 /** Karaoke: reduces vocals in real time and shows lyrics in English letters. */
 val KaraokeModeKey = booleanPreferencesKey("karaokeMode")
+
+/** Up to six songs the user picked for the Home Music Cube: lines of "id<US>title<US>thumbnail". */
+val MusicCubeSongsKey = stringPreferencesKey("music_cube_songs")

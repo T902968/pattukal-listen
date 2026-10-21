@@ -10,6 +10,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -75,16 +76,6 @@ private fun DrawScope.drawGlass(
       ),
     )
   }
-  // bright rim: light from the top-left, accent from the bottom-right
-  drawOutline(
-    outline,
-    Brush.linearGradient(
-      listOf(Color.White.copy(alpha = if (solid) 0.9f else 0.7f), Color.White.copy(alpha = 0.06f), accent.copy(alpha = 0.65f)),
-      start = Offset.Zero,
-      end = Offset(w, h),
-    ),
-    style = Stroke(width = 1.3.dp.toPx()),
-  )
   // bubble look for round buttons: inner depth, curved window highlight and a lower reflection
   if (shape == CircleShape && !solid) {
     val r = minOf(w, h) / 2f
@@ -96,19 +87,7 @@ private fun DrawScope.drawGlass(
       ),
       r, Offset(w / 2f, h / 2f),
     )
-    drawArc(
-      Color.White.copy(alpha = 0.55f), startAngle = 200f, sweepAngle = 70f, useCenter = false,
-      topLeft = Offset(w * 0.14f, h * 0.14f), size = Size(w * 0.72f, h * 0.72f),
-      style = Stroke(width = 2.2.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round),
-    )
   }
-  // specular streak (flat shapes only; round bubbles use the curved highlight)
-  if (shape != CircleShape) drawRoundRect(
-    Color.White.copy(alpha = if (solid) 0.40f else 0.50f),
-    topLeft = Offset(w * 0.2f, h * 0.08f),
-    size = Size(w * 0.6f, max(2f, h * 0.09f)),
-    cornerRadius = CornerRadius(h * 0.05f),
-  )
   if (ringDeg != null) {
     rotate(ringDeg) {
       drawOutline(
@@ -198,4 +177,19 @@ fun GlassIconButton(
 fun Modifier.glassSurface(shape: Shape, base: Color, solid: Boolean = false): Modifier {
   val accent = MaterialTheme.colorScheme.primary
   return this.clip(shape).drawBehind { drawGlass(shape, base, accent, solid, 0f, null) }
+}
+
+/**
+ * Same refractive liquid glass as the Home navigation bar (backdrop blur + lens), kept dark and clear
+ * instead of white. Falls back to a smoky translucent fill below Android 12 or for non-rounded shapes.
+ */
+@Composable
+fun Modifier.navLiquidGlass(shape: Shape): Modifier {
+  val base = LocalGlassEffectConfig.current
+  val cfg = base.copy(globalEnabled = true, surfaceTintColor = Color.Black, surfaceOpacity = 0.22f, blurRadius = 6f)
+  return if (isGlassSupported() && shape is androidx.compose.foundation.shape.CornerBasedShape) {
+    this.clip(shape).liquidGlass(config = cfg, shape = shape)
+  } else {
+    this.clip(shape).background(Color.Black.copy(alpha = 0.32f))
+  }
 }

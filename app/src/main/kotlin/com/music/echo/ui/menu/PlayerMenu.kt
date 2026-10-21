@@ -1087,6 +1087,17 @@ fun PlayerMenu(
       Material3MenuGroup(
         items =
           buildList {
+            if (isQueueTrigger != true) {
+              add(
+                Material3MenuItemData(
+                  title = { Text(text = "Player background", fontWeight = FontWeight.SemiBold) },
+                  description = { Text(text = "Change how the Now Playing screen looks") },
+                  icon = { Icon(painter = painterResource(R.drawable.palette), contentDescription = null, modifier = Modifier.size(24.dp)) },
+                  onClick = { showBackgroundDialog = true }
+                )
+              )
+            }
+
             add(
               Material3MenuItemData(
                 title = { Text(text = stringResource(R.string.details)) },
@@ -1113,21 +1124,17 @@ fun PlayerMenu(
                     Text(text = "Reduces the vocals and shows lyrics in English letters (best on stereo songs)")
                   },
                   icon = { Icon(painter = painterResource(R.drawable.mic), contentDescription = null, modifier = Modifier.size(24.dp)) },
-                  onClick = { onKaraokeChange(!karaokeOn) }
+                  onClick = {
+                    onKaraokeChange(!karaokeOn)
+                    if (!karaokeOn) {
+                      echo.music.iad1tya.ui.immersive.CinemaState.openLyrics()
+                      onDismiss()
+                    }
+                  }
                 )
               )
             }
 
-            if (isQueueTrigger != true) {
-              add(
-                Material3MenuItemData(
-                  title = { Text(text = "Player background", fontWeight = FontWeight.SemiBold) },
-                  description = { Text(text = "Change how the Now Playing screen looks") },
-                  icon = { Icon(painter = painterResource(R.drawable.palette), contentDescription = null, modifier = Modifier.size(24.dp)) },
-                  onClick = { showBackgroundDialog = true }
-                )
-              )
-            }
 
             if (isQueueTrigger != true) {
               add(

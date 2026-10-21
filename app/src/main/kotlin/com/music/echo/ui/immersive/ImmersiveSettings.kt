@@ -207,7 +207,13 @@ fun ImmersiveSettingsScreen(navController: NavController) {
 
       // ---------- Music Cube ----------
       SectionTitle("Music Cube")
-      SwitchRow("Show on Home", "A small cube beside Quick Picks", cubeOn, setCubeOn)
+      SwitchRow("Show on Home", "A small cube at the top of Home", cubeOn, setCubeOn)
+      var showCubePicker by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
+      if (showCubePicker) CubeSongPickerDialog(onDismiss = { showCubePicker = false })
+      Column(Modifier.fillMaxWidth().clickable { showCubePicker = true }.padding(vertical = 6.dp)) {
+        Text("Choose your 6 songs", color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
+        Text("Pick what the cube shows. Empty = songs from your music language", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+      }
       SwitchRow("Grid layout", "Plain tiles instead of the 3D cube (used automatically with TalkBack)", cubeGrid, setCubeGrid)
       SwitchRow("Reduced motion", "Snap to faces without spring animation", cubeReduced, setCubeReduced)
 

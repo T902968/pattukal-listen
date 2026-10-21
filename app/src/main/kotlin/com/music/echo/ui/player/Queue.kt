@@ -130,6 +130,7 @@ import echo.music.iad1tya.extensions.move
 import echo.music.iad1tya.extensions.toggleRepeatMode
 import echo.music.iad1tya.models.MediaMetadata
 import echo.music.iad1tya.ui.component.glassSurface
+import echo.music.iad1tya.ui.component.navLiquidGlass
 import echo.music.iad1tya.ui.component.GlassIconButton
 import echo.music.iad1tya.ui.component.ActionPromptDialog
 import echo.music.iad1tya.ui.component.BottomSheet
@@ -1095,7 +1096,7 @@ fun Queue(
                   modifier =
                     Modifier.animateItem()
                       .padding(horizontal = 10.dp, vertical = 3.dp)
-                      .glassSurface(androidx.compose.foundation.shape.RoundedCornerShape(24.dp), androidx.compose.ui.graphics.Color.White)
+                      .navLiquidGlass(androidx.compose.foundation.shape.RoundedCornerShape(24.dp))
                       .then(
                         if (isActive)
                           Modifier.border(
@@ -1387,10 +1388,10 @@ private fun PlayerQueueButton(
 
   val appliedModifier =
     if (isActive) {
-      modifier.then(buttonModifier.glassSurface(shape, textButtonColor, solid = true)).alpha(alphaFactor)
+      modifier.then(buttonModifier.navLiquidGlass(shape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.30f))).alpha(alphaFactor)
     } else {
       modifier
-        .then(buttonModifier.glassSurface(shape, textButtonColor))
+        .then(buttonModifier.navLiquidGlass(shape))
         .alpha(alphaFactor)
     }
 

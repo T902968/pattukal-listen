@@ -1323,6 +1323,13 @@ fun HomeScreen(
                         )
                     }
 
+                    item(key = "home_music_cube") {
+                        echo.music.iad1tya.ui.immersive.HomeMusicCube(
+                            navController,
+                            quickPicks.orEmpty()
+                        )
+                    }
+
                     homeSections.forEach { section ->
 
                         when (section) {
@@ -1849,9 +1856,6 @@ fun HomeScreen(
                                     ?.takeIf { it.isNotEmpty() }
                                     ?.let { quickPicks ->
 
-                                        item(key = "music_cube") {
-                                            echo.music.iad1tya.ui.immersive.MusicCubeHomeCard(navController, quickPicks.distinctBy { it.id }.take(6))
-                                        }
 
                                         item(
                                             key =

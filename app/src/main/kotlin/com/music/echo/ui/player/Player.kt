@@ -1724,11 +1724,10 @@ fun BottomSheetPlayer(
                       .background(MaterialTheme.colorScheme.surfaceVariant),
                   contentAlignment = Alignment.Center
                 ) {
-                  Icon(
+                  androidx.compose.foundation.Image(
                     painter = painterResource(R.drawable.ic_launcher_nobg),
                     contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = textButtonColor.copy(alpha = 0.7f)
+                    modifier = Modifier.size(40.dp)
                   )
                 }
               } else {
@@ -1955,21 +1954,8 @@ fun BottomSheetPlayer(
         Spacer(modifier = Modifier.width(12.dp))
 
         if (useNewPlayerDesign) {
-          val shareShape =
-            RoundedCornerShape(
-              topStart = 50.dp,
-              bottomStart = 50.dp,
-              topEnd = 3.dp,
-              bottomEnd = 3.dp
-            )
-
-          val favShape =
-            RoundedCornerShape(
-              topStart = 3.dp,
-              bottomStart = 3.dp,
-              topEnd = 50.dp,
-              bottomEnd = 50.dp
-            )
+          val shareShape = CircleShape
+          val favShape = CircleShape
 
           val middleShape = RoundedCornerShape(3.dp)
 
@@ -1988,7 +1974,7 @@ fun BottomSheetPlayer(
                       containerColor = textButtonColor,
                       contentColor = iconButtonColor,
                     ),
-                  modifier = Modifier.size(42.dp),
+                  modifier = Modifier.size(48.dp),
                 ) {
                   Icon(
                     painter =
@@ -2040,7 +2026,7 @@ fun BottomSheetPlayer(
                       containerColor = textButtonColor,
                       contentColor = iconButtonColor,
                     ),
-                  modifier = Modifier.size(42.dp),
+                  modifier = Modifier.size(48.dp),
                 ) {
                   when (download?.state) {
                     Download.STATE_COMPLETED -> {
@@ -2093,7 +2079,7 @@ fun BottomSheetPlayer(
                       containerColor = textButtonColor,
                       contentColor = iconButtonColor,
                     ),
-                  modifier = Modifier.size(42.dp),
+                  modifier = Modifier.size(48.dp),
                 ) {
                   Icon(
                     painter = painterResource(R.drawable.more_horiz),
@@ -2110,7 +2096,7 @@ fun BottomSheetPlayer(
                       containerColor = textButtonColor,
                       contentColor = iconButtonColor,
                     ),
-                  modifier = Modifier.size(42.dp),
+                  modifier = Modifier.size(48.dp),
                 ) {
                   HeartBurstIcon(
                     isLiked = currentSong?.song?.liked == true,
@@ -2576,15 +2562,7 @@ fun BottomSheetPlayer(
                       scaleX = backButtonScale
                       scaleY = backButtonScale
                     }
-                    .then(
-                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
-                        Modifier.border(
-                          width = 1.dp,
-                          color = Color.White.copy(alpha = 0.28f),
-                          shape = CircleShape
-                        )
-                      } else Modifier
-                    )
+                    
               ) {
                 Icon(
                   painter = painterResource(R.drawable.skip_previous),
@@ -2666,11 +2644,7 @@ fun BottomSheetPlayer(
                   Modifier.size(84.dp)
                     .liquidPlayHalo(effectiveIsPlaying)
                     .androidxDrawBehindGlow(effectiveIsPlaying, playGlowColor) { playGlow }
-                    .then(
-                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS)
-                        Modifier.border(1.dp, Color.White.copy(alpha = 0.42f), CircleShape)
-                      else Modifier
-                    )
+                    
                     .graphicsLayer {
                     scaleX = playPauseScale
                     scaleY = playPauseScale
@@ -2732,15 +2706,7 @@ fun BottomSheetPlayer(
                       scaleX = nextButtonScale
                       scaleY = nextButtonScale
                     }
-                    .then(
-                      if (playerBackground == PlayerBackgroundStyle.LIQUID_GLASS) {
-                        Modifier.border(
-                          width = 1.dp,
-                          color = Color.White.copy(alpha = 0.28f),
-                          shape = CircleShape
-                        )
-                      } else Modifier
-                    )
+                    
               ) {
                 Icon(
                   painter = painterResource(R.drawable.skip_next),
@@ -2750,10 +2716,10 @@ fun BottomSheetPlayer(
               }
             }
             Spacer(modifier = Modifier.height(14.dp))
-            echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true })
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true }) }
           } else {
             Spacer(modifier = Modifier.height(12.dp))
-            echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true })
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true }) }
             Row(
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),

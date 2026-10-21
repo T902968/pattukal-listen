@@ -358,3 +358,4 @@ Ambient Mode keeps the existing album-art square and layers muted Canvas artwork
 - **Karaoke:** `KaraokeModeKey`; `StereoWidenerAudioProcessor.vocalRemoval` does real-time centre-channel reduction; `LyricsUtils.romanizeIndic` (ICU) gives English-letter lyrics.
 - **Bug reports:** `ui/screens/settings/BugReport.kt` posts to a FormSubmit relay that emails `BUG_REPORT_EMAIL`.
 - **Companion AI:** `BuddyBrain.providers` always appends free keyless sources after the user's own key, so it auto-falls back.
+- **Round 2:** `navLiquidGlass` (GlassButtons.kt) = the nav-bar liquid glass, used by Play Next; glass buttons have no rim/streak lines. `HomeMusicCube` + `CubeSongPickerDialog` (ui/immersive/CubeSongs.kt) drive the Home cube. Karaoke opens Cinema lyrics via `CinemaState.openLyrics()`. Hidden thumbnail uses `ic_launcher_nobg` untinted.

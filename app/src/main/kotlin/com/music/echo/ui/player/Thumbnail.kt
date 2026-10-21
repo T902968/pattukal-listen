@@ -923,11 +923,10 @@ private fun HiddenThumbnailPlaceholder(textBackgroundColor: Color, modifier: Mod
     modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant),
     contentAlignment = Alignment.Center
   ) {
-    Icon(
+    androidx.compose.foundation.Image(
       painter = painterResource(R.drawable.ic_launcher_nobg),
       contentDescription = stringResource(R.string.hide_player_thumbnail),
-      tint = textBackgroundColor.copy(alpha = 0.7f),
-      modifier = Modifier.size(120.dp)
+      modifier = Modifier.size(150.dp)
     )
   }
 }

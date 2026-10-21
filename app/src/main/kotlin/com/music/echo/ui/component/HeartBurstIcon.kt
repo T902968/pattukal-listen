@@ -37,7 +37,7 @@ fun HeartBurstIcon(
       burstAnim.snapTo(0f)
       burstAnim.animateTo(
         targetValue = 1f,
-        animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing)
+        animationSpec = tween(durationMillis = 700, easing = LinearOutSlowInEasing)
       )
     }
     wasLiked = isLiked
@@ -62,6 +62,30 @@ fun HeartBurstIcon(
       Canvas(modifier = Modifier.size(iconSize * 2.5f)) {
         val center = Offset(size.width / 2, size.height / 2)
         val maxRadius = size.width / 2.2f
+
+        // liquid ripple rings spreading from the heart
+        drawCircle(
+          color = likedColor.copy(alpha = 0.55f * alpha),
+          radius = maxRadius * progress * 1.05f,
+          center = center,
+          style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3.dp.toPx() * (1f - progress * 0.6f)),
+        )
+        drawCircle(
+          color = likedColor.copy(alpha = 0.25f * alpha),
+          radius = maxRadius * (progress * 0.7f),
+          center = center,
+          style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx()),
+        )
+        // small liquid droplets flying out between the hearts
+        for (d in 0 until 10) {
+          val da = (d * 36f + 18f) * (Math.PI / 180f)
+          val dr = maxRadius * (0.55f + 0.55f * progress)
+          drawCircle(
+            color = likedColor.copy(alpha = 0.8f * alpha),
+            radius = size.width * 0.035f * (1f - progress * 0.7f),
+            center = Offset(center.x + cos(da).toFloat() * dr, center.y + sin(da).toFloat() * dr),
+          )
+        }
 
         for (i in 0 until particleCount) {
           val angle = (i * (360f / particleCount)) * (Math.PI / 180f)
