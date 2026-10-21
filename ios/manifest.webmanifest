@@ -1,0 +1,13 @@
+{
+  "id": "./",
+  "name": "Pattukal — Music, your way",
+  "short_name": "Pattukal",
+  "description": "Discover music, build queues and save your favourites.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080914",
+  "theme_color": "#090914",
+  "orientation": "portrait",
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
