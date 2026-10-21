@@ -1,0 +1,73 @@
+name: iOS Web App Preview
+
+on:
+  push:
+    branches:
+      - ios-web-app
+    paths:
+      - 'ios/**'
+      - '.github/workflows/ios-web-app-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-web-app-preview
+  cancel-in-progress: true
+
+jobs:
+  validate-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout iOS web-app branch
+        uses: actions/checkout@v4
+        with:
+          ref: ios-web-app
+
+      - name: Validate required PWA files
+        run: |
+          test -s ios/index.html
+          test -s ios/manifest.webmanifest
+          test -s ios/sw.js
+          test -s ios/icon.svg
+          node --version
+
+      - name: Validate embedded JavaScript syntax
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('ios/index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)];
+          if (!scripts.length) throw new Error('No embedded script found in ios/index.html');
+          for (const [index, match] of scripts.entries()) {
+            new Function(match[1]);
+            console.log('Embedded script ' + (index + 1) + ': syntax OK');
+          }
+          const manifest = JSON.parse(fs.readFileSync('ios/manifest.webmanifest', 'utf8'));
+          if (!manifest.name || !manifest.start_url) throw new Error('PWA manifest is missing name/start_url');
+          console.log('PWA manifest: JSON OK');
+          NODE
+
+      - name: Package standalone preview
+        run: |
+          mkdir -p preview/ios
+          cp -R ios/. preview/ios/
+          cat > preview/README.txt <<'EOF'
+          Pattukal iOS web-app preview
+          
+          This artifact is built from the ios-web-app branch and does not deploy
+          to or modify the production GitHub Pages site.
+          
+          For a live URL, use a separate preview host or configure a separate
+          Pages project/site. Do not deploy this artifact to the production
+          Pages environment while testing.
+          EOF
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pattukal-ios-web-preview
+          path: preview/
+          if-no-files-found: error
+          retention-days: 14
