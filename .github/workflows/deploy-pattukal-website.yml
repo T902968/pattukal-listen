@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'index.html'
+      - 'ios/**'
+      - 'docs/pattukal-official-music-app-download.html'
       - '.github/workflows/deploy-pattukal-website.yml'
   workflow_dispatch:
 
@@ -30,8 +32,9 @@ jobs:
 
       - name: Prepare website files
         run: |
-          mkdir -p _site
+          mkdir -p _site/ios
           cp index.html _site/index.html
+          cp -R ios/. _site/ios/
           if [ -f docs/pattukal-official-music-app-download.html ]; then
             cp docs/pattukal-official-music-app-download.html _site/pattukal-official-music-app-download.html
           fi
