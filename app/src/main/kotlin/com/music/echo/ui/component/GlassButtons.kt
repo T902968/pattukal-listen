@@ -186,7 +186,17 @@ fun Modifier.glassSurface(shape: Shape, base: Color, solid: Boolean = false): Mo
 @Composable
 fun Modifier.navLiquidGlass(shape: Shape): Modifier {
   val base = LocalGlassEffectConfig.current
-  val cfg = base.copy(globalEnabled = true, surfaceTintColor = Color.Black, surfaceOpacity = 0.22f, blurRadius = 6f)
+  // calmer than the nav bar: softer lens, no colour fringing, more blur and a darker tint
+  val cfg =
+    base.copy(
+      globalEnabled = true,
+      surfaceTintColor = Color.Black,
+      surfaceOpacity = 0.5f,
+      blurRadius = 18f,
+      lensHeight = 0.18f,
+      lensAmount = 0.15f,
+      chromaticAberration = false,
+    )
   return if (isGlassSupported() && shape is androidx.compose.foundation.shape.CornerBasedShape) {
     this.clip(shape).liquidGlass(config = cfg, shape = shape)
   } else {
