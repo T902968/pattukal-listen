@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#090914" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#090914">
+  <meta name="description" content="Pattukal – Your music. Your vibe. Official music app. Install on iOS as a web app.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Pattukal">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Pattukal">
+  <meta name="msapplication-TileColor" content="#090914">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+  <title>Pattukal · iOS Web App</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080914;
+      --text: #f8f4ff;
+      --muted: #c4bddb;
+      --violet: #9c67ff;
+      --cyan: #20d8f2;
+      --blue: #347dff;
+      --glass: rgba(255,255,255,0.08);
+      --border: rgba(228,216,255,0.25);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    body {
+      min-height: 100dvh;
+      padding: calc(20px + var(--safe-top)) 16px calc(24px + var(--safe-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background:
+        radial-gradient(ellipse at 20% 10%, #a34aff55 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 20%, #00c9ff33 0%, transparent 40%),
+        radial-gradient(ellipse at 50% 90%, #3658ff44 0%, transparent 50%),
+        var(--bg);
+    }
+    .shell {
+      width: min(420px, 100%);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-radius: 36px;
+      border: 1px solid var(--border);
+      background: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03) 50%, rgba(189,170,255,0.06));
+      box-shadow: 0 30px 80px rgba(0,0,0,0.55), inset 0 1px rgba(255,255,255,0.25);
+      overflow: hidden;
+      position: relative;
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+    }
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(120deg, rgba(215,182,255,0.08), transparent 40%, rgba(35,217,255,0.06) 70%);
+    }
+    .content {
+      position: relative;
+      padding: 36px 28px 28px;
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .badge {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      font-weight: 600;
+      color: #e3d3ff;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .logo {
+      width: 88px;
+      height: 88px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #9c67ff, #20d8f2);
+      display: grid;
+      place-items: center;
+      font-size: 42px;
+      margin-bottom: 22px;
+      box-shadow: 0 12px 40px rgba(156,103,255,0.45);
+    }
+    h1 {
+      font-size: clamp(2.6rem, 10vw, 3.4rem);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 10px;
+      background: linear-gradient(95deg, #f6edff, #b49aff 55%, #45dfff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .tagline {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 280px;
+      margin-bottom: 28px;
+    }
+    .cta {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 20px;
+      border-radius: 18px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: linear-gradient(105deg, #9a63ff, #657dff 50%, #17cbe9);
+      color: #fff;
+      box-shadow: 0 10px 32px rgba(93,104,255,0.4);
+    }
+    .btn-secondary {
+      background: var(--glass);
+      color: #e8e0ff;
+      border: 1px solid var(--border);
+    }
+    .install-hint {
+      font-size: 13px;
+      color: #a89cc8;
+      line-height: 1.5;
+      padding: 0 8px;
+      margin-bottom: 20px;
+    }
+    .install-hint strong { color: #d4c8f0; }
+    .status {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      text-align: left;
+      font-size: 13px;
+      color: #c9c1df;
+    }
+    .status h3 {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: #e3d3ff;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .status p { margin: 2px 0; }
+    .footer {
+      padding: 16px 20px 22px;
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: #8e86a9;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer a { color: #b9a8e8; text-decoration: none; }
+    #installBanner {
+      display: none;
+      position: fixed;
+      bottom: calc(16px + var(--safe-bottom));
+      left: 16px;
+      right: 16px;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(20,18,40,0.95);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      z-index: 100;
+      font-size: 14px;
+      color: #e8e0ff;
+      text-align: center;
+    }
+    #installBanner.show { display: block; }
+    @media (display-mode: standalone) {
+      .install-hint { display: none; }
+      #installBanner { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="content">
+      <div class="badge">Pattukal · iOS</div>
+      <div class="logo" aria-hidden="true">♬</div>
+      <h1>Pattukal</h1>
+      <p class="tagline">Your music. Your atmosphere.<br>Install this web app on your iPhone or iPad.</p>
+
+      <div class="cta">
+        <a class="btn btn-primary" id="downloadApk" href="https://github.com/T902968/pattukal-listen/releases/download/latest/pattukal.apk">
+          ↓ Download Android APK
+        </a>
+        <button class="btn btn-secondary" id="installBtn" type="button">
+          ＋ Add to Home Screen
+        </button>
+      </div>
+
+      <p class="install-hint" id="iosHint">
+        On iPhone / iPad: tap the <strong>Share</strong> button
+        <span style="font-size:16px">⎋</span> then
+        <strong>Add to Home Screen</strong>.
+        The app will open full-screen like a native app.
+      </p>
+
+      <div class="status">
+        <h3>Status</h3>
+        <p id="pwaStatus">Checking installability…</p>
+        <p id="offlineStatus">Offline support: ready</p>
+        <p id="releaseInfo">Loading latest release…</p>
+      </div>
+    </div>
+    <div class="footer">
+      AKSHAY UI CREATION · <a href="https://github.com/T902968/pattukal-listen">GitHub</a><br>
+      Music engine inspired by Echo Music · GPL-3.0
+    </div>
+  </div>
+
+  <div id="installBanner">
+    Tap Share → Add to Home Screen to install Pattukal
+  </div>
+
+  <script>
+    // Service Worker registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(() => console.log('[Pattukal] SW registered'))
+        .catch(e => console.warn('[Pattukal] SW failed', e));
+    }
+
+    // Detect standalone / installed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+    const statusEl = document.getElementById('pwaStatus');
+    const hintEl = document.getElementById('iosHint');
+    const installBtn = document.getElementById('installBtn');
+    const banner = document.getElementById('installBanner');
+
+    if (isStandalone) {
+      statusEl.textContent = 'Installed · Running as app';
+      installBtn.style.display = 'none';
+    } else {
+      statusEl.textContent = 'Ready to install on Home Screen';
+      // Show hint for iOS Safari
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isIOS) {
+        setTimeout(() => banner.classList.add('show'), 1800);
+        setTimeout(() => banner.classList.remove('show'), 8000);
+      }
+    }
+
+    installBtn.addEventListener('click', () => {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isIOS) {
+        banner.classList.add('show');
+        setTimeout(() => banner.classList.remove('show'), 6000);
+        alert('On iOS:\n1. Tap the Share button (square with arrow)\n2. Scroll and tap "Add to Home Screen"\n3. Confirm – Pattukal will appear on your Home Screen!');
+      } else if (window.deferredPrompt) {
+        window.deferredPrompt.prompt();
+      } else {
+        alert('Use your browser menu → "Install app" or "Add to Home Screen".');
+      }
+    });
+
+    // Android Chrome install prompt capture
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredPrompt = e;
+      statusEl.textContent = 'Install prompt available';
+    });
+
+    // Latest release info
+    async function loadRelease() {
+      const el = document.getElementById('releaseInfo');
+      const apk = document.getElementById('downloadApk');
+      try {
+        const res = await fetch('https://api.github.com/repos/T902968/pattukal-listen/releases/tags/latest?t=' + Date.now(), {
+          headers: { 'Accept': 'application/vnd.github+json' },
+          cache: 'no-store'
+        });
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        const asset = (data.assets || []).find(a => a.name === 'pattukal.apk' && a.state === 'uploaded');
+        const date = data.published_at || data.updated_at;
+        const fmt = new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' });
+        el.textContent = date
+          ? `Latest: ${data.tag_name || 'latest'} · ${fmt.format(new Date(date))} IST`
+          : 'Release info unavailable';
+        if (asset) {
+          apk.href = asset.browser_download_url;
+          apk.setAttribute('download', 'pattukal.apk');
+        }
+      } catch (e) {
+        el.textContent = 'Could not load release info';
+      }
+    }
+    loadRelease();
+  </script>
+</body>
+</html>
