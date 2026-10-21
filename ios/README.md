@@ -1,52 +1,45 @@
-# Pattukal – Full iOS / Web Music App
+# Pattukal – Real YouTube Music Web App
 
-Complete Progressive Web App music player that you can install on iPhone / iPad (Add to Home Screen).
+Full Progressive Web App that can **search and play real YouTube / YouTube Music tracks**.
+
+## How it works
+
+- Search uses public **Piped** instances (privacy-friendly YouTube frontend APIs).
+- When you tap a song it fetches a real audio stream and plays it.
+- Same installable PWA experience on iPhone / iPad (Add to Home Screen).
 
 ## Features
 
-- **Home** – Quick Mix cards + Trending + For You lists
-- **Search** – Live filter across songs
-- **Library** – Liked songs + Recently played (saved in localStorage)
-- **Full-screen Player** – Progress, shuffle, repeat, like, next/prev
-- **Mini Player** – Always available while browsing
-- **Media Session** – Lock screen / Control Center controls on iOS
-- **Offline shell** – Service Worker caches the app
-- **Installable** – Works as standalone app after Add to Home Screen
+- Live search for real songs
+- Actual streaming playback
+- Home / Trending loaded from real data
+- Mini player + full-screen player
+- Like + Recently played (localStorage)
+- Media Session (lock screen controls)
+- Offline app shell
 
-## How to test on iPhone
+## Test on iPhone
 
-1. Open the app in **Safari**:
-   - After GitHub Pages deploy, or
-   - Use a raw link / local server / tunnel pointing to the `ios/` folder
-2. Tap **Share → Add to Home Screen**
-3. Open the icon – it runs full-screen like a native app
-4. Tap any song – it plays, mini player appears, full player opens
+1. Open in **Safari**:
+   ```
+   https://raw.githack.com/T902968/pattukal-listen/ios/ios/index.html
+   ```
+2. Share → **Add to Home Screen**
+3. Search any song and play
 
-## Current music source
+## Limitations (honest)
 
-Demo tracks from Bensound (royalty-free) so playback works immediately without API keys.
+- Depends on public Piped instances (sometimes one is down → it auto-rotates).
+- Not 100% identical to the Android Innertube client (no official YouTube login, no offline downloads yet, no Cast).
+- Some tracks may fail if the instance is rate-limited or geo-blocked.
 
-Next upgrade path: connect real YouTube Music / Innertube search + streaming (requires backend proxy for CORS & reliability).
+This is the practical way to get **real playback** in a pure web app without running your own backend.
 
-## Files
+## Next possible upgrades
 
-| File | Role |
-|------|------|
-| `index.html` | App shell + screens |
-| `styles.css` | Liquid-glass UI |
-| `app.js` | Player, queue, library, search logic |
-| `sw.js` | Offline caching |
-| `manifest.webmanifest` | PWA install |
+- Self-hosted Piped / Invidious backend for reliability
+- Lyrics
+- Playlists & Google account sync
+- Better error handling & instance health checks
 
-## Local run
-
-```bash
-npx serve ios
-```
-
-Then open the URL in Safari on your device.
-
----
-
-Branch: `ios`  
-Full web app experience for testing on iOS.
+Branch: `ios`

@@ -110,11 +110,16 @@ html, body {
 .card-art {
   width: 100%;
   aspect-ratio: 1;
-  object-fit: cover;
   background: linear-gradient(135deg, #9c67ff55, #20d8f255);
   display: grid;
   place-items: center;
   font-size: 36px;
+  overflow: hidden;
+}
+.card-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .card-info { padding: 10px; }
 .card-title {
@@ -189,9 +194,7 @@ html, body {
 }
 .song-like.liked { color: #ff6b9d; }
 
-.search-box {
-  margin-bottom: 20px;
-}
+.search-box { margin-bottom: 20px; }
 .search-box input {
   width: 100%;
   padding: 14px 18px;
@@ -297,7 +300,6 @@ html, body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 15;
-  padding-bottom: 0;
 }
 .nav-btn {
   display: flex;
@@ -371,10 +373,7 @@ html, body {
   color: var(--muted);
   font-size: 15px;
 }
-.progress-wrap {
-  width: 100%;
-  margin-bottom: 24px;
-}
+.progress-wrap { width: 100%; margin-bottom: 24px; }
 .progress-wrap input[type=range] {
   width: 100%;
   height: 4px;
