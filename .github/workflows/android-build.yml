@@ -3,6 +3,12 @@ name: Pattukal Android CI
 on:
   push:
     branches: ["main", "ui/paattukal-liquid-glass", "upstream-v1.4.3-port", "fix/remove-startup-confetti"]
+    paths-ignore:
+      - 'index.html'
+      - 'docs/**'
+      - '.github/workflows/android-build.yml'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/deploy-pattukal-website.yml'
   workflow_dispatch:
 
 permissions:
