@@ -1649,6 +1649,7 @@ class MainActivity : ComponentActivity() {
             }
             if (!startup.visible) {
               echo.music.iad1tya.ui.immersive.CinemaOverlay(navController)
+              echo.music.iad1tya.ui.immersive.KaraokeOverlay()
             }
             if (!startup.visible) {
               echo.music.iad1tya.ui.buddy.BuddyOverlay(

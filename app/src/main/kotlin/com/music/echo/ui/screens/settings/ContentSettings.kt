@@ -186,7 +186,7 @@ fun ContentSettings(
   val (hideYoutubeShorts, onHideYoutubeShortsChange) =
     rememberPreference(key = HideYoutubeShortsKey, defaultValue = false)
   val (sponsorBlockEnabled, onSponsorBlockEnabledChange) =
-    rememberPreference(key = SponsorBlockEnabledKey, defaultValue = false)
+    rememberPreference(key = SponsorBlockEnabledKey, defaultValue = true)
   val (showArtistDescription, onShowArtistDescriptionChange) =
     rememberPreference(key = ShowArtistDescriptionKey, defaultValue = true)
   val (showArtistSubscriberCount, onShowArtistSubscriberCountChange) =

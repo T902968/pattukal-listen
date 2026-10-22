@@ -10,6 +10,9 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalDensity
@@ -196,4 +199,22 @@ fun Modifier.liquidGlass(
     },
     backdropScale = resolutionScale,
   )
+}
+
+/**
+ * The same refractive liquid glass the Home navigation bar uses, forced on for panels such as the
+ * Up Next list. Falls back to a dark frosted fill where the effect is unsupported.
+ */
+@Composable
+fun Modifier.liquidPanel(shape: CornerBasedShape): Modifier {
+  val base = LocalGlassEffectConfig.current
+  return if (isGlassSupported()) {
+    this.liquidGlass(
+      config = base.copy(globalEnabled = true, blurRadius = 8f, surfaceOpacity = base.surfaceOpacity.coerceAtMost(0.4f)),
+      shape = shape,
+    )
+  } else {
+    this.clip(shape)
+      .background(Brush.verticalGradient(listOf(Color(0xB3101018), Color(0x8C000000))))
+  }
 }

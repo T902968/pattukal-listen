@@ -1087,6 +1087,28 @@ fun PlayerMenu(
       Material3MenuGroup(
         items =
           buildList {
+            if (isQueueTrigger != true) {
+              add(
+                Material3MenuItemData(
+                  title = { Text(text = "Player background", fontWeight = FontWeight.SemiBold) },
+                  description = { Text(text = "Change how the Now Playing screen looks") },
+                  icon = { Icon(painter = painterResource(R.drawable.palette), contentDescription = null, modifier = Modifier.size(24.dp)) },
+                  onClick = { showBackgroundDialog = true }
+                )
+              )
+            }
+
+            add(
+              Material3MenuItemData(
+                title = { Text(text = "Karaoke", fontWeight = FontWeight.SemiBold) },
+                description = { Text(text = "Instrumental only, with lyrics in English letters") },
+                icon = { Icon(painter = painterResource(R.drawable.mic), contentDescription = null, modifier = Modifier.size(24.dp)) },
+                onClick = {
+                  onDismiss()
+                  echo.music.iad1tya.ui.immersive.KaraokeState.open()
+                }
+              )
+            )
             add(
               Material3MenuItemData(
                 title = { Text(text = stringResource(R.string.details)) },
@@ -1104,30 +1126,6 @@ fun PlayerMenu(
                 }
               )
             )
-
-            if (isQueueTrigger != true) {
-              add(
-                Material3MenuItemData(
-                  title = { Text(text = if (karaokeOn) "Karaoke: on" else "Karaoke", fontWeight = FontWeight.SemiBold) },
-                  description = {
-                    Text(text = "Reduces the vocals and shows lyrics in English letters (best on stereo songs)")
-                  },
-                  icon = { Icon(painter = painterResource(R.drawable.mic), contentDescription = null, modifier = Modifier.size(24.dp)) },
-                  onClick = { onKaraokeChange(!karaokeOn) }
-                )
-              )
-            }
-
-            if (isQueueTrigger != true) {
-              add(
-                Material3MenuItemData(
-                  title = { Text(text = "Player background", fontWeight = FontWeight.SemiBold) },
-                  description = { Text(text = "Change how the Now Playing screen looks") },
-                  icon = { Icon(painter = painterResource(R.drawable.palette), contentDescription = null, modifier = Modifier.size(24.dp)) },
-                  onClick = { showBackgroundDialog = true }
-                )
-              )
-            }
 
             if (isQueueTrigger != true) {
               add(

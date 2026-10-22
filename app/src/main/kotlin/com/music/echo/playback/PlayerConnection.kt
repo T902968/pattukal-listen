@@ -556,7 +556,7 @@ class PlayerConnection(
               it[SponsorBlockEnabledKey]
             } catch (e: Exception) {
               null
-            }) ?: false
+            }) ?: true
           }
 
         launch {
