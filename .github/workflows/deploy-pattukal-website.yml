@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'index.html'
+      - 'docs/pattukal-official-music-app-download.html'
       - '.github/workflows/deploy-pattukal-website.yml'
   workflow_dispatch:
 
