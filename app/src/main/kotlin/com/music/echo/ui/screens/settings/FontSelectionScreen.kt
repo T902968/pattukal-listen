@@ -60,7 +60,7 @@ fun FontSelectionScreen(
   navController: NavController,
   scrollBehavior: TopAppBarScrollBehavior,
 ) {
-  val selectedFontState = rememberPreference(SelectedFontKey, defaultValue = AppFont.VESPER.value)
+  val selectedFontState = rememberPreference(SelectedFontKey, defaultValue = AppFont.IMPACTED.value)
   val selectedFont = selectedFontState.value
   val onSelectedFontChange: (String) -> Unit = { selectedFontState.value = it }
   val context = LocalContext.current
@@ -95,6 +95,10 @@ fun FontSelectionScreen(
   val activeFontFamily =
     remember(selectedFont, customFontPath) {
       when (AppFont.fromValue(selectedFont)) {
+        AppFont.IMPACTED -> echo.music.iad1tya.ui.theme.ImpactedFont
+        AppFont.PAYBACK -> echo.music.iad1tya.ui.theme.PaybackFont
+        AppFont.SOOPAFRE -> echo.music.iad1tya.ui.theme.SoopafreFont
+        AppFont.SPOTABE -> echo.music.iad1tya.ui.theme.SpotabeFont
         AppFont.SYSTEM -> FontFamily.Default
         AppFont.VESPER -> echo.music.iad1tya.ui.theme.VesperFraktur
         AppFont.GOOGLE_SANS -> GoogleSansFontFamily
