@@ -981,6 +981,10 @@ fun AppearanceSettings(
                 val fontLabel =
                   when (AppFont.fromValue(selectedFontValue)) {
                     AppFont.VESPER -> "Vesper Fraktur"
+                    AppFont.IMPACTED -> stringResource(echo.music.iad1tya.R.string.font_impacted)
+                    AppFont.PAYBACK -> stringResource(echo.music.iad1tya.R.string.font_payback)
+                    AppFont.SOOPAFRE -> stringResource(echo.music.iad1tya.R.string.font_soopafre)
+                    AppFont.SPOTABE -> stringResource(echo.music.iad1tya.R.string.font_spotabe)
                     AppFont.SYSTEM -> stringResource(echo.music.iad1tya.R.string.font_system)
                     AppFont.GOOGLE_SANS ->
                       stringResource(echo.music.iad1tya.R.string.font_google_sans)
