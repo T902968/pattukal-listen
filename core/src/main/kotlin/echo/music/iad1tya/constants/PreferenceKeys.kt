@@ -852,6 +852,10 @@ val AmbientFullScreenArtKey = booleanPreferencesKey("ambient_full_screen_art")
 val AmbientSpacingKey = floatPreferencesKey("ambient_spacing")
 
 enum class AppFont(val value: String) {
+  IMPACTED("impacted"),
+  PAYBACK("payback"),
+  SOOPAFRE("soopafre"),
+  SPOTABE("spotabe"),
   VESPER("vesper"),
   SYSTEM("system"),
   GOOGLE_SANS("google_sans"),
@@ -861,7 +865,7 @@ enum class AppFont(val value: String) {
   CUSTOM("custom");
 
   companion object {
-    fun fromValue(value: String): AppFont = entries.find { it.value == value } ?: VESPER
+    fun fromValue(value: String): AppFont = entries.find { it.value == value } ?: IMPACTED
   }
 }
 
