@@ -937,9 +937,13 @@
 
     <string name="app_font">App Font</string>
     <string name="font_impacted">Impacted</string>
+    <string name="font_impacted_desc">Use Impacted display font</string>
     <string name="font_payback">PaybAck</string>
+    <string name="font_payback_desc">Use PaybAck display font</string>
     <string name="font_soopafre">Soopafre</string>
+    <string name="font_soopafre_desc">Use Soopafre display font</string>
     <string name="font_spotabe">Spotabe</string>
+    <string name="font_spotabe_desc">Use Spotabe display font</string>
     <string name="font_system">System Default</string>
     <string name="font_google_sans">Google Sans</string>
     <string name="font_sans_flex">Sans Flex</string>
