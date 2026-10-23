@@ -184,6 +184,54 @@ fun FontSelectionScreen(
           listOf(
             Material3SettingsItem(
               customIcon = {
+                AnimatedRadioButton(selected = selectedFont == AppFont.IMPACTED.value, onClick = null)
+              },
+              title = {
+                Text(text = stringResource(R.string.font_impacted), fontFamily = echo.music.iad1tya.ui.theme.ImpactedFont)
+              },
+              description = {
+                Text(text = stringResource(R.string.font_impacted_desc))
+              },
+              onClick = { onSelectedFontChange(AppFont.IMPACTED.value) }
+            ),
+            Material3SettingsItem(
+              customIcon = {
+                AnimatedRadioButton(selected = selectedFont == AppFont.PAYBACK.value, onClick = null)
+              },
+              title = {
+                Text(text = stringResource(R.string.font_payback), fontFamily = echo.music.iad1tya.ui.theme.PaybackFont)
+              },
+              description = {
+                Text(text = stringResource(R.string.font_payback_desc))
+              },
+              onClick = { onSelectedFontChange(AppFont.PAYBACK.value) }
+            ),
+            Material3SettingsItem(
+              customIcon = {
+                AnimatedRadioButton(selected = selectedFont == AppFont.SOOPAFRE.value, onClick = null)
+              },
+              title = {
+                Text(text = stringResource(R.string.font_soopafre), fontFamily = echo.music.iad1tya.ui.theme.SoopafreFont)
+              },
+              description = {
+                Text(text = stringResource(R.string.font_soopafre_desc))
+              },
+              onClick = { onSelectedFontChange(AppFont.SOOPAFRE.value) }
+            ),
+            Material3SettingsItem(
+              customIcon = {
+                AnimatedRadioButton(selected = selectedFont == AppFont.SPOTABE.value, onClick = null)
+              },
+              title = {
+                Text(text = stringResource(R.string.font_spotabe), fontFamily = echo.music.iad1tya.ui.theme.SpotabeFont)
+              },
+              description = {
+                Text(text = stringResource(R.string.font_spotabe_desc))
+              },
+              onClick = { onSelectedFontChange(AppFont.SPOTABE.value) }
+            ),
+            Material3SettingsItem(
+              customIcon = {
                 AnimatedRadioButton(selected = selectedFont == AppFont.VESPER.value, onClick = null)
               },
               title = {
