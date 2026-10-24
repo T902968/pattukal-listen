@@ -180,26 +180,23 @@ fun Modifier.glassSurface(shape: Shape, base: Color, solid: Boolean = false): Mo
 }
 
 /**
- * Same refractive liquid glass as the Home navigation bar (backdrop blur + lens), kept dark and clear
- * instead of white. Falls back to a smoky translucent fill below Android 12 or for non-rounded shapes.
+ * Light, cheap frosted-glass fill for long lists (Play Next). Pure gradients, no backdrop blur, so a
+ * queue of dozens of rows scrolls smoothly (per-row backdrop blur was the source of the lag).
  */
 @Composable
-fun Modifier.navLiquidGlass(shape: Shape): Modifier {
-  val base = LocalGlassEffectConfig.current
-  // calmer than the nav bar: softer lens, no colour fringing, more blur and a darker tint
-  val cfg =
-    base.copy(
-      globalEnabled = true,
-      surfaceTintColor = Color.Black,
-      surfaceOpacity = 0.5f,
-      blurRadius = 18f,
-      lensHeight = 0.18f,
-      lensAmount = 0.15f,
-      chromaticAberration = false,
+fun Modifier.lightGlass(shape: Shape): Modifier =
+  this.clip(shape)
+    .background(
+      Brush.verticalGradient(
+        listOf(Color.White.copy(alpha = 0.13f), Color.White.copy(alpha = 0.05f))
+      )
     )
-  return if (isGlassSupported() && shape is androidx.compose.foundation.shape.CornerBasedShape) {
-    this.clip(shape).liquidGlass(config = cfg, shape = shape)
-  } else {
-    this.clip(shape).background(Color.Black.copy(alpha = 0.32f))
-  }
-}
+    .drawBehind {
+      // soft top light, like the nav bar glass, without any line or border
+      drawRect(
+        Brush.verticalGradient(
+          0f to Color.White.copy(alpha = 0.10f),
+          0.45f to Color.Transparent,
+        )
+      )
+    }

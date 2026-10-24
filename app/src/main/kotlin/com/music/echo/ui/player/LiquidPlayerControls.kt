@@ -9,6 +9,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -56,6 +57,8 @@ fun LiquidSeekBar(
   enabled: Boolean,
   playing: Boolean,
   modifier: Modifier = Modifier,
+  /** 0 = Bar (glass tube), 1 = Wavy, 2 = Slim, 3 = Squiggly. Follows Settings > Appearance > Slider style. */
+  style: Int = 1,
 ) {
   val accent = MaterialTheme.colorScheme.primary
   val accent2 = MaterialTheme.colorScheme.tertiary
@@ -99,6 +102,10 @@ fun LiquidSeekBar(
         val r = tube / 2f
         val frac = (value / safeMax).coerceIn(0f, 1f)
         val fillX = size.width * frac
+        if (style != 0) {
+          drawStyledSeek(style, cy, fillX, flow, playing, live.floatValue, grow, accent)
+          return@drawBehind
+        }
         // glass tube
         drawRoundRect(Color.White.copy(alpha = 0.12f), Offset(0f, cy - r), Size(size.width, tube), CornerRadius(r))
         drawRoundRect(
@@ -143,6 +150,53 @@ fun LiquidSeekBar(
         drawCircle(Color.White.copy(alpha = 0.8f), br, Offset(bx, cy), style = Stroke(1.4.dp.toPx()))
         drawCircle(Color.White.copy(alpha = 0.55f), br * 0.55f, Offset(bx, cy), style = Stroke(1.dp.toPx()))
       }
+  )
+}
+
+/** Wavy / Slim / Squiggly seek bars drawn in the same glass look as the liquid player. */
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawStyledSeek(
+  style: Int,
+  cy: Float,
+  fillX: Float,
+  flow: Float,
+  playing: Boolean,
+  level: Float,
+  grow: Float,
+  accent: Color,
+) {
+  val stroke = (if (style == 2) 3f else 4.5f).dp.toPx()
+  val active = lerp(accent, Color.White, 0.55f)
+  // inactive track: soft glass line
+  drawLine(Color.White.copy(alpha = 0.20f), Offset(0f, cy), Offset(size.width, cy), stroke, androidx.compose.ui.graphics.StrokeCap.Round)
+  if (fillX > 0f) {
+    if (style == 2) {
+      drawLine(active, Offset(0f, cy), Offset(fillX, cy), stroke, androidx.compose.ui.graphics.StrokeCap.Round)
+    } else {
+      val squiggly = style == 3
+      val amp = (if (squiggly) 5f else 3.2f).dp.toPx() * (if (playing) (0.8f + 0.6f * level) else 0.35f)
+      val wave = (if (squiggly) 15f else 22f).dp.toPx()
+      val phase = flow * 2f * PI.toFloat() * (if (squiggly) 2f else 1f)
+      val path = androidx.compose.ui.graphics.Path()
+      var x = 0f
+      path.moveTo(0f, cy)
+      while (x < fillX) {
+        // ease the wave in from the left edge so it starts on the line
+        val ease = (x / 24.dp.toPx()).coerceIn(0f, 1f)
+        path.lineTo(x, cy + sin(x / wave * 2f * PI.toFloat() - phase) * amp * ease)
+        x += 3f
+      }
+      path.lineTo(fillX, cy)
+      drawPath(path, active, style = Stroke(stroke, cap = androidx.compose.ui.graphics.StrokeCap.Round))
+    }
+  }
+  // thumb: small glass bead (a slim line for Slim)
+  val tr = (if (style == 2) 6f else 9f).dp.toPx() + 2.dp.toPx() * grow
+  val tx = fillX.coerceIn(tr, size.width - tr)
+  drawCircle(accent.copy(alpha = 0.16f + 0.2f * grow), tr * 1.6f, Offset(tx, cy))
+  drawCircle(Color.White.copy(alpha = 0.9f), tr, Offset(tx, cy))
+  drawCircle(
+    Brush.radialGradient(listOf(Color.White, accent.copy(alpha = 0.35f)), center = Offset(tx - tr * 0.3f, cy - tr * 0.3f), radius = tr * 1.3f),
+    tr, Offset(tx, cy),
   )
 }
 
@@ -202,7 +256,7 @@ fun GlassPill(
     modifier
       .height(54.dp)
       .glassSurface(shape, if (checked) accent else Color.White)
-      .then(if (checked) Modifier.border(1.5.dp, accent.copy(alpha = 0.9f), shape) else Modifier)
+      .then(if (checked) Modifier.background(accent.copy(alpha = 0.22f)) else Modifier)
       .clickable(enabled = enabled, onClick = onClick),
     horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
     verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,

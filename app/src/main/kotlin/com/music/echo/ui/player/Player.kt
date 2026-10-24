@@ -305,6 +305,7 @@ fun BottomSheetPlayer(
   val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
     rememberPreference(HidePlayerThumbnailKey, false)
   val cropAlbumArt by rememberPreference(CropAlbumArtKey, true)
+  val showAmbienceButton by rememberPreference(echo.music.iad1tya.constants.ShowAmbienceButtonKey, false)
   val showLyricsOnPlayer by rememberPreference(ShowLyricsOnPlayerKey, false)
   val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
   val isLocalMedia = mediaMetadata?.id?.isLocalMediaId() == true
@@ -443,7 +444,7 @@ fun BottomSheetPlayer(
   val playerVolume by playerConnection.service.playerVolume.collectAsState()
 
   val (audioQuality) = rememberEnumPreference(AudioQualityKey, defaultValue = AudioQuality.OPUS)
-  val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
+  val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.WAVY)
   val squigglySlider by rememberPreference(SquigglySliderKey, defaultValue = false)
   val wavyPlayPause by rememberPreference(WavyPlayPauseKey, defaultValue = true)
 
@@ -2239,6 +2240,13 @@ fun BottomSheetPlayer(
         },
         enabled = !isListenTogetherGuest,
         playing = effectiveIsPlaying,
+        style =
+          when {
+            sliderStyle == SliderStyle.WAVY && squigglySlider -> 3
+            sliderStyle == SliderStyle.WAVY -> 1
+            sliderStyle == SliderStyle.SLIM -> 2
+            else -> 0
+          },
         modifier = Modifier.padding(horizontal = PlayerHorizontalPadding),
       )
       Spacer(Modifier.height(4.dp))
@@ -2715,11 +2723,12 @@ fun BottomSheetPlayer(
                 )
               }
             }
-            Spacer(modifier = Modifier.height(14.dp))
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true }) }
+            if (showAmbienceButton) {
+              Spacer(modifier = Modifier.height(14.dp))
+              Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true }) }
+            }
           } else {
             Spacer(modifier = Modifier.height(12.dp))
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true }) }
             Row(
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
@@ -2796,6 +2805,10 @@ fun BottomSheetPlayer(
                   onClick = playerConnection::seekToNext,
                 )
               }
+            }
+            if (showAmbienceButton) {
+              Spacer(modifier = Modifier.height(10.dp))
+              Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { echo.music.iad1tya.ui.component.AmbienceButton(onClick = { showAmbienceSheet = true }) }
             }
 
             if (!hidePlayerSlider) {

@@ -59,18 +59,6 @@ fun AmbienceButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
             listOf(Color.White.copy(alpha = if (active) 0.30f else 0.22f), Color.White.copy(alpha = 0.06f))
           )
         )
-        .border(
-          BorderStroke(
-            1.dp,
-            Brush.verticalGradient(
-              listOf(
-                (if (active) Mint else Color.White).copy(alpha = 0.55f),
-                Color.White.copy(alpha = 0.08f)
-              )
-            )
-          ),
-          shape
-        )
         .clickable(onClick = onClick)
         .padding(horizontal = 18.dp, vertical = 9.dp),
     verticalAlignment = Alignment.CenterVertically,

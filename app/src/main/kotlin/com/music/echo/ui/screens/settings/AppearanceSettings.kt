@@ -196,6 +196,8 @@ fun AppearanceSettings(
     rememberPreference(echo.music.iad1tya.constants.ShowCodecOnPlayerKey, defaultValue = false)
   val (hidePlayerSlider, onHidePlayerSliderChange) =
     rememberPreference(echo.music.iad1tya.constants.HidePlayerSliderKey, defaultValue = false)
+  val (showAmbienceButton, onShowAmbienceButtonChange) =
+    rememberPreference(echo.music.iad1tya.constants.ShowAmbienceButtonKey, defaultValue = false)
   val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
     rememberPreference(HidePlayerThumbnailKey, defaultValue = false)
   val (cropAlbumArt, onCropAlbumArtChange) =
@@ -236,7 +238,7 @@ fun AppearanceSettings(
     rememberPreference(HideStatusBarOnFullscreenKey, defaultValue = false)
 
   val (sliderStyle, onSliderStyleChange) =
-    rememberEnumPreference(SliderStyleKey, defaultValue = SliderStyle.SLIM)
+    rememberEnumPreference(SliderStyleKey, defaultValue = SliderStyle.WAVY)
   val (squigglySlider, onSquigglySliderChange) =
     rememberPreference(SquigglySliderKey, defaultValue = false)
   val (wavyPlayPause, onWavyPlayPauseChange) =
@@ -1213,6 +1215,25 @@ fun AppearanceSettings(
               onClick = { onHidePlayerThumbnailChange(!hidePlayerThumbnail) }
             )
           else null,
+          Material3SettingsItem(
+            icon = painterResource(R.drawable.music_note),
+            title = { Text("Ambience button") },
+            description = { Text("Show the Ambience button under the play/pause controls") },
+            trailingContent = {
+              Switch(
+                checked = showAmbienceButton,
+                onCheckedChange = onShowAmbienceButtonChange,
+                thumbContent = {
+                  Icon(
+                    painter = painterResource(id = if (showAmbienceButton) R.drawable.check else R.drawable.close),
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                  )
+                }
+              )
+            },
+            onClick = { onShowAmbienceButtonChange(!showAmbienceButton) }
+          ),
           if (playerBackground != PlayerBackgroundStyle.APPLE_MUSIC)
             Material3SettingsItem(
               isHighlighted = (highlightKey == stringResource(R.string.thumbnail_corner_radius)),

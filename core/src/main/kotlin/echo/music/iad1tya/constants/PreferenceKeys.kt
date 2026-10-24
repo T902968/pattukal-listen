@@ -971,3 +971,6 @@ val KaraokeModeKey = booleanPreferencesKey("karaokeMode")
 
 /** Up to six songs the user picked for the Home Music Cube: lines of "id<US>title<US>thumbnail". */
 val MusicCubeSongsKey = stringPreferencesKey("music_cube_songs")
+
+/** Shows the Ambience button under the play/pause controls in the player. Off by default. */
+val ShowAmbienceButtonKey = booleanPreferencesKey("showAmbienceButton")

@@ -1,7 +1,13 @@
 {
   "features": [
+    "Ambience button now sits below play/pause and can be switched on in Settings > Appearance (off by default)",
+    "Play Next list uses a lighter glass look and scrolls smoothly",
+    "Seek bar now follows your slider style (Wavy is the new default, plus Bar, Slim and Squiggly)",
     "Default font changed"
   ],
-  "bug_fixes": [],
+  "bug_fixes": [
+    "Removed the outline lines on player buttons",
+    "Fixed lag in the Play Next list"
+  ],
   "contributors": []
 }
