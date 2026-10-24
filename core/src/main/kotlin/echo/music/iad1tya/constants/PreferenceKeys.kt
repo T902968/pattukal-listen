@@ -852,6 +852,10 @@ val AmbientFullScreenArtKey = booleanPreferencesKey("ambient_full_screen_art")
 val AmbientSpacingKey = floatPreferencesKey("ambient_spacing")
 
 enum class AppFont(val value: String) {
+  IMPACTED("impacted"),
+  SPOTABE("spotabe"),
+  PAYBACK("payback"),
+  SOOPAFRE("soopafre"),
   VESPER("vesper"),
   SYSTEM("system"),
   GOOGLE_SANS("google_sans"),
@@ -861,13 +865,15 @@ enum class AppFont(val value: String) {
   CUSTOM("custom");
 
   companion object {
-    fun fromValue(value: String): AppFont = entries.find { it.value == value } ?: VESPER
+    fun fromValue(value: String): AppFont = entries.find { it.value == value } ?: IMPACTED
   }
 }
 
 val SelectedFontKey = stringPreferencesKey("selected_app_font")
 /** One-time switch of existing installs to the Vesper font. */
 val VesperFontMigratedKey = androidx.datastore.preferences.core.booleanPreferencesKey("vesper_font_migrated")
+/** One-time switch of existing installs to the Impacted font. */
+val ImpactedFontMigratedKey = androidx.datastore.preferences.core.booleanPreferencesKey("impacted_font_migrated")
 val CustomFontPathKey = androidx.datastore.preferences.core.stringPreferencesKey("custom_font_path")
 val BlockedArtistsKey =
   androidx.datastore.preferences.core.stringSetPreferencesKey("blockedArtists")

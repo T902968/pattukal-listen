@@ -60,7 +60,7 @@ fun FontSelectionScreen(
   navController: NavController,
   scrollBehavior: TopAppBarScrollBehavior,
 ) {
-  val selectedFontState = rememberPreference(SelectedFontKey, defaultValue = AppFont.VESPER.value)
+  val selectedFontState = rememberPreference(SelectedFontKey, defaultValue = AppFont.IMPACTED.value)
   val selectedFont = selectedFontState.value
   val onSelectedFontChange: (String) -> Unit = { selectedFontState.value = it }
   val context = LocalContext.current
@@ -96,6 +96,10 @@ fun FontSelectionScreen(
     remember(selectedFont, customFontPath) {
       when (AppFont.fromValue(selectedFont)) {
         AppFont.SYSTEM -> FontFamily.Default
+        AppFont.IMPACTED -> echo.music.iad1tya.ui.theme.ImpactedFont
+        AppFont.SPOTABE -> echo.music.iad1tya.ui.theme.SpotabeFont
+        AppFont.PAYBACK -> echo.music.iad1tya.ui.theme.PaybackFont
+        AppFont.SOOPAFRE -> echo.music.iad1tya.ui.theme.SoopafreFont
         AppFont.VESPER -> echo.music.iad1tya.ui.theme.VesperFraktur
         AppFont.GOOGLE_SANS -> GoogleSansFontFamily
         AppFont.SANS_FLEX -> SansFlexFontFamily
@@ -180,6 +184,54 @@ fun FontSelectionScreen(
           listOf(
             Material3SettingsItem(
               customIcon = {
+                AnimatedRadioButton(selected = selectedFont == AppFont.IMPACTED.value, onClick = null)
+              },
+              title = {
+                Text(text = "Impacted", fontFamily = echo.music.iad1tya.ui.theme.ImpactedFont)
+              },
+              description = {
+                Text(text = "The Pattukal default font", fontFamily = echo.music.iad1tya.ui.theme.ImpactedFont)
+              },
+              onClick = { onSelectedFontChange(AppFont.IMPACTED.value) }
+            ),
+            Material3SettingsItem(
+              customIcon = {
+                AnimatedRadioButton(selected = selectedFont == AppFont.SPOTABE.value, onClick = null)
+              },
+              title = {
+                Text(text = "Spotabe", fontFamily = echo.music.iad1tya.ui.theme.SpotabeFont)
+              },
+              description = {
+                Text(text = "Bold display font", fontFamily = echo.music.iad1tya.ui.theme.SpotabeFont)
+              },
+              onClick = { onSelectedFontChange(AppFont.SPOTABE.value) }
+            ),
+            Material3SettingsItem(
+              customIcon = {
+                AnimatedRadioButton(selected = selectedFont == AppFont.PAYBACK.value, onClick = null)
+              },
+              title = {
+                Text(text = "Payback", fontFamily = echo.music.iad1tya.ui.theme.PaybackFont)
+              },
+              description = {
+                Text(text = "Playful display font", fontFamily = echo.music.iad1tya.ui.theme.PaybackFont)
+              },
+              onClick = { onSelectedFontChange(AppFont.PAYBACK.value) }
+            ),
+            Material3SettingsItem(
+              customIcon = {
+                AnimatedRadioButton(selected = selectedFont == AppFont.SOOPAFRE.value, onClick = null)
+              },
+              title = {
+                Text(text = "Soopafre", fontFamily = echo.music.iad1tya.ui.theme.SoopafreFont)
+              },
+              description = {
+                Text(text = "Stylish display font", fontFamily = echo.music.iad1tya.ui.theme.SoopafreFont)
+              },
+              onClick = { onSelectedFontChange(AppFont.SOOPAFRE.value) }
+            ),
+            Material3SettingsItem(
+              customIcon = {
                 AnimatedRadioButton(selected = selectedFont == AppFont.VESPER.value, onClick = null)
               },
               title = {
@@ -187,7 +239,7 @@ fun FontSelectionScreen(
               },
               description = {
                 Text(
-                  text = "The Pattukal default font",
+                  text = "Previous Pattukal font",
                   fontFamily = echo.music.iad1tya.ui.theme.VesperFraktur
                 )
               },

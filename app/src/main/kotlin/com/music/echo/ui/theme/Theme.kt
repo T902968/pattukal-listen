@@ -134,7 +134,7 @@ fun echomusicTheme(
   content: @Composable () -> Unit,
 ) {
   val context = LocalContext.current
-  val selectedFontValue by rememberPreference(SelectedFontKey, AppFont.VESPER.value)
+  val selectedFontValue by rememberPreference(SelectedFontKey, AppFont.IMPACTED.value)
   val natureTheme by rememberPreference(echo.music.iad1tya.constants.NatureThemeKey, false)
   val lavaTheme by rememberPreference(echo.music.iad1tya.constants.LavaThemeKey, false)
   val liquidTheme by rememberPreference(echo.music.iad1tya.constants.LiquidThemeKey, false)
@@ -145,6 +145,10 @@ fun echomusicTheme(
     remember(selectedFontValue, customFontPathValue) {
       when (AppFont.fromValue(selectedFontValue)) {
         AppFont.SYSTEM -> FontFamily.Default
+        AppFont.IMPACTED -> ImpactedFont
+        AppFont.SPOTABE -> SpotabeFont
+        AppFont.PAYBACK -> PaybackFont
+        AppFont.SOOPAFRE -> SoopafreFont
         AppFont.VESPER -> VesperFraktur
         AppFont.GOOGLE_SANS -> GoogleSansFontFamily
         AppFont.SANS_FLEX -> SansFlexFontFamily

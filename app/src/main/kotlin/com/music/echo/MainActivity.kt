@@ -413,6 +413,11 @@ class MainActivity : ComponentActivity() {
           preferences[echo.music.iad1tya.constants.DynamicThemeKey] = false
           preferences[echo.music.iad1tya.constants.VesperFontMigratedKey] = true
         }
+        if (preferences[echo.music.iad1tya.constants.ImpactedFontMigratedKey] != true) {
+          preferences[echo.music.iad1tya.constants.SelectedFontKey] =
+            echo.music.iad1tya.constants.AppFont.IMPACTED.value
+          preferences[echo.music.iad1tya.constants.ImpactedFontMigratedKey] = true
+        }
       }
     }
 

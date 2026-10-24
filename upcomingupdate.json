@@ -1,17 +1,7 @@
 {
   "features": [
-    "Karaoke is stronger: turning it on removes the vocals for an instrumental-style mix and opens Cinema lyrics in English letters",
-    "Play Next list now uses the same liquid glass as the Home navigation bar, dark and clear instead of white",
-    "New round liquid like and download buttons in Now Playing, with a liquid ripple and droplet animation when you like a song",
-    "Music Cube now sits at the top of Home and shows songs from your chosen music language; pick your own 6 songs in Settings > Appearance > Immersive > Music Cube",
-    "Player background is now the first option in the player's three-dot menu",
-    "Ambience button is centred under the player controls",
-    "Hidden player thumbnail now shows the Pattukal app icon",
-    "SponsorBlock auto-skip is on by default"
+    "Default font changed"
   ],
-  "bug_fixes": [
-    "Removed the outline lines around player and Play Next buttons",
-    "Luna and Kai companion faces are sharper (re-rendered at 4x resolution)"
-  ],
+  "bug_fixes": [],
   "contributors": []
 }

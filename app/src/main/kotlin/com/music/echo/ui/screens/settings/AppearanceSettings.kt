@@ -147,7 +147,7 @@ fun AppearanceSettings(
 ) {
   val scrollState = androidx.compose.foundation.rememberScrollState()
 
-  val (selectedFontValue) = rememberPreference(SelectedFontKey, defaultValue = AppFont.VESPER.value)
+  val (selectedFontValue) = rememberPreference(SelectedFontKey, defaultValue = AppFont.IMPACTED.value)
   val (dynamicTheme, onDynamicThemeChange) =
     rememberPreference(DynamicThemeKey, defaultValue = false)
   val (enableLegacyIcon, onEnableLegacyIconChange) =
@@ -980,6 +980,10 @@ fun AppearanceSettings(
               trailingContent = {
                 val fontLabel =
                   when (AppFont.fromValue(selectedFontValue)) {
+                    AppFont.IMPACTED -> "Impacted"
+                    AppFont.SPOTABE -> "Spotabe"
+                    AppFont.PAYBACK -> "Payback"
+                    AppFont.SOOPAFRE -> "Soopafre"
                     AppFont.VESPER -> "Vesper Fraktur"
                     AppFont.SYSTEM -> stringResource(echo.music.iad1tya.R.string.font_system)
                     AppFont.GOOGLE_SANS ->
