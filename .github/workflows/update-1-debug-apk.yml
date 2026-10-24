@@ -49,6 +49,12 @@ jobs:
           ./gradlew assembleArm64FossOptimized --console=plain 2>&1 | tee "$RUNNER_TEMP/gradle.log"
           exit "${PIPESTATUS[0]}"
 
+      - name: Show compile errors as annotations
+        if: failure()
+        run: |
+          grep -E "^e: |error:|What went wrong" -A1 "$RUNNER_TEMP/gradle.log" | sed 's#file:///home/runner/work/[^/]*/[^/]*/##' | head -c 9000 | awk 'NR<=9{print "::error::" $0}'
+          grep -E "^e: " "$RUNNER_TEMP/gradle.log" | sed 's#file:///home/runner/work/[^/]*/[^/]*/##' | sed -n '10,18p' | awk '{print "::warning::" $0}'
+
       - name: Upload build log on failure
         if: failure()
         uses: actions/upload-artifact@v7
