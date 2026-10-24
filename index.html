@@ -5,14 +5,14 @@
 </style></head><body><main class="shell"><div class="inner">
 <div class="wordmark">P A T T U K A L · O F F I C I A L</div><div class="headphones" aria-hidden="true">♬</div><h1>Pattukal</h1><p class="subtitle">Your music. Your atmosphere. Download the official Android app and start listening.</p>
 <a class="download" id="download-apk" href="https://github.com/T902968/pattukal-listen/releases/download/latest/pattukal.apk">↓ &nbsp; Download APK</a><a class="link" href="https://github.com/T902968/pattukal-listen">Explore web</a>
-<div class="badges"><span>Android APK</span><span>Latest Build</span><span>Official Download</span></div><div class="download-counter" aria-live="polite"><span class="counter-number" id="download-count">500</span><span class="counter-label">APK downloads</span></div>
+<div class="badges"><span>Android APK</span><span>Latest Build</span><span>Official Download</span></div><div class="download-counter" aria-live="polite"><span class="counter-number" id="download-count">835</span><span class="counter-label">APK downloads</span></div>
 <section class="update"><h2>LATEST APP UPDATE</h2><div class="stamp" id="release-time">Loading latest release time…</div><ul id="release-notes"><li>Loading the latest app changes…</li></ul><div class="meta" id="release-meta">Checking the latest APK from GitHub…</div><div class="meta" id="clock">Current India time: loading…</div></section>
 <div class="foot">AKSHAY UI CREATION</div><div class="subfoot">Graphic Design · Vyomakesh</div><div class="subfoot">Music engine foundation inspired by Echo Music by Aditya Yadav · GPL-3.0</div>
 </div></main><script>
 const timeEl=document.getElementById("release-time"),notesEl=document.getElementById("release-notes"),metaEl=document.getElementById("release-meta"),clockEl=document.getElementById("clock"),downloadCountEl=document.getElementById("download-count");
 const fmt={dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Kolkata"};
 function tick(){clockEl.textContent="Current India time: "+new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"medium",timeZone:"Asia/Kolkata"}).format(new Date())+" IST"}tick();setInterval(tick,1000);
-async function refreshRelease(){
+let srvTotal=null,pend=0;function showCount(){if(downloadCountEl)downloadCountEl.textContent=((srvTotal===null?835:srvTotal)+pend).toLocaleString("en-IN");}function setServerCount(n){if(srvTotal!==null&&n>srvTotal)pend=Math.max(0,pend-(n-srvTotal));srvTotal=n;showCount();}document.querySelectorAll('a.download').forEach(a=>a.addEventListener('click',()=>{pend++;showCount();setTimeout(refreshRelease,8000);}));async function refreshRelease(){
   const releaseApi="https://api.github.com/repos/T902968/pattukal-listen/releases/tags/latest";
   const actionsUrl="https://github.com/T902968/pattukal-listen/actions/workflows/android-build.yml";
   const releasesUrl="https://github.com/T902968/pattukal-listen/releases";
@@ -21,12 +21,12 @@ async function refreshRelease(){
     const res=await fetch(releaseApi+"?t="+Date.now(),{cache:"no-store",headers:{"Accept":"application/vnd.github+json"}});
     if(!res.ok) throw Error("Release API "+res.status);
     const r=await res.json();
-    const asset=(r.assets||[]).find(x=>x.name==="pattukal.apk"&&x.state==="uploaded");if(downloadCountEl){const actualDownloads=asset&&Number.isFinite(Number(asset.download_count))?Number(asset.download_count):0;const carriedMatch=(r.body||"").match(/Downloads carried:\s*(\d+)/);const carried=carriedMatch?Number(carriedMatch[1]):0;downloadCountEl.textContent=(500+carried+actualDownloads).toLocaleString("en-IN");}
+    const asset=(r.assets||[]).find(x=>x.name==="pattukal.apk"&&x.state==="uploaded");if(downloadCountEl){const actualDownloads=asset&&Number.isFinite(Number(asset.download_count))?Number(asset.download_count):0;const carriedMatch=(r.body||"").match(/Downloads carried:\s*(\d+)/);const carried=carriedMatch?Number(carriedMatch[1]):0;setServerCount(813+carried+actualDownloads);}
     const d=r.published_at||r.updated_at||r.created_at;
     timeEl.textContent=d?"Released "+new Intl.DateTimeFormat("en-IN",fmt).format(new Date(d))+" IST":"Release time unavailable";
-    const items=["Default font changed"];
+    const items=["Performance mode added in Settings for low-end devices", "Karaoke mode added \u2014 still improving the vocal removal", "Player slider changed to a new Wavy animation, plus 4 new slider styles in Settings", "New Home layout; player buttons fixed with no more bugs", "Ambience on/off option added", "Pattukal Taste AI added in the AI hub for smoother, personal tracks", "Play Next bar made lighter and smoother on more devices", "Spotify bugs fixed", "Settings back button bug fixed", "Default font changed"];
     notesEl.replaceChildren();
-    for(const s of items.slice(0,11)){const li=document.createElement("li");li.textContent=s;notesEl.appendChild(li)}
+    for(const s of items.slice(0,12)){const li=document.createElement("li");li.textContent=s;notesEl.appendChild(li)}
     if(asset){downloadEl.href=asset.browser_download_url;downloadEl.textContent="↓  Download APK";downloadEl.setAttribute("download","pattukal.apk")}
     else {downloadEl.href=r.html_url||releasesUrl;downloadEl.textContent="↓  Download APK";downloadEl.removeAttribute("download")}
     metaEl.textContent="Latest build "+(r.tag_name||"latest")+" · "+(asset?(asset.size/1048576).toFixed(1)+" MB":"APK asset not found")+" · Auto-refreshes every minute";

@@ -1,20 +1,16 @@
 {
   "features": [
-    "Pattukal Taste AI in the AI hub (on by default): daily mixes, mood-based picks and discover songs from your favourites and history",
-    "Skip This Forever: hold a song or use the song menu so it is never recommended or played again",
-    "Magic Cube now sits at the top of Home and shows new songs on every refresh",
-    "Hold a language song to add it to Play Next or the queue",
-    "New Performance settings: low-end device mode, battery saver and reduce animations",
-    "Ambience is back and on by default, with an on/off switch and Stop all in the player",
-    "Karaoke removes the singer's voice while keeping the instruments",
-    "Slider styles in Settings now match the player; Wavy is the default",
+    "Performance mode added in Settings for low-end devices",
+    "Karaoke mode added — still improving the vocal removal",
+    "Player slider changed to a new Wavy animation, plus 4 new slider styles in Settings",
+    "New Home layout; player buttons fixed with no more bugs",
+    "Ambience on/off option added",
+    "Pattukal Taste AI added in the AI hub for smoother, personal tracks",
+    "Play Next bar made lighter and smoother on more devices",
+    "Spotify bugs fixed",
+    "Settings back button bug fixed",
     "Default font changed"
   ],
-  "bug_fixes": [
-    "Removed the circle that appeared when pressing player buttons",
-    "Softer glass and smoother scrolling in the Play Next list",
-    "Top songs moved lower on Home",
-    "Smoother animated backgrounds"
-  ],
+  "bug_fixes": [],
   "contributors": []
 }
