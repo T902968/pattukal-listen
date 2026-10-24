@@ -111,6 +111,27 @@ fun AmbienceSheet(onDismiss: () -> Unit) {
         TextButton(onClick = { AmbienceEngine.stopAll() }) { Text("Stop all", color = Mint) }
       }
 
+      // master on / off for the whole ambience layer
+      val ambienceOn = auto || levels.values.any { it > 0f }
+      Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.weight(1f)) {
+          Text("Ambience", fontWeight = FontWeight.Bold)
+          Text(
+            if (ambienceOn) "On: sounds are playing under your music" else "Off: turn on for a mix picked for this song",
+            color = Color.White.copy(alpha = 0.6f),
+            style = MaterialTheme.typography.bodySmall
+          )
+        }
+        Switch(
+          checked = ambienceOn,
+          onCheckedChange = { on ->
+            if (on) AmbienceEngine.setAuto(true, AmbienceNowPlaying.title, AmbienceNowPlaying.artist)
+            else AmbienceEngine.stopAll()
+          },
+          colors = SwitchDefaults.colors(checkedTrackColor = Mint, checkedThumbColor = Color(0xFF04110A))
+        )
+      }
+
       Row(
         modifier =
           Modifier.fillMaxWidth()

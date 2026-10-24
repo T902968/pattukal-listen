@@ -37,6 +37,8 @@ android {
     // Local builds keep the current baseline version code.
     versionCode = (System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 162).coerceAtLeast(162)
     versionName = "1.4.1"
+    // Branch/test builds (PATTUKAL_TEST_BUILD=1 in CI) never show the "Update available" prompt.
+    buildConfigField("boolean", "IS_TEST_BUILD", (System.getenv("PATTUKAL_TEST_BUILD") == "1").toString())
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true

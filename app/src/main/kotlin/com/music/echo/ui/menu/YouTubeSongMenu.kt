@@ -329,6 +329,23 @@ fun YouTubeSongMenu(
             NewAction(
               icon = {
                 Icon(
+                  painter = painterResource(R.drawable.close),
+                  contentDescription = null,
+                  modifier = Modifier.size(28.dp),
+                  tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+              },
+              text = "Skip this forever",
+              onClick = {
+                kotlinx.coroutines.GlobalScope.launch {
+                  echo.music.iad1tya.ui.component.skipSongForever(context, song.id, song.title)
+                }
+                onDismiss()
+              }
+            ),
+            NewAction(
+              icon = {
+                Icon(
                   painter = painterResource(R.drawable.playlist_add),
                   contentDescription = null,
                   modifier = Modifier.size(28.dp),

@@ -358,6 +358,10 @@ fun NavGraphBuilder.navigationBuilder(
     com.music.echo.ui.screens.settings.FontSelectionScreen(navController, scrollBehavior)
   }
 
+  composable("settings/performance") {
+    echo.music.iad1tya.ui.screens.settings.PerformanceSettings(navController, scrollBehavior)
+  }
+
   composable("settings/ai_companion") {
     echo.music.iad1tya.ui.screens.settings.AICompanionScreen(navController)
   }

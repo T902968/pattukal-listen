@@ -1115,7 +1115,7 @@ fun HomeScreen(
 
                     val base =
                         when (section) {
-                            HomeSection.QuickPicks -> 10000
+                            HomeSection.QuickPicks -> -10000
 
                             is HomeSection.HomePageSection ->
                                 9000 -
@@ -1168,7 +1168,7 @@ fun HomeScreen(
 
                 val defaultOrder =
                     mapOf(
-                        HomeSection.QuickPicks to 1000,
+                        HomeSection.QuickPicks to -1000,
                         HomeSection.SpeedDial to 100,
                         HomeSection.FromTheCommunity to 80,
                         HomeSection.DailyDiscover to 70,
@@ -1290,6 +1290,13 @@ fun HomeScreen(
                             .asPaddingValues()
                 ) {
 
+                    item(key = "home_music_cube_$isRefreshing") {
+                        echo.music.iad1tya.ui.immersive.HomeMusicCube(
+                            navController,
+                            quickPicks.orEmpty()
+                        )
+                    }
+
                     item {
                         ChipsRow(
                             chips =
@@ -1323,10 +1330,9 @@ fun HomeScreen(
                         )
                     }
 
-                    item(key = "home_music_cube") {
-                        echo.music.iad1tya.ui.immersive.HomeMusicCube(
-                            navController,
-                            quickPicks.orEmpty()
+                    item(key = "taste_ai_rows") {
+                        echo.music.iad1tya.ui.component.TasteAiHomeRows(
+                            refreshKey = isRefreshing
                         )
                     }
 

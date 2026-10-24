@@ -99,29 +99,11 @@ private fun DrawScope.drawGlass(
       )
     }
   }
-  if (ripple > 0f && ripple < 1f) {
-    val md = max(w, h)
-    drawCircle(
-      Color.White.copy(alpha = (1f - ripple) * 0.55f),
-      radius = md * (0.15f + 1.0f * ripple),
-      center = Offset(w / 2f, h / 2f),
-      style = Stroke(width = (1f + 3f * (1f - ripple)).dp.toPx()),
-    )
-    val r2 = ((ripple - 0.2f) / 0.8f).coerceIn(0f, 1f)
-    if (r2 > 0f) {
-      drawCircle(
-        accent.copy(alpha = (1f - r2) * 0.5f),
-        radius = md * (0.1f + 0.9f * r2),
-        center = Offset(w / 2f, h / 2f),
-        style = Stroke(width = 2.dp.toPx()),
-      )
-    }
-  }
 }
 
 /**
  * Liquid-glass button used across the player. Same call shape as FilledIconButton so existing buttons
- * adopt it directly. Press = springy squeeze + a water ripple ring. [active] spins a light ring around it.
+ * adopt it directly. Press = a small springy squeeze (no ripple circle). [active] spins a light ring around it.
  * The accent follows the current Pattukal theme.
  */
 @Composable
@@ -142,13 +124,7 @@ fun GlassIconButton(
   val container = colors.containerColor
   val contentColor = colors.contentColor
   val base = if (container.alpha >= 0.6f) container else contentColor
-  val ripple = remember { Animatable(0f) }
-  LaunchedEffect(pressed) {
-    if (pressed) {
-      ripple.snapTo(0f)
-      ripple.animateTo(1f, tween(720, easing = FastOutSlowInEasing))
-    }
-  }
+  val ripple = remember { Animatable(0f) } // press circle removed: kept at 0
   val scale by animateFloatAsState(if (pressed) 0.9f else 1f, spring(dampingRatio = 0.5f, stiffness = 520f), label = "glassScale")
   val ring =
     if (active) {
@@ -185,18 +161,5 @@ fun Modifier.glassSurface(shape: Shape, base: Color, solid: Boolean = false): Mo
  */
 @Composable
 fun Modifier.lightGlass(shape: Shape): Modifier =
-  this.clip(shape)
-    .background(
-      Brush.verticalGradient(
-        listOf(Color.White.copy(alpha = 0.13f), Color.White.copy(alpha = 0.05f))
-      )
-    )
-    .drawBehind {
-      // soft top light, like the nav bar glass, without any line or border
-      drawRect(
-        Brush.verticalGradient(
-          0f to Color.White.copy(alpha = 0.10f),
-          0.45f to Color.Transparent,
-        )
-      )
-    }
+  // Flat translucent fill: no gradient brush allocation per frame, so long queues scroll smoothly.
+  this.clip(shape).background(Color.White.copy(alpha = 0.06f))

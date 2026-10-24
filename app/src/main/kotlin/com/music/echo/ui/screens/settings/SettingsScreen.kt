@@ -294,6 +294,16 @@ fun SettingsScreen(
           )
         )
       }
+      if ("performance battery saver low end lag".contains(searchLower)) {
+        add(
+          Material3SettingsItem(
+            icon = painterResource(R.drawable.sparks),
+            title = { Text("Performance") },
+            description = { Text("Low-end mode, battery saver and lag fixes") },
+            onClick = { navController.navigate("settings/performance") }
+          )
+        )
+      }
       if (
         storageText.lowercase().contains(searchLower) ||
           storageDesc.lowercase().contains(searchLower)

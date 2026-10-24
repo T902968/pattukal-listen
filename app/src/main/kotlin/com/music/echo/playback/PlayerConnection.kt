@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -491,6 +492,15 @@ class PlayerConnection(
     currentMediaItemIndex.value = player.currentMediaItemIndex
     currentWindowIndex.value = player.getCurrentQueueIndex()
     updateCanSkipPreviousAndNext()
+    val id = mediaItem?.mediaId
+    if (id != null) {
+      scope.launch {
+        val raw = context.dataStore.data.first()[echo.music.iad1tya.constants.SkippedForeverKey].orEmpty()
+        if (raw.isNotEmpty() && raw.lines().any { it.substringBefore('\u001F') == id } && player.hasNextMediaItem()) {
+          player.seekToNext()
+        }
+      }
+    }
   }
 
   override fun onTimelineChanged(

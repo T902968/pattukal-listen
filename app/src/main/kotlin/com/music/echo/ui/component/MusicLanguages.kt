@@ -174,54 +174,5 @@ fun LanguageSongRows(refreshKey: Any?) {
         }
     }
 
-  rows.forEach { (title, songs) ->
-    Column(Modifier.fillMaxWidth().padding(top = 8.dp)) {
-      Text(
-        title,
-        style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-      )
-      LazyRow(
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-      ) {
-        items(songs, key = { "lang_${title}_${it.id}" }) { song ->
-          Column(
-            Modifier.width(140.dp)
-              .clip(RoundedCornerShape(16.dp))
-              .clickable {
-                playerConnection.playQueue(
-                  YouTubeQueue(song.endpoint ?: WatchEndpoint(videoId = song.id), song.toMediaMetadata())
-                )
-              }
-          ) {
-            Box(Modifier.size(140.dp).clip(RoundedCornerShape(16.dp))) {
-              AsyncImage(
-                model = song.thumbnail,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().height(140.dp),
-              )
-            }
-            Text(
-              song.title,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis,
-              style = MaterialTheme.typography.bodyMedium,
-              fontWeight = FontWeight.SemiBold,
-              modifier = Modifier.padding(top = 6.dp),
-            )
-            Text(
-              song.artists.joinToString { it.name },
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis,
-              style = MaterialTheme.typography.bodySmall,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-          }
-        }
-      }
-    }
-  }
+  rows.forEach { (title, songs) -> SongCardRow(title = title, songs = songs) }
 }

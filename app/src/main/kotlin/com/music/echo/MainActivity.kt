@@ -1150,8 +1150,10 @@ class MainActivity : ComponentActivity() {
 
         val baseBg = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
 
-        val (liquidGlassGlobalEnabled) =
+        val (liquidGlassPref) =
           rememberPreference(LiquidGlassGlobalEnabledKey, defaultValue = true)
+        val liquidGlassGlobalEnabled =
+          liquidGlassPref && !echo.music.iad1tya.utils.rememberLitePerformance()
         val (liquidGlassVibrancy) = rememberPreference(LiquidGlassVibrancyKey, defaultValue = 2f)
         val (liquidGlassBlurRadius) =
           rememberPreference(LiquidGlassBlurRadiusKey, defaultValue = 1f)

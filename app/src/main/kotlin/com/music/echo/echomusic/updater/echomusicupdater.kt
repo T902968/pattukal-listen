@@ -669,6 +669,12 @@ suspend fun checkForUpdate(
 ) {
   withContext(Dispatchers.IO) {
     try {
+      if (BuildConfig.IS_TEST_BUILD) {
+        withContext(Dispatchers.Main) {
+          onSuccess(BuildConfig.VERSION_NAME, false, emptyList(), "", "", null, null, null)
+        }
+        return@withContext
+      }
       val url = URL("https://api.github.com/repos/T902968/pattukal-listen/releases/latest")
       val json = url.openStream().bufferedReader().use { it.readText() }
       val targetRelease = JSONObject(json)

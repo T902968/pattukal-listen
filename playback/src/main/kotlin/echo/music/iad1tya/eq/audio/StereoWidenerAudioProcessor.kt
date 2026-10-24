@@ -33,6 +33,7 @@ class StereoWidenerAudioProcessor : AudioProcessor {
   @Volatile var vocalRemoval: Boolean = false
 
   private var bassState = 0.0
+  private var airState = 0.0
 
   private var channelCount = 0
   private var encoding = C.ENCODING_INVALID
@@ -87,10 +88,15 @@ class StereoWidenerAudioProcessor : AudioProcessor {
           var side = (left - right) * 0.5 * widthNow
 
           if (karaoke) {
-            // keep ~200 Hz and below of the centre (kick / bass), drop the rest of it
+            // Split the centre channel into bass (<~200 Hz), voice band (~200 Hz-4.5 kHz) and air
+            // (>~4.5 kHz). The voice band is almost fully removed; bass and cymbals/air stay, so the
+            // instrumental keeps its punch. Stereo side (guitars, pads, reverb) is lifted slightly.
             bassState += 0.03 * (mid - bassState)
-            mid = bassState + (mid - bassState) * 0.03
-            side *= 1.5
+            airState += 0.45 * (mid - airState)
+            val voice = airState - bassState
+            val air = mid - airState
+            mid = bassState + voice * 0.04 + air * 0.85
+            side *= 1.6
           }
 
           var outLeft = mid + side

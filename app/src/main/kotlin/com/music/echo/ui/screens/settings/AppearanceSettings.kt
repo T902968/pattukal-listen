@@ -197,7 +197,7 @@ fun AppearanceSettings(
   val (hidePlayerSlider, onHidePlayerSliderChange) =
     rememberPreference(echo.music.iad1tya.constants.HidePlayerSliderKey, defaultValue = false)
   val (showAmbienceButton, onShowAmbienceButtonChange) =
-    rememberPreference(echo.music.iad1tya.constants.ShowAmbienceButtonKey, defaultValue = false)
+    rememberPreference(echo.music.iad1tya.constants.ShowAmbienceButtonKey, defaultValue = true)
   val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
     rememberPreference(HidePlayerThumbnailKey, defaultValue = false)
   val (cropAlbumArt, onCropAlbumArtChange) =
@@ -752,13 +752,15 @@ fun AppearanceSettings(
               }
               .padding(12.dp)
         ) {
-          Slider(
-            value = 0.35f,
-            valueRange = 0f..1f,
-            onValueChange = {},
-            colors = sliderPreviewColors,
+          echo.music.iad1tya.ui.player.LiquidSeekBar(
+            value = 0.5f,
+            max = 1f,
+            onChange = {},
+            onFinish = {},
             enabled = false,
-            modifier = Modifier.weight(1f)
+            playing = true,
+            style = 0,
+            modifier = Modifier.weight(1f).fillMaxWidth()
           )
           Text(
             text = "Bar",
@@ -796,14 +798,15 @@ fun AppearanceSettings(
               }
               .padding(12.dp)
         ) {
-          WavySlider(
+          echo.music.iad1tya.ui.player.LiquidSeekBar(
             value = 0.5f,
-            valueRange = 0f..1f,
-            onValueChange = {},
-            colors = sliderPreviewColors,
-            modifier = Modifier.weight(1f),
-            isPlaying = true,
-            enabled = false
+            max = 1f,
+            onChange = {},
+            onFinish = {},
+            enabled = false,
+            playing = true,
+            style = 1,
+            modifier = Modifier.weight(1f).fillMaxWidth()
           )
           Text(
             text = stringResource(R.string.wavy),
@@ -840,17 +843,15 @@ fun AppearanceSettings(
               }
               .padding(12.dp)
         ) {
-          Slider(
+          echo.music.iad1tya.ui.player.LiquidSeekBar(
             value = 0.65f,
-            valueRange = 0f..1f,
-            onValueChange = {},
-            thumb = { Spacer(modifier = Modifier.size(0.dp)) },
-            track = { sliderState ->
-              PlayerSliderTrack(sliderState = sliderState, colors = sliderPreviewColors)
-            },
-            colors = sliderPreviewColors,
+            max = 1f,
+            onChange = {},
+            onFinish = {},
             enabled = false,
-            modifier = Modifier.weight(1f)
+            playing = true,
+            style = 2,
+            modifier = Modifier.weight(1f).fillMaxWidth()
           )
           Text(
             text = stringResource(R.string.slim),
@@ -888,14 +889,15 @@ fun AppearanceSettings(
               }
               .padding(12.dp)
         ) {
-          SquigglySlider(
+          echo.music.iad1tya.ui.player.LiquidSeekBar(
             value = 0.5f,
-            valueRange = 0f..1f,
-            onValueChange = {},
-            modifier = Modifier.weight(1f),
+            max = 1f,
+            onChange = {},
+            onFinish = {},
             enabled = false,
-            colors = sliderPreviewColors,
-            isPlaying = true
+            playing = true,
+            style = 3,
+            modifier = Modifier.weight(1f).fillMaxWidth()
           )
           Text(
             text = stringResource(R.string.squiggly),

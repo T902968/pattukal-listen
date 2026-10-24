@@ -42,6 +42,8 @@ jobs:
             -keyalg RSA -keysize 2048 -validity 10000
 
       - name: Build Debug APK (no release publishing)
+        env:
+          PATTUKAL_TEST_BUILD: "1"
         run: |
           chmod +x gradlew
           ./gradlew assembleArm64FossOptimized --console=plain 2>&1 | tee "$RUNNER_TEMP/gradle.log"

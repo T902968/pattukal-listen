@@ -972,5 +972,19 @@ val KaraokeModeKey = booleanPreferencesKey("karaokeMode")
 /** Up to six songs the user picked for the Home Music Cube: lines of "id<US>title<US>thumbnail". */
 val MusicCubeSongsKey = stringPreferencesKey("music_cube_songs")
 
-/** Shows the Ambience button under the play/pause controls in the player. Off by default. */
+/** Shows the Ambience button under the play/pause controls in the player. On by default. */
 val ShowAmbienceButtonKey = booleanPreferencesKey("showAmbienceButton")
+
+/** Pattukal Taste AI: personalized daily mixes, mood rows and discovery. All on by default. */
+val TasteAiEnabledKey = booleanPreferencesKey("taste_ai_enabled")
+val TasteAiDailyMixKey = booleanPreferencesKey("taste_ai_daily_mix")
+val TasteAiMoodKey = booleanPreferencesKey("taste_ai_mood")
+val TasteAiDiscoverKey = booleanPreferencesKey("taste_ai_discover")
+
+/** "Skip This Forever" list: one "id<US>title" per line. Those songs are never recommended or auto-played. */
+val SkippedForeverKey = stringPreferencesKey("skipped_forever")
+
+/** Performance: lighter visuals for low-end phones and battery saving. */
+val LowEndModeKey = booleanPreferencesKey("perf_low_end_mode")
+val BatterySaverKey = booleanPreferencesKey("perf_battery_saver")
+val ReduceAnimationsKey = booleanPreferencesKey("perf_reduce_animations")

@@ -43,6 +43,13 @@ import echo.music.iad1tya.constants.OpenRouterApiKey
 import echo.music.iad1tya.constants.OpenRouterBaseUrlKey
 import echo.music.iad1tya.constants.OpenRouterModelKey
 import echo.music.iad1tya.constants.TranslateLanguageKey
+import echo.music.iad1tya.constants.TasteAiEnabledKey
+import echo.music.iad1tya.constants.TasteAiDailyMixKey
+import echo.music.iad1tya.constants.TasteAiMoodKey
+import echo.music.iad1tya.constants.TasteAiDiscoverKey
+import androidx.datastore.preferences.core.edit
+import echo.music.iad1tya.utils.dataStore
+import kotlinx.coroutines.launch
 import echo.music.iad1tya.constants.TranslateModeKey
 import echo.music.iad1tya.lyrics.LyricsTranslationHelper
 import echo.music.iad1tya.ui.component.EnumDialog
@@ -63,6 +70,36 @@ fun AiSettings(
 
   var aiProvider by rememberPreference(AiProviderKey, "OpenRouter")
   var musicLanguagesRaw by rememberPreference(echo.music.iad1tya.constants.MusicLanguagesKey, "")
+  val tasteScope = androidx.compose.runtime.rememberCoroutineScope()
+  val tasteContext = androidx.compose.ui.platform.LocalContext.current
+  val (skippedRaw, _) = rememberPreference(echo.music.iad1tya.constants.SkippedForeverKey, "")
+  val skippedCount = echo.music.iad1tya.ui.component.parseSkippedForever(skippedRaw).size
+  var clearSkipped by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+  @androidx.compose.runtime.Composable
+  fun tasteSwitch(icon: Int, title: String, desc: String, key: androidx.datastore.preferences.core.Preferences.Key<Boolean>): Material3SettingsItem {
+    var on by rememberPreference(key, true)
+    return Material3SettingsItem(
+      icon = painterResource(icon),
+      title = { Text(title) },
+      description = { Text(desc) },
+      trailingContent = { Switch(checked = on, onCheckedChange = { on = it }) },
+      onClick = { on = !on },
+    )
+  }
+  if (clearSkipped) {
+    androidx.compose.material3.AlertDialog(
+      onDismissRequest = { clearSkipped = false },
+      title = { Text("Clear skipped songs?") },
+      text = { Text("They can be recommended and played again.") },
+      confirmButton = {
+        androidx.compose.material3.TextButton(onClick = {
+          tasteScope.launch { tasteContext.dataStore.edit { it[echo.music.iad1tya.constants.SkippedForeverKey] = "" } }
+          clearSkipped = false
+        }) { Text("Clear") }
+      },
+      dismissButton = { androidx.compose.material3.TextButton(onClick = { clearSkipped = false }) { Text("Cancel") } },
+    )
+  }
   var showMusicLanguageDialog by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
   var openRouterApiKey by rememberPreference(OpenRouterApiKey, "")
   var openRouterBaseUrl by
@@ -462,6 +499,25 @@ fun AiSettings(
         onDismiss = { showMusicLanguageDialog = false },
       )
     }
+    Material3SettingsGroup(
+      scrollState = scrollState,
+      title = "Pattukal Taste AI",
+      items =
+        listOf(
+          tasteSwitch(R.drawable.sparks, "Pattukal Taste AI", "Personalized music from your taste", TasteAiEnabledKey),
+          tasteSwitch(R.drawable.sparks, "Daily mixes", "Built from your favourites", TasteAiDailyMixKey),
+          tasteSwitch(R.drawable.sparks, "Mood-based picks", "Songs for the time of day", TasteAiMoodKey),
+          tasteSwitch(R.drawable.sparks, "Discover", "New songs from favourites and history", TasteAiDiscoverKey),
+          Material3SettingsItem(
+            icon = painterResource(R.drawable.sparks),
+            title = { Text("Skipped forever") },
+            description = { Text("${skippedCount} songs won't be recommended or played. Tap to clear.") },
+            onClick = { clearSkipped = true },
+          ),
+        ),
+    )
+    Spacer(modifier = Modifier.height(16.dp))
+
     Material3SettingsGroup(
       scrollState = scrollState,
       title = "AI feed",

@@ -31,11 +31,19 @@ import kotlin.random.Random
 @Composable
 private fun rememberSceneSeconds(running: Boolean = true): State<Float> {
   val seconds = remember { mutableFloatStateOf(0f) }
-  LaunchedEffect(running) {
-    if (!running) return@LaunchedEffect
+  val reduce = echo.music.iad1tya.utils.rememberReduceMotion()
+  LaunchedEffect(running, reduce) {
+    if (!running || reduce) return@LaunchedEffect
     val start = withFrameNanos { it } - (seconds.floatValue * 1_000_000_000L).toLong()
+    var last = 0L
     while (true) {
-      withFrameNanos { now -> seconds.floatValue = (now - start) / 1_000_000_000f }
+      // ~30 fps is plenty for ambient scenes and halves the per-frame cost.
+      withFrameNanos { now ->
+        if (now - last >= 33_000_000L) {
+          last = now
+          seconds.floatValue = (now - start) / 1_000_000_000f
+        }
+      }
     }
   }
   return seconds

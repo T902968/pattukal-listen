@@ -359,3 +359,11 @@ Ambient Mode keeps the existing album-art square and layers muted Canvas artwork
 - **Bug reports:** `ui/screens/settings/BugReport.kt` posts to a FormSubmit relay that emails `BUG_REPORT_EMAIL`.
 - **Companion AI:** `BuddyBrain.providers` always appends free keyless sources after the user's own key, so it auto-falls back.
 - **Round 2:** `navLiquidGlass` (GlassButtons.kt) = the nav-bar liquid glass, used by Play Next; glass buttons have no rim/streak lines. `HomeMusicCube` + `CubeSongPickerDialog` (ui/immersive/CubeSongs.kt) drive the Home cube. Karaoke opens Cinema lyrics via `CinemaState.openLyrics()`. Hidden thumbnail uses `ic_launcher_nobg` untinted.
+
+## Pattukal Taste AI / Performance (Update 1, batch 2)
+- `ui/component/TasteAi.kt`: Home rows (Daily Mix, mood, Discover) built from liked + most played songs; toggles `TasteAi*Key` in AI hub (`AiSettings.kt`), all default on.
+- `ui/component/SongCards.kt`: shared `SongCardRow` (tap = play, hold = Add to play next / Add to queue / Skip this forever). "Skip This Forever" ids live in `SkippedForeverKey`; `PlayerConnection.onMediaItemTransition` auto-skips them.
+- Home order: Music Cube (reshuffles per refresh), chips, language rows, Taste AI rows, sections (QuickPicks last).
+- `settings/performance` (`PerformanceSettings.kt`, `utils/Performance.kt`): `LowEndModeKey`, `BatterySaverKey`, `ReduceAnimationsKey`; lite mode disables liquid glass in MainActivity and stops PlayerScenes; scenes capped at 30 fps.
+- Karaoke (`StereoWidenerAudioProcessor`): band-split DSP (bass and air kept, voice band attenuated), not ML stem separation.
+- Test builds (`PATTUKAL_TEST_BUILD=1`) set `BuildConfig.IS_TEST_BUILD` and never show the update prompt.
