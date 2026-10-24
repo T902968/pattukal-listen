@@ -21,7 +21,7 @@ async function refreshRelease(){
     const res=await fetch(releaseApi+"?t="+Date.now(),{cache:"no-store",headers:{"Accept":"application/vnd.github+json"}});
     if(!res.ok) throw Error("Release API "+res.status);
     const r=await res.json();
-    const asset=(r.assets||[]).find(x=>x.name==="pattukal.apk"&&x.state==="uploaded");if(downloadCountEl){const actualDownloads=asset&&Number.isFinite(Number(asset.download_count))?Number(asset.download_count):0;downloadCountEl.textContent=(500+actualDownloads).toLocaleString("en-IN");}
+    const asset=(r.assets||[]).find(x=>x.name==="pattukal.apk"&&x.state==="uploaded");if(downloadCountEl){const actualDownloads=asset&&Number.isFinite(Number(asset.download_count))?Number(asset.download_count):0;const carriedMatch=(r.body||"").match(/Downloads carried:\s*(\d+)/);const carried=carriedMatch?Number(carriedMatch[1]):0;downloadCountEl.textContent=(500+carried+actualDownloads).toLocaleString("en-IN");}
     const d=r.published_at||r.updated_at||r.created_at;
     timeEl.textContent=d?"Released "+new Intl.DateTimeFormat("en-IN",fmt).format(new Date(d))+" IST":"Release time unavailable";
     const items=["Default font changed"];

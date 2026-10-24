@@ -115,7 +115,11 @@ jobs:
             exit 1
           fi
           APK_SIZE="$(ls -l pattukal.apk | awk '{printf "%.1f MB", $5/1048576}')"
-          RELEASE_NOTES="$(printf 'New in Pattukal:\n\n- Default font changed.\n\nAPK size: %s\nRelease updated: %s\n\nPattukal version: %s\nPattukal build: %s\n' "$APK_SIZE" "$UPDATED_AT" "$APP_VERSION" "$BUILD_NUMBER")"
+          OLD_RELEASE="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/latest" 2>/dev/null || echo '{}')"
+          OLD_COUNT="$(echo "$OLD_RELEASE" | jq -r '[.assets[]? | select(.name=="pattukal.apk") | .download_count] | add // 0')"
+          OLD_CARRY="$(echo "$OLD_RELEASE" | jq -r '.body // ""' | sed -n 's/.*Downloads carried: \([0-9]*\).*/\1/p' | head -n1)"
+          DOWNLOADS_CARRIED=$(( ${OLD_CARRY:-0} + ${OLD_COUNT:-0} ))
+          RELEASE_NOTES="$(printf 'New in Pattukal:\n\n- Default font changed.\n\nAPK size: %s\nRelease updated: %s\n\nPattukal version: %s\nPattukal build: %s\n<!-- Downloads carried: %s -->\n' "$APK_SIZE" "$UPDATED_AT" "$APP_VERSION" "$BUILD_NUMBER" "$DOWNLOADS_CARRIED")"
           gh release delete latest --yes 2>/dev/null || true
           gh release create latest pattukal.apk \
             --title "Pattukal Latest — Optimized 44 MB APK" \
