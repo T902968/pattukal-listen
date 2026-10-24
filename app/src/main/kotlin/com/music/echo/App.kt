@@ -359,7 +359,21 @@ class App : Application(), SingletonImageLoader.Factory {
       .apply {
         crossfade(true)
         allowHardware(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
-        components { add(echo.music.iad1tya.utils.ThumbnailFallbackInterceptor()) }
+        components {
+          add(
+            coil3.network.okhttp.OkHttpNetworkFetcherFactory(
+              callFactory = {
+                okhttp3.OkHttpClient.Builder()
+                  .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                  .readTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+                  .retryOnConnectionFailure(true)
+                  .dispatcher(okhttp3.Dispatcher().apply { maxRequests = 64; maxRequestsPerHost = 16 })
+                  .build()
+              }
+            )
+          )
+          add(echo.music.iad1tya.utils.ThumbnailFallbackInterceptor())
+        }
 
         memoryCache { MemoryCache.Builder().maxSizePercent(context, 0.25).build() }
         if (cacheSize == 0) {
