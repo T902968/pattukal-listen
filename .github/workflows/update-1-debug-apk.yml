@@ -1,4 +1,4 @@
-name: Pattukal Update 1 Debug APK
+name: Pattukal Update 1 APK
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build-debug-apk:
-    name: Build Update 1 Debug APK
+    name: Build Update 1 Optimized APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Pattukal
@@ -44,7 +44,7 @@ jobs:
       - name: Build Debug APK (no release publishing)
         run: |
           chmod +x gradlew
-          ./gradlew assembleArm64FossDebug --console=plain 2>&1 | tee "$RUNNER_TEMP/gradle.log"
+          ./gradlew assembleArm64FossOptimized --console=plain 2>&1 | tee "$RUNNER_TEMP/gradle.log"
           exit "${PIPESTATUS[0]}"
 
       - name: Upload build log on failure
@@ -58,7 +58,7 @@ jobs:
       - name: Upload test APK
         uses: actions/upload-artifact@v7
         with:
-          name: Pattukal-Update-1-Debug-APK
+          name: Pattukal-Update-1-Optimized-APK
           path: app/build/outputs/apk/**/*.apk
           if-no-files-found: error
           retention-days: 7
