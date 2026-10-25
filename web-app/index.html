@@ -132,19 +132,21 @@ canvas#seek{width:100%;height:38px;touch-action:none;display:block}
 <script>
 "use strict";
 /* ---------- tiny helpers ---------- */
-const THUMBS=['hqdefault','mqdefault','sddefault','default'];
-const thumb=id=>'https://i.ytimg.com/vi/'+id+'/'+THUMBS[0]+'.jpg';
-// if a thumbnail fails or is YouTube's tiny grey placeholder, step down to the next size
-document.addEventListener('error',e=>{const i=e.target;if(i.tagName!=='IMG'||!i.src.includes('ytimg.com'))return;
-  const m=i.src.match(/\/vi\/([^/]+)\/(\w+)\.jpg/);if(!m)return;const n=THUMBS.indexOf(m[2])+1;if(n>0&&n<THUMBS.length)i.src='https://i.ytimg.com/vi/'+m[1]+'/'+THUMBS[n]+'.jpg'},true);
-document.addEventListener('load',e=>{const i=e.target;if(i.tagName==='IMG'&&i.src.includes('ytimg.com')&&i.naturalWidth===120&&i.naturalHeight===90&&!i.src.includes('/default.jpg')){i.dispatchEvent(new Event('error'))}},true);
-const $=s=>document.querySelector(s);
-const LS={get(k,d){try{const v=localStorage.getItem('pk_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('pk_'+k,JSON.stringify(v))}catch(e){}}};
-const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fmt=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>t.style.display='none',1800)}
-const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-
+// Thumbnails: try several hosts and sizes in turn, because some networks block one of them.
+const THUMB_URLS=[
+ id=>'https://i.ytimg.com/vi/'+id+'/hqdefault.jpg',
+ id=>'https://img.youtube.com/vi/'+id+'/hqdefault.jpg',
+ id=>'https://i.ytimg.com/vi/'+id+'/mqdefault.jpg',
+ id=>'https://i9.ytimg.com/vi/'+id+'/hqdefault.jpg',
+ id=>'https://wsrv.nl/?w=360&url='+encodeURIComponent('https://i.ytimg.com/vi/'+id+'/hqdefault.jpg'),
+ id=>'https://i.ytimg.com/vi/'+id+'/default.jpg'
+];
+const thumb=id=>THUMB_URLS[0](id);
+function nextThumb(i){const id=i.dataset.id;if(!id)return;const n=(+i.dataset.n||0)+1;
+  if(n<THUMB_URLS.length){i.dataset.n=n;i.src=THUMB_URLS[n](id)}else{i.removeAttribute('src');i.style.background='linear-gradient(135deg,#2a1f5c,#5c1f4a)'}}
+document.addEventListener('error',e=>{if(e.target.tagName==='IMG')nextThumb(e.target)},true);
+document.addEventListener('load',e=>{const i=e.target;if(i.tagName==='IMG'&&i.dataset.id&&i.naturalWidth<=120&&i.naturalHeight<=90&&(+i.dataset.n||0)<THUMB_URLS.length-1)nextThumb(i)},true);
+function setImg(el,id){el.dataset.n=0;el.dataset.id=id;el.referrerPolicy='no-referrer';el.src=thumb(id)}
 /* ---------- settings (all optional, like the Android app) ---------- */
 const S=Object.assign({lowEnd:false,battery:false,reduceAnim:false,tasteAi:true,daily:true,mood:true,discover:true,ambienceBtn:true,cropThumb:true,slider:'wavy',bg:'waves',langs:null},LS.get('settings',{}));
 const saveS=()=>{LS.set('settings',S);applyPerf()};
@@ -236,8 +238,8 @@ function setMedia(){if(!('mediaSession' in navigator)||!cur)return;
   navigator.mediaSession.setActionHandler('nexttrack',()=>next(false));navigator.mediaSession.setActionHandler('previoustrack',prev);
   try{navigator.mediaSession.setActionHandler('seekto',e=>yt.seekTo(e.seekTime,true))}catch(e){}}
 function showNow(){
-  $('#mini').classList.add('on');$('#mimg').src=thumb(cur.id);$('#mtxt').innerHTML=`<b>${esc(cur.title)}</b><i>${esc(cur.artist)}</i>`;
-  $('#pimg').src=thumb(cur.id);$('#ptitle').textContent=cur.title;$('#pby').textContent=cur.artist;$('#art').classList.toggle('crop',S.cropThumb);uiPlay();
+  $('#mini').classList.add('on');setImg($('#mimg'),cur.id);$('#mtxt').innerHTML=`<b>${esc(cur.title)}</b><i>${esc(cur.artist)}</i>`;
+  setImg($('#pimg'),cur.id);$('#ptitle').textContent=cur.title;$('#pby').textContent=cur.artist;$('#art').classList.toggle('crop',S.cropThumb);uiPlay();
 }
 function uiPlay(){const g=playing?'❚❚':'▶';$('#mplay').textContent=g;$('#pplay').textContent=g;if(cur){$('#plike').textContent=isLiked(cur.id)?'♥':'♡';$('#plike').classList.toggle('on',isLiked(cur.id))}$('#pstate').textContent=playing?'Now playing':'Paused'}
 $('#mplay').onclick=e=>{e.stopPropagation();toggle()};$('#pplay').onclick=toggle;$('#pnext').onclick=()=>next(false);$('#pprev').onclick=prev;
@@ -301,7 +303,7 @@ requestAnimationFrame(function loop(ts){if($('#player').classList.contains('on')
 function sheet(html){$('#sheet').innerHTML=html;$('#sheet').classList.add('on');$('#scrim').classList.add('on')}
 function closeSheet(){$('#sheet').classList.remove('on');$('#scrim').classList.remove('on')}
 $('#scrim').onclick=closeSheet;
-function row(s,i,onclick){return `<button class="it" data-a="${onclick}" data-i="${i}"><img src="${thumb(s.id)}" loading="lazy" alt=""><span class="t"><b>${esc(s.title)}</b><i>${esc(s.artist)}</i></span></button>`}
+function row(s,i,onclick){return `<button class="it" data-a="${onclick}" data-i="${i}"><img src="${thumb(s.id)}" data-id="${esc(s.id)}" referrerpolicy="no-referrer" loading="lazy" alt=""><span class="t"><b>${esc(s.title)}</b><i>${esc(s.artist)}</i></span></button>`}
 $('#pq').onclick=()=>{
   sheet(`<h3>Queue</h3>${queue.length?'<div class="list">'+queue.map((s,i)=>row(s,i,'q')).join('')+'</div>':'<div class="empty">Nothing queued</div>'}`);
   document.querySelectorAll('#sheet [data-a=q]').forEach(b=>b.onclick=()=>{qi=+b.dataset.i;load(queue[qi]);closeSheet()});
@@ -358,8 +360,8 @@ function bindSongs(root,getList){
     el.addEventListener('contextmenu',e=>{e.preventDefault()});
     el.addEventListener('click',()=>{if(!held)play(s,list)});
   })}
-const cardH=s=>`<button class="card" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" loading="lazy" alt=""><b>${esc(s.title)}</b><i>${esc(s.artist)}</i></button>`;
-const itemH=s=>`<button class="it" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" loading="lazy" alt=""><span class="t"><b>${esc(s.title)}</b><i>${esc(s.artist)}</i></span></button>`;
+const cardH=s=>`<button class="card" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" data-id="${esc(s.id)}" referrerpolicy="no-referrer" loading="lazy" alt=""><b>${esc(s.title)}</b><i>${esc(s.artist)}</i></button>`;
+const itemH=s=>`<button class="it" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" data-id="${esc(s.id)}" referrerpolicy="no-referrer" loading="lazy" alt=""><span class="t"><b>${esc(s.title)}</b><i>${esc(s.artist)}</i></span></button>`;
 
 /* ---------- screens ---------- */
 let tab='home',homeKey=0;
@@ -371,7 +373,7 @@ function section(title,sub,songs){const v=visible(songs);if(!v.length)return nul
   const wrap=document.createElement('div');wrap.innerHTML=`<h2>${esc(title)}</h2>${sub?`<p class="sub">${esc(sub)}</p>`:''}<div class="row">${v.map(cardH).join('')}</div>`;bindSongs(wrap,()=>v);return wrap}
 function cubeEl(songs){
   const v=visible(songs).slice(0,6);if(v.length<6)return null;
-  const w=document.createElement('div');w.innerHTML=`<div class="cubewrap"><div class="cube">${v.map((s,i)=>`<div class="face f${i}" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" alt=""><span>${esc(s.title)}</span></div>`).join('')}</div></div><p class="cubehint">Magic Cube · tap a face to play · pull down to refresh for new songs</p>`;bindSongs(w,()=>v);return w}
+  const w=document.createElement('div');w.innerHTML=`<div class="cubewrap"><div class="cube">${v.map((s,i)=>`<div class="face f${i}" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" data-id="${esc(s.id)}" referrerpolicy="no-referrer" alt=""><span>${esc(s.title)}</span></div>`).join('')}</div></div><p class="cubehint">Magic Cube · tap a face to play · pull down to refresh for new songs</p>`;bindSongs(w,()=>v);return w}
 
 async function renderHome(){
   const key=++homeKey;main.innerHTML=`<h1>Pattukal</h1><div id="cube"></div><div id="rows"><div class="empty">Loading your music…</div></div>`;
