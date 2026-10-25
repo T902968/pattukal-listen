@@ -130,6 +130,9 @@ canvas#seek{width:100%;height:38px;touch-action:none;display:block}
 <div class="toast" id="toast"></div>
 
 <script>
+window.addEventListener('error',e=>{if(e.target&&e.target!==window)return;const m=document.getElementById('main');if(m&&!m.children.length)m.innerHTML='<p style="padding:20px;color:#f88">Something went wrong: '+String(e.message).replace(/</g,'&lt;')+'<br><br>Fully close and reopen the page.</p>'});
+</script>
+<script>
 "use strict";
 /* ---------- tiny helpers ---------- */
 // Thumbnails: try several hosts and sizes in turn, because some networks block one of them.
@@ -442,7 +445,7 @@ function renderSettings(){
   main.querySelectorAll('#sl .chip').forEach(c=>c.onclick=()=>{S.slider=c.dataset.v;saveS();renderSettings()});
   main.querySelectorAll('#bgs .chip').forEach(c=>c.onclick=()=>{S.bg=c.dataset.v;saveS();renderSettings()});
 }
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js?v=5').catch(()=>{});
 render();
 </script>
 </body>
