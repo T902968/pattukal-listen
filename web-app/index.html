@@ -164,7 +164,7 @@ pre.dg{white-space:pre-wrap;font-size:11.5px;color:var(--mut);background:var(--g
 .still .breathe .art{animation:none}
 .glow{position:absolute;left:50%;top:38%;width:70vmin;height:70vmin;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,var(--g1,transparent),transparent 70%);opacity:.35;filter:blur(30px);pointer-events:none}
 /* ---- extras ---- */
-#buddy{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom) + 132px);z-index:25;width:46px;height:46px;border-radius:50%;background:var(--glass);border:1px solid var(--line);font-size:22px;backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));animation:bob calc(3s/var(--dur)) ease-in-out infinite}
+#buddy{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom) + 132px);z-index:70;cursor:grab;user-select:none;-webkit-user-select:none;width:46px;height:46px;border-radius:50%;background:var(--glass);border:1px solid var(--line);font-size:22px;backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));animation:bob calc(3s/var(--dur)) ease-in-out infinite}
 .lite #buddy,.still #buddy{animation:none;backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg2)}
 @keyframes bob{50%{transform:translateY(-4px)}}
 #galaxy{position:fixed;inset:0;z-index:50;background:var(--bg);display:none}#galaxy.on{display:block}#galaxy canvas{width:100%;height:100%;display:block;touch-action:none}
@@ -785,7 +785,20 @@ function loadExtras(){if(window.PK&&PK.galaxy)return Promise.resolve();if(extras
   window.PK={S,LS,toast,sheet,closeSheet,search,sx,visible,play,playNext,addQueue,hist,likes,seen,LANGS,MOODS,GENRES,esc,thumb,shuffle,topArtists,openSearch,go:t=>go(t),getCur:()=>cur,isPlaying:()=>playing,still,loadQueue,sessions,MOODQ:langPart,uniqHist,toggle,openPlayer,effAcc:()=>ACC};
   extrasP=new Promise((res,rej)=>{const s=document.createElement('script');s.src='extras.js?v=1';s.onload=res;s.onerror=()=>{extrasP=null;rej()};document.head.appendChild(s)});return extrasP}
 function syncBuddy(){const b=$('#buddy');b.style.display=S.buddy?'':'none'}
-$('#buddy').onclick=()=>loadExtras().then(()=>PK.buddy()).catch(()=>toast("Couldn't load Buddy"));syncBuddy();
+/* Buddy floats above everything: drag it anywhere, the spot is remembered */
+(function(){const b=$('#buddy');let sx=0,sy=0,ox=0,oy=0,moved=0,drag=false;
+  const clamp=(x,y)=>[Math.max(4,Math.min(innerWidth-b.offsetWidth-4,x)),Math.max(4,Math.min(innerHeight-b.offsetHeight-4,y))];
+  const place=(x,y)=>{[x,y]=clamp(x,y);b.style.left=x+'px';b.style.top=y+'px';b.style.right='auto';b.style.bottom='auto'};
+  const saved=LS.get('buddyPos',null);const home=()=>{if(saved)place(saved.x*innerWidth,saved.y*innerHeight)};
+  b.style.touchAction='none';
+  b.addEventListener('pointerdown',e=>{drag=true;moved=0;sx=e.clientX;sy=e.clientY;const r=b.getBoundingClientRect();ox=r.left;oy=r.top;b.setPointerCapture(e.pointerId)});
+  b.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-sx,dy=e.clientY-sy;moved=Math.max(moved,Math.abs(dx)+Math.abs(dy));if(moved>6){b.style.animation='none';place(ox+dx,oy+dy)}});
+  const end=e=>{if(!drag)return;drag=false;b.style.animation='';if(moved>6){const r=b.getBoundingClientRect();LS.set('buddyPos',{x:r.left/innerWidth,y:r.top/innerHeight});window.__buddyMoved=true;setTimeout(()=>window.__buddyMoved=false,60)}};
+  b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end);
+  b.addEventListener('keydown',e=>{const k={ArrowLeft:[-20,0],ArrowRight:[20,0],ArrowUp:[0,-20],ArrowDown:[0,20]}[e.key];if(!k)return;e.preventDefault();const r=b.getBoundingClientRect();place(r.left+k[0],r.top+k[1]);const q=b.getBoundingClientRect();LS.set('buddyPos',{x:q.left/innerWidth,y:q.top/innerHeight})});
+  addEventListener('resize',()=>{if(b.style.left){const r=b.getBoundingClientRect();place(r.left,r.top)}});
+  b.onclick=()=>{if(window.__buddyMoved)return;loadExtras().then(()=>PK.buddy()).catch(()=>toast("Couldn't load Buddy"))};
+  syncBuddy();home()})();
 
 /* ---------- navigation (direct links like #library work, refresh keeps the tab) ---------- */
 function go(t){tab=t;history.replaceState(history.state&&history.state.pl?history.state:null,'','#'+t);document.querySelectorAll('nav button').forEach(x=>{const on=x.dataset.t===t;x.classList.toggle('on',on);x.setAttribute('aria-current',on?'page':'false')});render();main.scrollTop=0}
