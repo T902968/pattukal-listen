@@ -147,6 +147,13 @@ function nextThumb(i){const id=i.dataset.id;if(!id)return;const n=(+i.dataset.n|
 document.addEventListener('error',e=>{if(e.target.tagName==='IMG')nextThumb(e.target)},true);
 document.addEventListener('load',e=>{const i=e.target;if(i.tagName==='IMG'&&i.dataset.id&&i.naturalWidth<=120&&i.naturalHeight<=90&&(+i.dataset.n||0)<THUMB_URLS.length-1)nextThumb(i)},true);
 function setImg(el,id){el.dataset.n=0;el.dataset.id=id;el.referrerPolicy='no-referrer';el.src=thumb(id)}
+const $=s=>document.querySelector(s);
+const LS={get(k,d){try{const v=localStorage.getItem('pk_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('pk_'+k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>t.style.display='none',1800)}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
 /* ---------- settings (all optional, like the Android app) ---------- */
 const S=Object.assign({lowEnd:false,battery:false,reduceAnim:false,tasteAi:true,daily:true,mood:true,discover:true,ambienceBtn:true,cropThumb:true,slider:'wavy',bg:'waves',langs:null},LS.get('settings',{}));
 const saveS=()=>{LS.set('settings',S);applyPerf()};
