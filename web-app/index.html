@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pattukal">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-512.png">
-<link rel="icon" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <title>Pattukal</title>
 <style>
 :root{--bg:#0b0b12;--bg2:#141420;--fg:#f3f2fa;--mut:#9a98b0;--acc:#8b7bff;--acc2:#ff6fb1;--onacc:#0b0b12;--glass:rgba(255,255,255,.07);--line:rgba(255,255,255,.1);--navbg:rgba(11,11,18,.82);--sheetbg:rgba(20,20,32,.94);--menubg:rgba(30,30,46,.97);--shadow:0 24px 60px rgba(0,0,0,.5);--r:20px;--ar:22px;--blur:18px;--dur:1;--fs:15px;--tap:44px;--sp:16px;--font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
@@ -187,14 +187,33 @@ pre.dg{white-space:pre-wrap;font-size:11.5px;color:var(--mut);background:var(--g
 #galaxy{position:fixed;inset:0;z-index:50;background:var(--bg);display:none}#galaxy.on{display:block}#galaxy canvas{width:100%;height:100%;display:block;touch-action:none}
 #galaxy .gx{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}#galaxy .gx *{pointer-events:auto}
 #galaxy .gh{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 14px);text-align:center;color:var(--mut);font-size:12px;pointer-events:none}
+
+/* ---- floating liquid-glass bars: mini player pill, gap, nav pill + search circle ---- */
+.brandcube{background:none!important;box-shadow:none!important;overflow:hidden;padding:0}.brandcube img{width:100%;height:100%;border-radius:13px;display:block}
+:root{--navh:64px;--navgap:14px;--glassfill:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05));--glassrim:rgba(255,255,255,.26)}
+main{padding-bottom:calc(env(safe-area-inset-bottom) + 190px)!important}
+#app nav{left:0;right:0;bottom:0;padding:0 14px calc(env(safe-area-inset-bottom) + 12px);display:flex;justify-content:center;align-items:center;gap:12px;background:none!important;border:0!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none}
+#app nav>*{pointer-events:auto}
+#app .navpill{display:flex;gap:6px;padding:6px;height:var(--navh);border-radius:99px;background:var(--glassfill);border:1px solid var(--glassrim);backdrop-filter:blur(var(--blur)) saturate(1.5);-webkit-backdrop-filter:blur(var(--blur)) saturate(1.5);box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.25)}
+#app .navpill button{flex-direction:row;gap:8px;min-width:96px;min-height:0;height:100%;padding:0 20px;border-radius:99px;font-size:15px;color:var(--mut)}
+#app .navpill button.on{background:rgba(255,255,255,.2);color:var(--fg);font-weight:650;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+#app .navpill button:not(.on) span:not(.navico){display:none}
+#app nav .navsearch{width:var(--navh);height:var(--navh);flex:none;min-height:0;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--glassfill);border:1px solid var(--glassrim);backdrop-filter:blur(var(--blur)) saturate(1.5);-webkit-backdrop-filter:blur(var(--blur)) saturate(1.5);box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.25);color:var(--mut)}
+#app nav .navsearch.on{color:var(--fg);background:rgba(255,255,255,.2)}
+#app nav .navico{font-size:24px;line-height:1}#app nav .navsearch .navico{font-size:30px}
+#app #mini{left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom) + 12px + var(--navh) + var(--navgap));gap:12px;padding:8px 10px 8px 8px;border-radius:99px;min-height:64px;background:var(--glassfill);border:1px solid var(--glassrim);backdrop-filter:blur(var(--blur)) saturate(1.5);-webkit-backdrop-filter:blur(var(--blur)) saturate(1.5);box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.25)}
+#app #mini img{width:48px;height:48px;border-radius:50%}
+#app #mini .ib{background:none;width:44px;height:44px}
+.lite #app nav,.lite #app .navpill,.lite #app .navsearch,.lite #app #mini{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.lite #app .navpill,.lite #app .navsearch,.lite #app #mini{background:var(--bg2)}
 </style>
 </head>
 <body>
 <div id="app">
-  <header id="topbar"><div class="brandmark"><span class="brandcube">✦</span><span><b>Pattukal</b><small>YOUR MUSIC UNIVERSE</small></span></div><button id="topsettings" class="topgear" aria-label="Open settings" title="Settings">⚙</button></header>
+  <header id="topbar"><div class="brandmark"><span class="brandcube"><img src="icon-192.png" alt="" width="38" height="38"></span><span><b>Pattukal</b><small>YOUR MUSIC UNIVERSE</small></span></div><button id="topsettings" class="topgear" aria-label="Open settings" title="Settings">⚙</button></header>
   <main id="main"></main>
-  <div id="mini"><img id="mimg" alt=""><div class="t" id="mtxt"></div><button class="ib" id="mplay">▶</button></div>
-  <nav aria-label="Main navigation"><button data-t="home" class="on"><span class="navico">⌂</span><span>Home</span></button><button data-t="search"><span class="navico">⌕</span><span>Search</span></button><button data-t="library"><span class="navico">▤</span><span>Library</span></button></nav>
+  <div id="mini"><img id="mimg" alt=""><div class="t" id="mtxt"></div><button class="ib" id="mplay">▶</button><button class="ib" id="mnext" aria-label="Next song">⏭</button></div>
+  <nav aria-label="Main navigation"><div class="navpill"><button data-t="home" class="on"><span class="navico">⌂</span><span>Home</span></button><button data-t="library"><span class="navico">▤</span><span>Library</span></button></div><button data-t="search" class="navsearch" aria-label="Search"><span class="navico">⌕</span></button></nav>
 </div>
 
 <div id="player" data-l="immersive">
@@ -407,7 +426,7 @@ function toggle(){
   if(!ytReady){toast('Player is still loading…');return}
   if(restored){const r=restored;restored=null;load(cur,r.pos);return}
   if(status==='error'||status==='stalled'){retry();return}
-  try{playing?yt.pauseVideo():yt.playVideo()}catch(e){dlog('toggle failed '+e)}}
+  userPaused=playing;try{playing?yt.pauseVideo():yt.playVideo()}catch(e){dlog('toggle failed '+e)}}
 async function similar(s){const l=await sx(`${s.artist} songs`);return visible(l).filter(x=>x.id!==s.id&&!queue.some(q=>q.id===x.id)).slice(0,10)}
 function playNext(s){queue.splice(qi+1,0,s);toast('Playing next');savePos(true)}
 function addQueue(s){queue.push(s);toast('Added to queue');savePos(true)}
@@ -428,13 +447,13 @@ function restoreSession(){if(!S.restore)return;const r=LS.get('sess',null);if(!r
 function loadQueue(list,idx,at){queue.length=0;list.forEach(s=>queue.push(s));qi=Math.min(Math.max(0,idx||0),queue.length-1);origOrder=null;restored=null;errRun=0;load(queue[qi],at||0)}
 const sessions=()=>LS.get('sessions',[]);
 function saveSession(name){const l=sessions();l.unshift({n:name||('Session '+new Date().toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})),q:queue.slice(0,100).map(m=>({id:m.id,title:m.title,artist:m.artist,dur:m.dur,img:m.img})),i:qi,p:Math.floor(pos)});LS.set('sessions',l.slice(0,10));toast('Session saved')}
-setInterval(()=>{if(yt&&ytReady&&playing&&document.visibilityState==='visible'){try{pos=yt.getCurrentTime()||0;dur=yt.getDuration()||dur}catch(e){}}if(document.visibilityState==='visible')tick();if(playing)savePos()},500);
+setInterval(()=>{if(playing)lastPlayingAt=Date.now();if(yt&&ytReady&&playing&&document.visibilityState==='visible'){try{pos=yt.getCurrentTime()||0;dur=yt.getDuration()||dur}catch(e){}}if(document.visibilityState==='visible')tick();if(playing)savePos()},500);
 function tick(){$('#tcur').textContent=fmt(pos);$('#tdur').textContent=fmt(dur);
   if('mediaSession' in navigator&&dur&&isFinite(dur)&&playing){try{navigator.mediaSession.setPositionState({duration:dur,position:Math.min(pos,dur),playbackRate:1})}catch(e){}}lyricTick()}
 function setMedia(){if(!('mediaSession' in navigator)||!cur)return;const ms=navigator.mediaSession;
   try{ms.metadata=new MediaMetadata({title:cur.title,artist:cur.artist,artwork:[{src:'https://i.ytimg.com/vi/'+cur.id+'/mqdefault.jpg',sizes:'320x180',type:'image/jpeg'},{src:thumb(cur.id),sizes:'480x360',type:'image/jpeg'}]})}catch(e){}
   const set=(a,f)=>{try{ms.setActionHandler(a,f)}catch(e){}};
-  set('play',toggle);set('pause',toggle);set('nexttrack',()=>next(false));set('previoustrack',prev);
+  set('play',()=>{userPaused=false;try{yt.playVideo()}catch(e){}});set('pause',()=>{userPaused=true;try{yt.pauseVideo()}catch(e){}});set('nexttrack',()=>next(false));set('previoustrack',prev);
   set('seekto',e=>seekTo(e.seekTime));set('seekbackward',e=>seekTo(pos-(e.seekOffset||10)));set('seekforward',e=>seekTo(pos+(e.seekOffset||10)));
   set('stop',()=>{try{yt.pauseVideo()}catch(e){}})}
 const STAT={loading:'Loading…',buffering:'Buffering…',playing:'Now playing',paused:'Paused',stalled:'Tap play to start',error:'Unavailable',ended:'Ended',idle:'Now playing'};
@@ -451,7 +470,7 @@ function uiPlay(){const g=playing?'❚❚':'▶';$('#mplay').textContent=g;$('#p
   $('#prep').setAttribute('aria-label','Repeat: '+repeat);$('#pshuf').setAttribute('aria-label','Shuffle: '+(shuf?'on':'off'));
   $('#pstate').textContent=STAT[status]||'Now playing';
   if('mediaSession' in navigator)try{navigator.mediaSession.playbackState=playing?'playing':cur?'paused':'none'}catch(e){}}
-$('#mplay').onclick=e=>{e.stopPropagation();toggle()};$('#pplay').onclick=toggle;$('#pnext').onclick=()=>next(false);$('#pprev').onclick=prev;
+$('#mplay').onclick=e=>{e.stopPropagation();toggle()};$('#mnext').onclick=e=>{e.stopPropagation();next(false)};$('#pplay').onclick=toggle;$('#pnext').onclick=()=>next(false);$('#pprev').onclick=prev;
 $('#pshuf').onclick=()=>setShuffle(!shuf);$('#prep').onclick=cycleRepeat;
 function openPlayer(){const p=$('#player');if(!p.classList.contains('on')){p.classList.add('on');history.pushState({pl:1},'');drawBgLoop()}}
 function closePlayer(){$('#player').classList.remove('on')}
@@ -460,7 +479,12 @@ addEventListener('popstate',()=>{if($('#player').classList.contains('on'))closeP
 $('#plike').onclick=()=>cur&&like(cur);
 $('#blay').onclick=()=>{const i=LAYOUTS.findIndex(x=>x[0]===S.layout);const n=LAYOUTS[(i+1)%LAYOUTS.length];S.layout=n[0];saveS();toast('Layout: '+n[1])};
 /* come back to the page: re-sync with the real player state */
-document.addEventListener('visibilitychange',()=>{
+let userPaused=false,lastPlayingAt=0;
+function bgResume(){ // the browser sometimes pauses an embedded player when the page is hidden; try once to carry on
+  if(document.visibilityState!=='hidden'||!cur||userPaused||Date.now()-lastPlayingAt>4000)return;
+  setTimeout(()=>{try{if(yt&&yt.getPlayerState()===2&&!userPaused){yt.playVideo();dlog('background resume attempted')}}catch(e){}},700);
+  setTimeout(()=>{try{if(yt&&yt.getPlayerState()===2&&!userPaused)yt.playVideo()}catch(e){}},2500)}
+document.addEventListener('visibilitychange',()=>{bgResume();
   if(document.visibilityState==='visible'){if(yt&&ytReady){try{const st=yt.getPlayerState();if(st===1||st===2||st===3){playing=st===1;pos=yt.getCurrentTime()||pos}}catch(e){}uiPlay();tick()}}else savePos(true)});
 addEventListener('pagehide',()=>savePos(true));
 addEventListener('online',()=>{toast('Back online');if(status==='error'||status==='stalled')retry()});addEventListener('offline',()=>toast("You're offline"));
@@ -828,7 +852,7 @@ function syncBuddy(){const b=$('#buddy');b.style.display=S.buddy?'':'none'}
 /* ---------- navigation (direct links like #library work, refresh keeps the tab) ---------- */
 function go(t){tab=t;history.replaceState(history.state&&history.state.pl?history.state:null,'','#'+t);document.querySelectorAll('nav button').forEach(x=>{const on=x.dataset.t===t;x.classList.toggle('on',on);x.setAttribute('aria-current',on?'page':'false')});render();main.scrollTop=0}
 addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(TABS.includes(t)&&t!==tab)go(t)});
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js?v=7').catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js?v=8').catch(()=>{});
 restoreSession();
 document.querySelectorAll('[title]').forEach(b=>{if(b.tagName==='BUTTON'&&!b.getAttribute('aria-label'))b.setAttribute('aria-label',b.title)});
 $('#pclose').setAttribute('aria-label','Close player');$('#pmenu').setAttribute('aria-label','Song menu');$('#mplay').setAttribute('aria-label','Play');
