@@ -40,8 +40,8 @@ h2{font-size:19px;margin:22px 0 2px}
 .search input:focus{border-color:var(--acc)}
 /* magic cube */
 .cubewrap{perspective:700px;height:210px;display:flex;align-items:center;justify-content:center;margin:2px 0 6px}
-.cube{width:150px;height:150px;position:relative;transform-style:preserve-3d;animation:spin 18s linear infinite}
-.lite .cube{animation:none;transform:rotateX(-18deg) rotateY(28deg)}
+.cube{width:150px;height:150px;position:relative;transform-style:preserve-3d;will-change:transform}.cubewrap{touch-action:pan-y;cursor:grab}
+
 @keyframes spin{from{transform:rotateX(-18deg) rotateY(0)}to{transform:rotateX(-18deg) rotateY(360deg)}}
 .face{position:absolute;inset:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--bg2);backface-visibility:hidden}
 .face img{width:100%;height:100%;object-fit:cover}
@@ -93,7 +93,7 @@ canvas#seek{width:100%;height:38px;touch-action:none;display:block}
 .note{color:var(--mut);font-size:12.5px;padding:10px 0}
 .empty{color:var(--mut);padding:30px 0;text-align:center}
 .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;background:var(--glass);margin-left:6px}
-@media (prefers-reduced-motion:reduce){.cube{animation:none;transform:rotateX(-18deg) rotateY(28deg)}}
+
 </style>
 </head>
 <body>
@@ -205,7 +205,7 @@ const queue=[];let qi=-1,cur=null,playing=false,dur=0,pos=0;
 function loadYT(){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s)}
 window.onYouTubeIframeAPIReady=()=>{
   yt=new YT.Player('yt',{width:'100%',height:'100%',playerVars:{playsinline:1,controls:0,rel:0,modestbranding:1,disablekb:1,fs:0,iv_load_policy:3},events:{
-    onReady:()=>{ytReady=true;if(pending){yt.loadVideoById(pending);pending=null}},
+    onReady:()=>{ytReady=true;try{yt.setVolume(LS.get('musicVol',100))}catch(e){}if(pending){yt.loadVideoById(pending);pending=null}},
     onStateChange:e=>{
       if(e.data===1){playing=true;dur=yt.getDuration()||dur}
       else if(e.data===2){playing=false}
@@ -336,13 +336,18 @@ function ambStart(k){if(!AC)AC=new (window.AudioContext||window.webkitAudioConte
   const len=AC.sampleRate*2,buf=AC.createBuffer(1,len,AC.sampleRate),d=buf.getChannelData(0);let b=0;
   for(let i=0;i<len;i++){const w=Math.random()*2-1;d[i]=k==='rain'?w:(b=(b+.02*w)/1.02)*3.5}
   const src=AC.createBufferSource();src.buffer=buf;src.loop=true;const f=AC.createBiquadFilter();f.type=k==='rain'?'highpass':'lowpass';f.frequency.value=k==='rain'?1800:k==='ocean'?500:900;
-  const g=AC.createGain();g.gain.value=.5;src.connect(f);f.connect(g);g.connect(AC.destination);src.start();
+  const g=AC.createGain();g.gain.value=(typeof ambVol!=='undefined'&&ambVol[k]!=null)?ambVol[k]:.5;src.connect(f);f.connect(g);g.connect(AC.destination);src.start();
   if(k==='ocean'||k==='wind'){const l=AC.createOscillator(),lg=AC.createGain();l.frequency.value=k==='ocean'?.12:.2;lg.gain.value=.3;l.connect(lg);lg.connect(g.gain);l.start()}
   amb[k]={src,g}}
 function ambStop(k){if(amb[k]){try{amb[k].src.stop()}catch(e){}delete amb[k]}}
+let ambVol=LS.get('ambVol',{rain:.5,wind:.5,ocean:.5,fire:.5}),musicVol=LS.get('musicVol',100);
 $('#bamb').onclick=()=>{
   const on=Object.keys(amb).length>0;
-  sheet(`<h3>Ambience</h3><button class="opt" id="ambm"><span>Ambience<small>Layer calm sounds under your music</small></span><span class="sw ${on?'on':''}"></span></button>`+AMB.map(a=>`<button class="opt" data-k="${a[0]}"><span>${a[1]}</span><span class="sw ${amb[a[0]]?'on':''}"></span></button>`).join('')+`<button class="opt" id="ambx"><span>Stop all</span></button>`);
+  const sl=(id,label,v)=>`<div class="opt" style="display:block"><div style="display:flex;justify-content:space-between"><span>${label}</span><span class="sub" id="${id}v" style="margin:0">${Math.round(v)}%</span></div><input type="range" id="${id}" min="0" max="100" value="${Math.round(v)}" style="width:100%;accent-color:#8b7bff"></div>`;
+  sheet(`<h3>Ambience</h3>`+sl('mvol','Song volume',musicVol)+`<button class="opt" id="ambm"><span>Ambience<small>Layer calm sounds under your music</small></span><span class="sw ${on?'on':''}"></span></button>`
+   +AMB.map(a=>`<button class="opt" data-k="${a[0]}"><span>${a[1]}</span><span class="sw ${amb[a[0]]?'on':''}"></span></button>`+sl('av_'+a[0],a[1]+' volume',ambVol[a[0]]*100)).join('')+`<button class="opt" id="ambx"><span>Stop all</span></button>`);
+  $('#mvol').oninput=e=>{musicVol=+e.target.value;LS.set('musicVol',musicVol);$('#mvolv').textContent=musicVol+'%';if(yt&&ytReady)yt.setVolume(musicVol)};
+  AMB.forEach(a=>{$('#av_'+a[0]).oninput=e=>{const v=+e.target.value/100;ambVol[a[0]]=v;LS.set('ambVol',ambVol);$('#av_'+a[0]+'v').textContent=e.target.value+'%';if(amb[a[0]])amb[a[0]].g.gain.value=v}});
   document.querySelectorAll('#sheet [data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;amb[k]?ambStop(k):ambStart(k);$('#bamb').click()});
   $('#ambm').onclick=()=>{on?Object.keys(amb).forEach(ambStop):ambStart('rain');$('#bamb').click()};
   $('#ambx').onclick=()=>{Object.keys(amb).forEach(ambStop);closeSheet()};
@@ -368,7 +373,7 @@ function bindSongs(root,getList){
     ['pointerup','pointerleave','pointercancel'].forEach(ev=>el.addEventListener(ev,()=>clearTimeout(t)));
     el.addEventListener('pointermove',e=>{if(Math.abs(e.clientX-sx0)>8)clearTimeout(t)});
     el.addEventListener('contextmenu',e=>{e.preventDefault()});
-    el.addEventListener('click',()=>{if(!held)play(s,list)});
+    el.addEventListener('click',()=>{if(!held&&!window.__cubeMoved)play(s,list)});
   })}
 const cardH=s=>`<button class="card" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" data-id="${esc(s.id)}" referrerpolicy="no-referrer" loading="lazy" alt=""><b>${esc(s.title)}</b><i>${esc(s.artist)}</i></button>`;
 const itemH=s=>`<button class="it" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" data-id="${esc(s.id)}" referrerpolicy="no-referrer" loading="lazy" alt=""><span class="t"><b>${esc(s.title)}</b><i>${esc(s.artist)}</i></span></button>`;
@@ -381,9 +386,24 @@ function render(){({home:renderHome,search:renderSearch,library:renderLibrary,se
 
 function section(title,sub,songs){const v=visible(songs);if(!v.length)return null;
   const wrap=document.createElement('div');wrap.innerHTML=`<h2>${esc(title)}</h2>${sub?`<p class="sub">${esc(sub)}</p>`:''}<div class="row">${v.map(cardH).join('')}</div>`;bindSongs(wrap,()=>v);return wrap}
+let cubeRaf=0;
 function cubeEl(songs){
   const v=visible(songs).slice(0,6);if(v.length<6)return null;
-  const w=document.createElement('div');w.innerHTML=`<div class="cubewrap"><div class="cube">${v.map((s,i)=>`<div class="face f${i}" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" data-id="${esc(s.id)}" referrerpolicy="no-referrer" alt=""><span>${esc(s.title)}</span></div>`).join('')}</div></div><p class="cubehint">Magic Cube · tap a face to play · pull down to refresh for new songs</p>`;bindSongs(w,()=>v);return w}
+  const w=document.createElement('div');w.innerHTML=`<div class="cubewrap"><div class="cube">${v.map((s,i)=>`<div class="face f${i}" data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" data-id="${esc(s.id)}" referrerpolicy="no-referrer" alt=""><span>${esc(s.title)}</span></div>`).join('')}</div></div><p class="cubehint">Magic Cube · drag to spin · tap a face to play · <button class="chip" id="cshuf" style="padding:3px 10px">Shuffle</button></p>`;
+  const wrap=w.querySelector('.cubewrap'),cube=w.querySelector('.cube');
+  let rx=-18,ry=28,vx=0,vy=0.25,down=false,lx=0,ly=0,moved=0;
+  const apply=()=>cube.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;apply();
+  cancelAnimationFrame(cubeRaf);
+  const loop=()=>{ if(!document.body.contains(cube))return;
+    if(!down){ry+=vy;rx+=vx;vx*=.94;vy+=((still()?0:.25)-vy)*.02;if(still()&&Math.abs(vy)<.02)vy=0;rx+=(-18-rx)*.01;apply()}
+    cubeRaf=requestAnimationFrame(loop)};loop();
+  wrap.addEventListener('pointerdown',e=>{down=true;moved=0;lx=e.clientX;ly=e.clientY;wrap.style.cursor='grabbing'});
+  window.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);
+    ry+=dx*.6;rx=Math.max(-70,Math.min(70,rx-dy*.6));vy=dx*.6;vx=-dy*.3;apply()});
+  const up=()=>{if(!down)return;down=false;wrap.style.cursor='grab';window.__cubeMoved=moved>8;setTimeout(()=>window.__cubeMoved=false,80)};
+  window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+  w.querySelector('#cshuf').onclick=()=>{toast('Shuffling cube…');renderHome()};
+  bindSongs(w,()=>v);return w}
 
 async function renderHome(){
   const key=++homeKey;main.innerHTML=`<h1>Pattukal</h1><div id="cube"></div><div id="rows"><div class="empty">Loading your music…</div></div>`;
@@ -397,7 +417,10 @@ async function renderHome(){
   const jobs=[];
   // Magic cube: new picks every refresh
   jobs.push(sx(`${L[0][2]} ${sfx[2]}`).then(r=>({k:'cube',r})));
-  L.slice(0,2).forEach((l,i)=>jobs.push(sx(`${l[2]} ${sfx[i]}`).then(r=>({k:'lang',t:l[1]+' songs',r:shuffle(r).slice(0,14)}))));
+  L.slice(0,4).forEach((l,i)=>{
+    jobs.push(sx(`${l[2]} ${sfx[i]}`).then(r=>({k:'lang',t:l[1]+(i?' '+['','new releases','trending','top hits'][i]:' songs'),r:shuffle(r).slice(0,20)})));
+    jobs.push(sx(`${l[2]} ${['romantic','party','melody','90s old'][i]} songs`).then(r=>({k:'lang',t:l[1]+' '+['romantic','party','melody','throwback'][i],r:shuffle(r).slice(0,20)})))});
+  [['new releases','new songs'],['trending','trending now'],['top hits','best of']].slice(L.length>1?0:0,3).forEach(m=>jobs.push(sx(`${L[0][2]} ${m[0]}`).then(r=>({k:'lang',t:L[0][1]+' '+m[1],r:shuffle(r).slice(0,20)}))));
   if(S.tasteAi){
     const artists=[...hist.map(h=>h.artist),...likes.map(l=>l.artist),...likes.map(l=>l.artist)].filter(Boolean);
     const cnt={};artists.forEach(a=>cnt[a]=(cnt[a]||0)+1);const top=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);
@@ -406,12 +429,20 @@ async function renderHome(){
       jobs.push(sx(m[1]).then(r=>({k:'t',t:m[0],sub:'Picked for this time of day',r:r.slice(0,14)})))}
     if(S.discover&&top.length>1)jobs.push(sx('songs like '+shuffle(top.slice(1))[0]).then(r=>({k:'t',t:'Discover',sub:'Similar to what you play',r:r.slice(0,14)})));
   }
-  jobs.push(sx(L[L.length-1][2]+' '+sfx[3]).then(r=>({k:'top',t:'Top songs',r:r.slice(0,14)}))); // top songs live at the bottom
+  jobs.push(sx(L[L.length-1][2]+' '+sfx[3]).then(r=>({k:'top',t:'Top songs',r:r.slice(0,20)}))); // top songs live at the bottom
   const res=await Promise.all(jobs);if(key!==homeKey)return;
   const rows=$('#rows');rows.innerHTML='';
   if(offline&&res.every(x=>!x.r.length)){rows.innerHTML=`<div class="empty">Couldn't reach a music server.<br>Check your connection, then pull down to retry.</div>`;return}
   const cube=res.find(x=>x.k==='cube');const ce=cube&&cubeEl(shuffle(cube.r));if(ce)$('#cube').appendChild(ce);
   res.filter(x=>x.k!=='cube').forEach(x=>{const e=section(x.t,x.sub,x.r);e&&rows.appendChild(e)});
+  const MORE=[['Workout energy','workout songs'],['Chill evenings','chill lofi songs'],['Road trip','road trip songs'],['Sad songs','sad songs'],['Dance floor','dance hits'],['Throwback','old classic songs'],['Rain songs','rain songs'],['Sleep','sleep calm songs']];
+  const btn=document.createElement('button');btn.className='chip on';btn.textContent='Load more songs';btn.style.margin='18px 0';let mi=0;
+  btn.onclick=async()=>{btn.textContent='Loading…';const batch=MORE.slice(mi,mi+3);mi+=3;
+    const lp=(S.langs&&S.langs[0]&&LANGS.find(l=>l[0]===S.langs[0])||LANGS[5])[2];
+    const rs=await Promise.all(batch.map(m=>sx(lp+' '+m[1]).then(r=>[m[0],r])));
+    rs.forEach(([t,r])=>{const e=section(t,'',shuffle(r).slice(0,20));e&&rows.insertBefore(e,btn)});
+    if(mi>=MORE.length)btn.remove();else btn.textContent='Load more songs'};
+  rows.appendChild(btn);
 }
 function addPull(){let y0=null;main.ontouchstart=e=>{y0=main.scrollTop===0?e.touches[0].clientY:null};
   main.ontouchend=e=>{if(y0!=null&&e.changedTouches[0].clientY-y0>90&&tab==='home'){toast('Refreshing…');renderHome()}y0=null}}
@@ -445,7 +476,7 @@ function renderSettings(){
   main.querySelectorAll('#sl .chip').forEach(c=>c.onclick=()=>{S.slider=c.dataset.v;saveS();renderSettings()});
   main.querySelectorAll('#bgs .chip').forEach(c=>c.onclick=()=>{S.bg=c.dataset.v;saveS();renderSettings()});
 }
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js?v=5').catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js?v=6').catch(()=>{});
 render();
 </script>
 </body>
