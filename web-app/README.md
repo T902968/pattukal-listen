@@ -1,6 +1,6 @@
 # Pattukal Web (test build)
 
-Single-page web app served at `/app-test/`. Plays through the YouTube IFrame player (the only audio engine; layouts, themes and extras never touch it), finds songs through public Piped / Invidious servers, lyrics from LRCLIB.
+Single-page web app served at `/app-test/`. Plays through an audio element fed by a stream from the same public servers (keeps playing in the background), with the YouTube IFrame player as the fallback when no stream can be fetched (layouts, themes and extras never touch the engine), finds songs through public Piped / Invidious servers, lyrics from LRCLIB.
 
 ## Files
 - `index.html` – app (player core, home, search, library, Theme Studio, settings)

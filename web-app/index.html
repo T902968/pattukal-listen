@@ -373,11 +373,12 @@ function loadYT(){ytWait&&clearTimeout(ytWait);document.querySelectorAll('script
   const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.dataset.yt=1;s.onerror=()=>{dlog('YouTube API script blocked');banner('The YouTube player could not load.','Retry',loadYT)};document.head.appendChild(s);
   ytWait=setTimeout(()=>{if(!ytReady){dlog('YouTube player timed out');banner('The YouTube player is slow to load.','Retry',loadYT)}},12000)}
 const errText=c=>c===101||c===150?"The owner doesn't allow this song to play here.":c===100?'This video was removed.':c===2?'This song link is invalid.':"This song couldn't be played.";
-window.onYouTubeIframeAPIReady=()=>{
-  if(yt)return;
-  yt=new YT.Player('yt',{width:'100%',height:'100%',playerVars:{playsinline:1,controls:0,rel:0,modestbranding:1,disablekb:1,fs:0,iv_load_policy:3},events:{
-    onReady:()=>{ytReady=true;clearTimeout(ytWait);dlog('player ready');try{yt.setVolume(LS.get('musicVol',100))}catch(e){}if(pending){const p=pending;pending=null;try{yt.loadVideoById(p.t?{videoId:p.id,startSeconds:p.t}:p.id)}catch(e){}}if(banner&&status==='idle')banner()},
-    onStateChange:e=>{
+/* ---- playback engine ----
+   Songs play through a normal audio element when a stream is available (this keeps playing with the screen
+   off and in the background, and gives lock-screen controls). If no stream can be fetched, the YouTube
+   player is used as a fallback. Everything else in the app talks to `yt`, which is this wrapper. */
+let realYT=null;
+function ysc(e){
       const st=e.data;let vid=null;try{vid=yt.getVideoData().video_id}catch(_){}
       if(cur&&vid&&vid!==cur.id){dlog('ignored stale event '+st);return}  // old track reporting late
       if(st===1){playing=true;status='playing';errRun=0;clearTimeout(stallT);banner();try{dur=yt.getDuration()||dur}catch(_){}}
@@ -385,10 +386,64 @@ window.onYouTubeIframeAPIReady=()=>{
       else if(st===3){status='buffering'}
       else if(st===0){playing=false;status='ended';onEnded()}
       uiPlay();
-    },
-    onError:e=>{const c=e.data;dlog('player error '+c);clearTimeout(stallT);errRun++;
+    }
+function yer(e){const c=e.data;dlog('player error '+c);clearTimeout(stallT);errRun++;
       if(errRun>=3){status='error';playing=false;banner(errText(c),'Retry',retry);uiPlay();return}
       toast("Can't play this one, skipping");next(true)}
+const au=new Audio();au.preload='auto';au.setAttribute('playsinline','');au.crossOrigin=null;
+const H={mode:'yt',vid:null,tok:0,tried:{},
+  async streamFor(id){
+    if(H.tried[id]&&H.tried[id].url)return H.tried[id].url;
+    if(H.tried[id]&&H.tried[id].bad)return null;
+    const order=[];if(working&&working.kind==='piped')order.push(working.base);PIPED.forEach(b=>{if(!order.includes(b))order.push(b)});
+    try{
+      const hit=await Promise.any(order.map(async base=>{
+        const r=await tmo(fetch(base+'/streams/'+id),6500);if(!r.ok)throw 0;const j=await r.json();
+        const all=(j.audioStreams||[]).filter(x=>x.url&&!x.videoOnly);const m4a=all.filter(x=>/mp4|m4a|aac/i.test(x.mimeType||x.format||''));
+        const pool=(m4a.length?m4a:all).slice().sort((x,y)=>(x.bitrate||0)-(y.bitrate||0));
+        const pick=pool.filter(x=>(x.bitrate||0)<=170000).pop()||pool[0];if(!pick)throw 0;return {base,url:pick.url}}));
+      H.tried[id]={url:hit.url};dlog('stream via '+hit.base);return hit.url}catch(e){}
+    for(const base of INV){ // Invidious serves AAC audio (itag 140) through its own proxy
+      const u=base+'/latest_version?id='+id+'&itag=140&local=true';
+      try{const r=await tmo(fetch(u,{method:'HEAD',mode:'no-cors'}),5000);H.tried[id]={url:u};dlog('stream via '+base);return u}catch(e){}
+    }
+    return null},
+  async loadVideoById(arg){
+    const id=typeof arg==='string'?arg:arg.videoId,start=(arg&&arg.startSeconds)||0,tok=++H.tok;H.vid=id;H.mode='loading';
+    try{au.pause()}catch(e){}try{realYT&&realYT.pauseVideo&&realYT.pauseVideo()}catch(e){}
+    const url=await H.streamFor(id);if(tok!==H.tok)return;
+    if(url){H.mode='audio';au.src=url;H.start=start;
+      const go=()=>{if(tok!==H.tok)return;if(H.start){try{au.currentTime=H.start}catch(e){}H.start=0}au.play().catch(err=>{dlog('audio play blocked: '+err.name);ysc({data:2})})};
+      au.addEventListener('loadedmetadata',go,{once:true});au.load()}
+    else H.fallback(arg)},
+  fallback(arg){ // use the YouTube player for this song
+    H.mode='yt';try{au.pause();au.removeAttribute('src')}catch(e){}
+    if(realYT&&realYT.loadVideoById){dlog('using YouTube player');realYT.loadVideoById(arg)}
+    else{dlog('no stream and YouTube player unavailable');yer({data:5})}},
+  playVideo(){if(H.mode==='audio')return au.play().catch(()=>{});realYT&&realYT.playVideo()},
+  pauseVideo(){if(H.mode==='audio')return au.pause();realYT&&realYT.pauseVideo()},
+  seekTo(t,a){if(H.mode==='audio'){try{au.currentTime=t}catch(e){}}else realYT&&realYT.seekTo(t,a)},
+  getCurrentTime(){return H.mode==='audio'?au.currentTime:(realYT?realYT.getCurrentTime():0)},
+  getDuration(){return H.mode==='audio'?(isFinite(au.duration)?au.duration:0):(realYT?realYT.getDuration():0)},
+  getPlayerState(){if(H.mode==='audio')return au.ended?0:au.paused?2:(au.readyState<3?3:1);return realYT?realYT.getPlayerState():-1},
+  getVideoData(){return H.mode==='audio'?{video_id:H.vid}:(realYT?realYT.getVideoData():{})},
+  setVolume(v){au.volume=Math.max(0,Math.min(1,v/100));try{realYT&&realYT.setVolume(v)}catch(e){}}
+};
+yt=H;ytReady=true;
+au.addEventListener('playing',()=>{if(H.mode==='audio')ysc({data:1})});
+au.addEventListener('pause',()=>{if(H.mode==='audio'&&!au.ended)ysc({data:2})});
+au.addEventListener('waiting',()=>{if(H.mode==='audio')ysc({data:3})});
+au.addEventListener('ended',()=>{if(H.mode==='audio')ysc({data:0})});
+au.addEventListener('error',()=>{if(H.mode!=='audio')return;const id=H.vid;dlog('audio stream failed, using YouTube');delete H.tried[id];H.fallback(id)});
+// iPhone only lets an audio element start after it has been played once from a tap: unlock it on the first touch
+(function(){const un=()=>{removeEventListener('pointerdown',un,true);try{au.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';au.play().then(()=>{if(String(au.src).startsWith('data:'))au.pause()}).catch(()=>{});}catch(e){}};addEventListener('pointerdown',un,true)})();
+try{au.volume=Math.max(0,Math.min(1,LS.get('musicVol',100)/100))}catch(e){}
+window.onYouTubeIframeAPIReady=()=>{
+  if(realYT)return;
+  realYT=new YT.Player('yt',{width:'100%',height:'100%',playerVars:{playsinline:1,controls:0,rel:0,modestbranding:1,disablekb:1,fs:0,iv_load_policy:3},events:{
+    onReady:()=>{dlog('YouTube fallback ready');clearTimeout(ytWait);try{realYT.setVolume(LS.get('musicVol',100))}catch(e){}},
+    onStateChange:e=>{if(H.mode==='yt')ysc(e)},
+    onError:e=>{if(H.mode==='yt')yer(e)}
   }});
 };
 loadYT();
@@ -406,7 +461,7 @@ function load(s,startAt){
   clearTimeout(stallT);stallT=setTimeout(()=>{if(tok===loadTok&&status!=='playing'&&status!=='paused'){status='stalled';playing=false;dlog('stalled');banner(isIOS()?'iPhone needs a tap to start audio.':'This is taking long to start.','Tap to retry',retry);uiPlay()}},10000);
   savePos(true);uiPlay();
 }
-function retry(){if(!cur)return;errRun=0;banner();load(cur,pos>3?pos:0)}
+function retry(){if(!cur)return;errRun=0;banner();if(H.mode==='audio'&&H.tried[cur.id])H.tried[cur.id]={bad:true};load(cur,pos>3?pos:0)}
 function onEnded(){if(repeat==='one'){try{yt.seekTo(0);yt.playVideo()}catch(e){}return}next(true)}
 function nextIndex(){let n=qi+1;while(n<queue.length&&skipped[queue[n].id])n++;return n}
 function next(auto){
@@ -852,7 +907,7 @@ function syncBuddy(){const b=$('#buddy');b.style.display=S.buddy?'':'none'}
 /* ---------- navigation (direct links like #library work, refresh keeps the tab) ---------- */
 function go(t){tab=t;history.replaceState(history.state&&history.state.pl?history.state:null,'','#'+t);document.querySelectorAll('nav button').forEach(x=>{const on=x.dataset.t===t;x.classList.toggle('on',on);x.setAttribute('aria-current',on?'page':'false')});render();main.scrollTop=0}
 addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(TABS.includes(t)&&t!==tab)go(t)});
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js?v=8').catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js?v=9').catch(()=>{});
 restoreSession();
 document.querySelectorAll('[title]').forEach(b=>{if(b.tagName==='BUTTON'&&!b.getAttribute('aria-label'))b.setAttribute('aria-label',b.title)});
 $('#pclose').setAttribute('aria-label','Close player');$('#pmenu').setAttribute('aria-label','Song menu');$('#mplay').setAttribute('aria-label','Play');
