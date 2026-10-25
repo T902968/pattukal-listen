@@ -1,0 +1,36 @@
+name: Deploy Pattukal Web (test)
+
+on:
+  push:
+    branches: [feature/pattukal-web]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble site (current website unchanged, web app under /app-test/)
+        run: |
+          mkdir -p _site/app-test
+          cp index.html _site/index.html
+          [ -f docs/pattukal-official-music-app-download.html ] && cp docs/pattukal-official-music-app-download.html _site/ || true
+          cp -r web-app/. _site/app-test/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

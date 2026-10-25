@@ -367,3 +367,8 @@ Ambient Mode keeps the existing album-art square and layers muted Canvas artwork
 - `settings/performance` (`PerformanceSettings.kt`, `utils/Performance.kt`): `LowEndModeKey`, `BatterySaverKey`, `ReduceAnimationsKey`; lite mode disables liquid glass in MainActivity and stops PlayerScenes; scenes capped at 30 fps.
 - Karaoke (`StereoWidenerAudioProcessor`): band-split DSP (bass and air kept, voice band attenuated), not ML stem separation.
 - Test builds (`PATTUKAL_TEST_BUILD=1`) set `BuildConfig.IS_TEST_BUILD` and never show the update prompt.
+
+## Pattukal Web (feature/pattukal-web)
+- `web-app/` is an installable web app (PWA): `index.html` (single file), `manifest.webmanifest`, `sw.js`. Same features as the Android app where a browser allows: Taste AI rows, Magic Cube, language rows, hold menu (play next / queue / skip forever), performance modes, slider styles (Wavy default), player backgrounds, lyrics (lrclib), ambience (WebAudio), sleep timer, favourites.
+- Playback uses the YouTube IFrame player; search uses public Piped/Invidious servers (tried in order). Karaoke is Android-only.
+- `deploy-web-test.yml` publishes it at `/app-test/` next to the unchanged website.
