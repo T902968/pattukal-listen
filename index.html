@@ -12,11 +12,12 @@
 const timeEl=document.getElementById("release-time"),notesEl=document.getElementById("release-notes"),metaEl=document.getElementById("release-meta"),clockEl=document.getElementById("clock"),downloadCountEl=document.getElementById("download-count");
 const fmt={dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Kolkata"};
 function tick(){clockEl.textContent="Current India time: "+new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"medium",timeZone:"Asia/Kolkata"}).format(new Date())+" IST"}tick();setInterval(tick,1000);
-let srvTotal=null,pend=0;function showCount(){if(downloadCountEl)downloadCountEl.textContent=((srvTotal===null?835:srvTotal)+pend).toLocaleString("en-IN");}function setServerCount(n){if(srvTotal!==null&&n>srvTotal)pend=Math.max(0,pend-(n-srvTotal));srvTotal=n;showCount();}document.querySelectorAll('a.download').forEach(a=>a.addEventListener('click',()=>{pend++;showCount();setTimeout(refreshRelease,8000);}));async function refreshRelease(){
+let srvTotal=null,pend=0;function showCount(){if(downloadCountEl)downloadCountEl.textContent=((srvTotal===null?835:srvTotal)+pend).toLocaleString("en-IN");}function setServerCount(n){if(srvTotal!==null&&n>srvTotal)pend=Math.max(0,pend-(n-srvTotal));srvTotal=n;showCount();}document.querySelectorAll('a.download').forEach(a=>a.addEventListener('click',()=>{pend++;showCount();setTimeout(refreshRelease,8000);}));let rateLimited=false,firstRun=true;const directApk="https://github.com/T902968/pattukal-listen/releases/download/latest/pattukal.apk";const releaseItems=["Performance mode added in Settings for low-end devices", "Karaoke mode added \u2014 still improving the vocal removal", "Player slider changed to a new Wavy animation, plus 4 new slider styles in Settings", "New Home layout; player buttons fixed with no more bugs", "Ambience on/off option added", "Pattukal Taste AI added in the AI hub for smoother, personal tracks", "Play Next bar made lighter and smoother on more devices", "Spotify bugs fixed", "Settings back button bug fixed", "Default font changed"];async function refreshRelease(){
   const releaseApi="https://api.github.com/repos/T902968/pattukal-listen/releases/tags/latest";
   const actionsUrl="https://github.com/T902968/pattukal-listen/actions/workflows/android-build.yml";
   const releasesUrl="https://github.com/T902968/pattukal-listen/releases";
   const downloadEl=document.getElementById("download-apk");
+  if(document.hidden&&!firstRun)return;firstRun=false;
   try{
     const res=await fetch(releaseApi+"?t="+Date.now(),{cache:"no-store",headers:{"Accept":"application/vnd.github+json"}});
     if(!res.ok) throw Error("Release API "+res.status);
@@ -24,19 +25,22 @@ let srvTotal=null,pend=0;function showCount(){if(downloadCountEl)downloadCountEl
     const asset=(r.assets||[]).find(x=>x.name==="pattukal.apk"&&x.state==="uploaded");if(downloadCountEl){const actualDownloads=asset&&Number.isFinite(Number(asset.download_count))?Number(asset.download_count):0;const carriedMatch=(r.body||"").match(/Downloads carried:\s*(\d+)/);const carried=carriedMatch?Number(carriedMatch[1]):0;setServerCount(813+carried+actualDownloads);}
     const d=r.published_at||r.updated_at||r.created_at;
     timeEl.textContent=d?"Released "+new Intl.DateTimeFormat("en-IN",fmt).format(new Date(d))+" IST":"Release time unavailable";
-    const items=["Performance mode added in Settings for low-end devices", "Karaoke mode added \u2014 still improving the vocal removal", "Player slider changed to a new Wavy animation, plus 4 new slider styles in Settings", "New Home layout; player buttons fixed with no more bugs", "Ambience on/off option added", "Pattukal Taste AI added in the AI hub for smoother, personal tracks", "Play Next bar made lighter and smoother on more devices", "Spotify bugs fixed", "Settings back button bug fixed", "Default font changed"];
+    const items=releaseItems;rateLimited=false;
     notesEl.replaceChildren();
     for(const s of items.slice(0,12)){const li=document.createElement("li");li.textContent=s;notesEl.appendChild(li)}
     if(asset){downloadEl.href=asset.browser_download_url;downloadEl.textContent="↓  Download APK";downloadEl.setAttribute("download","pattukal.apk")}
     else {downloadEl.href=r.html_url||releasesUrl;downloadEl.textContent="↓  Download APK";downloadEl.removeAttribute("download")}
-    metaEl.textContent="Latest build "+(r.tag_name||"latest")+" · "+(asset?(asset.size/1048576).toFixed(1)+" MB":"APK asset not found")+" · Auto-refreshes every minute";
+    metaEl.textContent="Latest build "+(r.tag_name||"latest")+" · "+(asset?(asset.size/1048576).toFixed(1)+" MB":"APK asset not found")+" · Auto-refreshes every few minutes";
+    try{localStorage.setItem("pk_release",JSON.stringify({time:timeEl.textContent,items:items.slice(0,12),meta:metaEl.textContent}))}catch(_){}
   }catch(e){
-    timeEl.textContent="Latest release details are not published yet.";
-    notesEl.replaceChildren();
-    const li=document.createElement("li");li.textContent="The direct APK release is not available right now. Open Android CI to download the latest successful build artifact, or check Releases for the published APK.";notesEl.appendChild(li);
-    downloadEl.href=releasesUrl;downloadEl.textContent="↓  Download APK";downloadEl.removeAttribute("download");
-    metaEl.textContent="Fallback link enabled · "+new Intl.DateTimeFormat("en-IN",fmt).format(new Date())+" IST · Checking again in 60 seconds";
+    // GitHub's public API allows ~60 requests per hour per network, so it can refuse for a while.
+    // The APK itself is always at the same address, so keep the button working and keep the last known details.
+    rateLimited=true;
+    downloadEl.href=directApk;downloadEl.textContent="\u2193  Download APK";downloadEl.setAttribute("download","pattukal.apk");
+    let saved=null;try{saved=JSON.parse(localStorage.getItem("pk_release")||"null")}catch(_){}
+    if(saved){timeEl.textContent=saved.time;notesEl.replaceChildren();for(const s of saved.items){const li=document.createElement("li");li.textContent=s;notesEl.appendChild(li)}metaEl.textContent=saved.meta+" \u00b7 Details refresh shortly"}
+    else{timeEl.textContent="Latest build is ready to download";notesEl.replaceChildren();for(const s of releaseItems){const li=document.createElement("li");li.textContent=s;notesEl.appendChild(li)}metaEl.textContent="Latest build \u00b7 Details refresh shortly"}
   }
 }
-refreshRelease();setInterval(refreshRelease,60000);
+refreshRelease();(function loop(){setTimeout(()=>{refreshRelease();loop()},rateLimited?600000:300000)})();document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshRelease()});
 </script></body></html>
