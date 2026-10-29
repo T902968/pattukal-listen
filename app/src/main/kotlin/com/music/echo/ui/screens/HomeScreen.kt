@@ -816,6 +816,15 @@ fun HomeScreen(
         }
     }
 
+    // Counts finished refreshes. The Home rows and the Magic Cube reload when this changes, instead of
+    // being re-keyed while the pull-to-refresh gesture is still in progress (that made the list jump).
+    var refreshCount by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    var wasRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(isRefreshing) {
+        if (wasRefreshing && !isRefreshing) refreshCount++
+        wasRefreshing = isRefreshing
+    }
+
     LaunchedEffect(scrollToTop?.value) {
         if (scrollToTop?.value == true) {
             lazylistState.animateScrollToItem(0)
@@ -1290,11 +1299,13 @@ fun HomeScreen(
                             .asPaddingValues()
                 ) {
 
-                    item(key = "home_music_cube_$isRefreshing") {
-                        echo.music.iad1tya.ui.immersive.HomeMusicCube(
-                            navController,
-                            quickPicks.orEmpty()
-                        )
+                    item(key = "home_music_cube") {
+                        androidx.compose.runtime.key(refreshCount) {
+                            echo.music.iad1tya.ui.immersive.HomeMusicCube(
+                                navController,
+                                quickPicks.orEmpty()
+                            )
+                        }
                     }
 
                     item {
@@ -1326,13 +1337,13 @@ fun HomeScreen(
                     item(key = "language_song_rows") {
                         echo.music.iad1tya.ui.component.FirstLaunchMusicLanguagePrompt()
                         echo.music.iad1tya.ui.component.LanguageSongRows(
-                            refreshKey = isRefreshing
+                            refreshKey = refreshCount
                         )
                     }
 
                     item(key = "taste_ai_rows") {
                         echo.music.iad1tya.ui.component.TasteAiHomeRows(
-                            refreshKey = isRefreshing
+                            refreshKey = refreshCount
                         )
                     }
 

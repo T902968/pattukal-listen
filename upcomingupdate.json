@@ -11,6 +11,8 @@
     "Settings back button bug fixed",
     "Default font changed"
   ],
-  "bug_fixes": [],
+  "bug_fixes": [
+    "Fixed Home refresh: pulling down now reloads the Magic Cube and rows smoothly without the list jumping"
+  ],
   "contributors": []
 }
