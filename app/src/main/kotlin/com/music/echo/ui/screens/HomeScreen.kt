@@ -63,6 +63,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import echo.music.iad1tya.ui.component.PattukalRefreshIndicator
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -810,10 +811,18 @@ fun HomeScreen(
             )
         }
 
+    // Counts finished refreshes. A boolean key flipped true->false and re-ran the
+    // language/taste rows twice, so they reshuffled and then snapped back.
+    var refreshTick by rememberSaveable { mutableIntStateOf(0) }
+    var wasRefreshing by remember { mutableStateOf(false) }
+
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
             randomSeed = System.currentTimeMillis()
+        } else if (wasRefreshing) {
+            refreshTick++
         }
+        wasRefreshing = isRefreshing
     }
 
     LaunchedEffect(scrollToTop?.value) {
@@ -1290,7 +1299,7 @@ fun HomeScreen(
                             .asPaddingValues()
                 ) {
 
-                    item(key = "home_music_cube_$isRefreshing") {
+                    item(key = "home_music_cube") {
                         echo.music.iad1tya.ui.immersive.HomeMusicCube(
                             navController,
                             quickPicks.orEmpty()
@@ -1326,13 +1335,13 @@ fun HomeScreen(
                     item(key = "language_song_rows") {
                         echo.music.iad1tya.ui.component.FirstLaunchMusicLanguagePrompt()
                         echo.music.iad1tya.ui.component.LanguageSongRows(
-                            refreshKey = isRefreshing
+                            refreshKey = refreshTick
                         )
                     }
 
                     item(key = "taste_ai_rows") {
                         echo.music.iad1tya.ui.component.TasteAiHomeRows(
-                            refreshKey = isRefreshing
+                            refreshKey = refreshTick
                         )
                     }
 

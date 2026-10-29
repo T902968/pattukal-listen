@@ -55,7 +55,7 @@ fun TasteAiHomeRows(refreshKey: Any?) {
           (liked + played).flatMap { it.artists }.map { it.name }.filter { it.isNotBlank() }
         }
       val top = artists.groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.map { it.key }
-      val rnd = Random(LocalDate.now().toEpochDay() + if (refreshKey == true) 1 else 0)
+      val rnd = Random(LocalDate.now().toEpochDay() + ((refreshKey as? Int) ?: 0))
       value =
         coroutineScope {
           buildList {
