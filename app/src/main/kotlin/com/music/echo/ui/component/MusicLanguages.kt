@@ -146,7 +146,7 @@ private suspend fun fetchLanguageSongs(query: String): List<SongItem> =
  * row two is the second language (or more songs of the first one). [refreshKey] reshuffles on refresh.
  */
 @Composable
-fun LanguageSongRows(refreshKey: Any?) {
+fun LanguageSongRows(refreshKey: Any?, mood: String? = null) {
   val (raw, _) = rememberPreference(MusicLanguagesKey, defaultValue = "")
   val languages = remember(raw) { parseMusicLanguages(raw) }
   if (languages.isEmpty()) return
@@ -155,17 +155,19 @@ fun LanguageSongRows(refreshKey: Any?) {
   val first = languages.first()
   val second = languages.getOrNull(1)
   val rows by
-    produceState<List<Pair<String, List<SongItem>>>>(initialValue = emptyList(), raw, refreshKey) {
-      val suffixes = listOf("new", "hits", "top", "popular", "latest", "trending").shuffled()
+    produceState<List<Pair<String, List<SongItem>>>>(initialValue = emptyList(), raw, refreshKey, mood) {
+      val suffixes =
+        if (mood.isNullOrBlank()) listOf("new", "hits", "top", "popular", "latest", "trending").shuffled()
+        else listOf("$mood songs", "$mood hits")
       value =
         coroutineScope {
           listOf(
               async {
-                "${first.label} songs" to fetchLanguageSongs("${first.query} ${suffixes[0]}").shuffled().take(14)
+                (if (mood.isNullOrBlank()) "${first.label} songs" else "${first.label} · $mood") to fetchLanguageSongs("${first.query} ${suffixes[0]}").shuffled().take(14)
               },
               async {
                 val l = second ?: first
-                (if (second != null) "${l.label} songs" else "More ${l.label}") to
+                (if (!mood.isNullOrBlank()) "${l.label} · $mood" else if (second != null) "${l.label} songs" else "More ${l.label}") to
                   fetchLanguageSongs("${l.query} ${suffixes[1]}").shuffled().take(14)
               },
             )

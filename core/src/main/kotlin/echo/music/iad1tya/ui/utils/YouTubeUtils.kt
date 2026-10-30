@@ -7,7 +7,9 @@ fun String.resize(
   if (width == null && height == null) return this
 
   if (this.contains("i.ytimg.com")) {
-    val targetQuality = if (width != null && width >= 1200) "maxresdefault.jpg" else "hqdefault.jpg"
+    // maxresdefault is huge and often missing (404, then a retry), which made artwork load slowly.
+    // sddefault (640x480) is sharp enough for a phone screen and exists for almost every video.
+    val targetQuality = if (width != null && width >= 1200) "sddefault.jpg" else "hqdefault.jpg"
     return this.replace(
       Regex("(default|mqdefault|hqdefault|sddefault|maxresdefault)\\.jpg"),
       targetQuality

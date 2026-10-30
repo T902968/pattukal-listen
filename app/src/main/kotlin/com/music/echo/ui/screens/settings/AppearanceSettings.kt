@@ -559,7 +559,16 @@ fun AppearanceSettings(
           PlayerBackgroundStyle.LIVE_MESH -> stringResource(R.string.live_mesh)
           PlayerBackgroundStyle.LIQUID_GLASS ->
             stringResource(R.string.player_background_liquid_glass)
-          else -> stringResource(R.string.unknown)
+          PlayerBackgroundStyle.APPLE_MUSIC -> stringResource(R.string.apple_music)
+          PlayerBackgroundStyle.NATURE -> "Nature"
+          PlayerBackgroundStyle.LAVA -> "Lava flow"
+          PlayerBackgroundStyle.LIQUID_SOUND -> "Liquid Sound"
+          PlayerBackgroundStyle.BEAT_CITY -> "Beat City"
+          PlayerBackgroundStyle.SNOWLAND -> "Snowland"
+          PlayerBackgroundStyle.TOKYO -> "Tokyo"
+          PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
+          PlayerBackgroundStyle.CLASSIC_CAR -> "Car drift"
+          else -> it.name.lowercase().replace('_', ' ').replaceFirstChar { c -> c.uppercase() }
         }
       }
     )

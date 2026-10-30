@@ -1233,6 +1233,11 @@ fun HomeScreen(
             PattukalLiquidBackground(
                 modifier = Modifier.matchParentSize()
             )
+            if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) {
+                echo.music.iad1tya.ui.component.HalloweenBackdrop(Modifier.matchParentSize())
+                val ambientOn by echo.music.iad1tya.utils.rememberPreference(echo.music.iad1tya.constants.HalloweenAmbientKey, false)
+                echo.music.iad1tya.ui.component.HalloweenAmbientWind(ambientOn)
+            }
 
             BoxWithConstraints(
                 modifier = Modifier.fillMaxSize(),
@@ -1300,10 +1305,11 @@ fun HomeScreen(
                 ) {
 
                     item(key = "home_music_cube") {
-                        androidx.compose.runtime.key(refreshCount) {
+                        androidx.compose.runtime.key(refreshCount, selectedChip?.title) {
                             echo.music.iad1tya.ui.immersive.HomeMusicCube(
                                 navController,
-                                quickPicks.orEmpty()
+                                quickPicks.orEmpty(),
+                                mood = selectedChip?.title
                             )
                         }
                     }
@@ -1337,13 +1343,25 @@ fun HomeScreen(
                     item(key = "language_song_rows") {
                         echo.music.iad1tya.ui.component.FirstLaunchMusicLanguagePrompt()
                         echo.music.iad1tya.ui.component.LanguageSongRows(
-                            refreshKey = refreshCount
+                            refreshKey = refreshCount,
+                            mood = selectedChip?.title
                         )
+                    }
+
+                    item(key = "halloween_extras") {
+                        echo.music.iad1tya.ui.component.HalloweenChoiceDialog()
+                        echo.music.iad1tya.ui.component.MysteryCapsule()
+                        echo.music.iad1tya.ui.component.TimeFoldEntry()
+                        if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) {
+                            echo.music.iad1tya.ui.component.GesturePad(navController)
+                            echo.music.iad1tya.ui.component.HalloweenCollections(refreshCount)
+                        }
                     }
 
                     item(key = "taste_ai_rows") {
                         echo.music.iad1tya.ui.component.TasteAiHomeRows(
-                            refreshKey = refreshCount
+                            refreshKey = refreshCount,
+                            mood = selectedChip?.title
                         )
                     }
 

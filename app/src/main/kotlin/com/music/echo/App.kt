@@ -357,7 +357,8 @@ class App : Application(), SingletonImageLoader.Factory {
         }
     return ImageLoader.Builder(this)
       .apply {
-        crossfade(true)
+        // a long fade on every thumbnail made Home and the player feel laggy; keep it very short
+        crossfade(100)
         allowHardware(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
         components {
           add(

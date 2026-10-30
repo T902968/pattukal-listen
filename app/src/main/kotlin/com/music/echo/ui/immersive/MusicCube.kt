@@ -152,7 +152,12 @@ private fun playCubeSong(connection: echo.music.iad1tya.playback.PlayerConnectio
  * swipe to turn it, tap the front face to play that song.
  */
 @Composable
-fun MusicCubeHomeCard(navController: NavController, songs: List<Song>, modifier: Modifier = Modifier) {
+fun MusicCubeHomeCard(
+  navController: NavController,
+  songs: List<Song>,
+  modifier: Modifier = Modifier,
+  onCustomize: (() -> Unit)? = null,
+) {
   val (enabled, _) = rememberPreference(MusicCubeEnabledKey, true)
   if (!enabled || songs.isEmpty()) return
   val (reducedPref, _) = rememberPreference(MusicCubeReducedMotionKey, false)
@@ -182,7 +187,7 @@ fun MusicCubeHomeCard(navController: NavController, songs: List<Song>, modifier:
       .clip(shape)
       .background(
         Brush.linearGradient(
-          listOf(Color.White.copy(alpha = 0.16f), Color(0xFF9FE8FF).copy(alpha = 0.07f), Color.White.copy(alpha = 0.10f))
+          listOf(Color.White.copy(alpha = 0.16f), (if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) Color(0xFFFF7A1A) else Color(0xFF9FE8FF)).copy(alpha = 0.09f), Color.White.copy(alpha = 0.10f))
         )
       )
       .border(
@@ -192,7 +197,7 @@ fun MusicCubeHomeCard(navController: NavController, songs: List<Song>, modifier:
       )
       .padding(12.dp)
   ) {
-    if (useGrid) CubeGrid(songs) else CubeBody(songs, reduced)
+    if (useGrid) CubeGrid(songs) else CubeBody(songs, reduced, onCustomize)
   }
 }
 
@@ -226,7 +231,7 @@ private fun CubeGrid(songs: List<Song>) {
 }
 
 @Composable
-private fun CubeBody(songs: List<Song>, reduced: Boolean) {
+private fun CubeBody(songs: List<Song>, reduced: Boolean, onCustomize: (() -> Unit)? = null) {
   val scope = rememberCoroutineScope()
   val rx = remember { Animatable(0f) }
   val ry = remember { Animatable(0f) }
@@ -275,10 +280,13 @@ private fun CubeBody(songs: List<Song>, reduced: Boolean) {
           }
         }
         .pointerInput(Unit) {
-          detectTapGestures {
-            val f = frontFace(rx.value, ry.value)
-            playCubeSong(connection, songs[f % songs.size], current?.id)
-          }
+          detectTapGestures(
+            onLongPress = { onCustomize?.invoke() },
+            onTap = {
+              val f = frontFace(rx.value, ry.value)
+              playCubeSong(connection, songs[f % songs.size], current?.id)
+            },
+          )
         }
     ) {
       Canvas(Modifier.size(126.dp)) { drawGlassCube(rx.value, ry.value, painters, titles) }
@@ -286,7 +294,7 @@ private fun CubeBody(songs: List<Song>, reduced: Boolean) {
 
     Spacer(Modifier.width(14.dp))
     Column(Modifier.weight(1f)) {
-      Text("MUSIC CUBE", color = Color.White.copy(alpha = 0.65f), fontSize = 10.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold)
+      Text(if (onCustomize != null) "MUSIC CUBE · HOLD TO CUSTOMIZE" else "MUSIC CUBE", color = Color.White.copy(alpha = 0.65f), fontSize = 10.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold)
       Spacer(Modifier.height(2.dp))
       Text(frontSong.title, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
       Text(

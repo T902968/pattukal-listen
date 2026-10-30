@@ -1260,6 +1260,7 @@ class MainActivity : ComponentActivity() {
           val startup = rememberPattukalStartup(playerReady = playerConnection != null)
           val buddyLook = remember { echo.music.iad1tya.ui.buddy.BuddyLook() }
           Box(modifier = Modifier.fillMaxSize().buddyTapTracker(buddyLook)) {
+            echo.music.iad1tya.ui.component.HalloweenPortalHost()
             Box(
               modifier =
                 Modifier.fillMaxSize()

@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -66,18 +67,18 @@ private fun SongItem.toPick() = CubePick(id, title, thumbnail)
  * chosen music language; otherwise Quick Picks. Works for a brand-new user with an empty library.
  */
 @Composable
-fun HomeMusicCube(navController: NavController, fallback: List<Song>) {
+fun HomeMusicCube(navController: NavController, fallback: List<Song>, mood: String? = null) {
   val (rawPicks, _) = rememberPreference(MusicCubeSongsKey, defaultValue = "")
   val (rawLang, _) = rememberPreference(MusicLanguagesKey, defaultValue = "")
   val picks = remember(rawPicks) { decodeCubePicks(rawPicks) }
   val language = remember(rawLang) { parseMusicLanguages(rawLang).firstOrNull() }
   val langSongs by
-    produceState<List<CubePick>>(emptyList(), language?.code, picks.isEmpty()) {
+    produceState<List<CubePick>>(emptyList(), language?.code, picks.isEmpty(), mood) {
       value =
         if (language == null || picks.isNotEmpty()) emptyList()
         else
           withContext(Dispatchers.IO) {
-            YouTube.search("${language.query} hits", YouTube.SearchFilter.FILTER_SONG)
+            YouTube.search("${language.query} ${if (mood.isNullOrBlank()) "hits" else "$mood songs"}", YouTube.SearchFilter.FILTER_SONG)
               .getOrNull()?.items.orEmpty().filterIsInstance<SongItem>().take(MAX_CUBE_SONGS).map { it.toPick() }
           }
     }
@@ -87,7 +88,9 @@ fun HomeMusicCube(navController: NavController, fallback: List<Song>) {
       langSongs.isNotEmpty() -> langSongs.map { it.toSong() }
       else -> fallback.distinctBy { it.id }.take(MAX_CUBE_SONGS)
     }
-  if (songs.isNotEmpty()) MusicCubeHomeCard(navController, songs)
+  var showPicker by remember { mutableStateOf(false) }
+  if (songs.isNotEmpty()) MusicCubeHomeCard(navController, songs, onCustomize = { showPicker = true })
+  if (showPicker) CubeSongPickerDialog(onDismiss = { showPicker = false })
 }
 
 /** Lets the user choose which six songs appear on the cube. */
@@ -110,6 +113,8 @@ fun CubeSongPickerDialog(onDismiss: () -> Unit) {
         }
     }
 
+  val database = echo.music.iad1tya.LocalDatabase.current
+  val liked by database.likedSongsByCreateDateAsc().collectAsState(initial = emptyList())
   AlertDialog(
     onDismissRequest = onDismiss,
     shape = RoundedCornerShape(28.dp),
@@ -137,6 +142,34 @@ fun CubeSongPickerDialog(onDismiss: () -> Unit) {
           shape = RoundedCornerShape(20.dp),
           modifier = Modifier.fillMaxWidth(),
         )
+        if (liked.isNotEmpty() && query.trim().length < 2) {
+          Text("Your liked songs", style = MaterialTheme.typography.labelLarge)
+          LazyColumn(Modifier.heightIn(max = 200.dp)) {
+            items(liked.reversed().take(40), key = { "liked_${it.id}" }) { ls ->
+              Row(
+                Modifier.fillMaxWidth()
+                  .clip(RoundedCornerShape(12.dp))
+                  .clickable(enabled = picks.size < MAX_CUBE_SONGS && picks.none { it.id == ls.id }) {
+                    setRaw(encodeCubePicks(picks + CubePick(ls.id, ls.song.title, ls.song.thumbnailUrl.orEmpty())))
+                  }
+                  .padding(vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+              ) {
+                AsyncImage(
+                  model = ls.song.thumbnailUrl,
+                  contentDescription = null,
+                  contentScale = ContentScale.Crop,
+                  modifier = Modifier.size(44.dp).clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
+                )
+                Column(Modifier.weight(1f)) {
+                  Text(ls.song.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                  Text(ls.artists.joinToString { it.name }, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+              }
+            }
+          }
+        }
         LazyColumn(Modifier.heightIn(max = 240.dp)) {
           items(results, key = { it.id }) { s ->
             Row(

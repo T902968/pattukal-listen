@@ -988,3 +988,9 @@ val SkippedForeverKey = stringPreferencesKey("skipped_forever")
 val LowEndModeKey = booleanPreferencesKey("perf_low_end_mode")
 val BatterySaverKey = booleanPreferencesKey("perf_battery_saver")
 val ReduceAnimationsKey = booleanPreferencesKey("perf_reduce_animations")
+
+/** Seasonal Halloween edition (experimental). "" = not chosen yet, "halloween" or "original" once the user picked. */
+val HalloweenChoiceKey = stringPreferencesKey("halloween_choice")
+val HalloweenReducedMotionKey = booleanPreferencesKey("halloween_reduced_motion")
+val HalloweenAmbientKey = booleanPreferencesKey("halloween_ambient")
+val HalloweenPortalKey = booleanPreferencesKey("halloween_portal")
