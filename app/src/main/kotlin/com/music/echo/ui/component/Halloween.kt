@@ -13,6 +13,12 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import echo.music.iad1tya.ui.component.glassSurface
+import echo.music.iad1tya.constants.GestureDrawKey
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -281,8 +287,8 @@ fun MysteryCapsule(modifier: Modifier = Modifier) {
   val (langRaw, _) = rememberPreference(MusicLanguagesKey, "")
   val skipped = rememberSkippedIds()
   val lang = remember(langRaw) { parseMusicLanguages(langRaw).firstOrNull()?.query }
-  var state by remember { mutableStateOf("idle") } // idle, opening, shown, empty
-  var song by remember { mutableStateOf<SongItem?>(null) }
+  var song by remember { mutableStateOf(HomeCache.get<SongItem>("capsule_song")) }
+  var state by remember { mutableStateOf(if (song != null) "shown" else "idle") } // idle, opening, shown, empty
   val pool = remember { mutableStateListOf<SongItem>() }
   val seen = remember { mutableSetOf<String>() }
   var busy by remember { mutableStateOf(false) }
@@ -298,15 +304,15 @@ fun MysteryCapsule(modifier: Modifier = Modifier) {
       split.animateTo(1f, tween(if (still) 200 else 800, easing = FastOutSlowInEasing))
       if (pool.size < 2) pool.addAll(capsuleSongs(lang, seen + skipped))
       val next = pool.firstOrNull { it.id !in seen && it.id !in skipped }
-      if (next == null) { state = "empty"; song = null } else { pool.remove(next); seen += next.id; song = next; state = "shown" }
+      if (next == null) { state = "empty"; song = null } else { pool.remove(next); seen += next.id; song = next; HomeCache.put("capsule_song", next); state = "shown" }
       HalloweenState.phase = HalloweenPhase.Idle
       busy = false
     }
   }
 
   Column(
-    modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).clip(RoundedCornerShape(26.dp))
-      .background(Brush.linearGradient(if (halloween) listOf(Color(0xCC12081F), Color(0xCC2A0F0A)) else listOf(Color.White.copy(alpha = 0.10f), Color.White.copy(alpha = 0.05f))))
+    modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+      .glassSurface(RoundedCornerShape(26.dp), if (halloween) Color(0xFF2A0F0A) else Color.White)
       .border(1.dp, if (halloween) Brush.linearGradient(listOf(Orange.copy(alpha = 0.8f), Violet.copy(alpha = 0.8f))) else Brush.linearGradient(listOf(Color.White.copy(alpha = 0.3f), Color.White.copy(alpha = 0.1f))), RoundedCornerShape(26.dp))
       .padding(14.dp)
   ) {
@@ -386,8 +392,9 @@ fun TimeFoldEntry() {
   val halloween = rememberHalloweenOn()
   var open by remember { mutableStateOf(false) }
   Row(
-    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).clip(RoundedCornerShape(22.dp))
-      .background(Color.White.copy(alpha = 0.08f)).border(1.dp, if (halloween) Violet.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.18f), RoundedCornerShape(22.dp))
+    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
+      .glassSurface(RoundedCornerShape(22.dp), if (halloween) Color(0xFF1B1030) else Color.White)
+      .border(1.dp, if (halloween) Violet.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.18f), RoundedCornerShape(22.dp))
       .clickable { open = true }.padding(14.dp),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -397,10 +404,12 @@ fun TimeFoldEntry() {
   }
   if (open) {
     val events by database.events().collectAsState(initial = emptyList())
+    val (langRaw, _) = rememberPreference(MusicLanguagesKey, "")
+    val languages = remember(langRaw) { parseMusicLanguages(langRaw) }
+    var lang by remember { mutableStateOf<String?>(null) } // null = my history
     var tab by remember { mutableStateOf(0) }
-    val zone = remember { ZoneId.systemDefault() }
     val today = remember { LocalDate.now() }
-    val groups = remember(events) {
+    val history = remember(events) {
       val byPeriod = linkedMapOf("Today" to mutableListOf<echo.music.iad1tya.db.entities.Song>(), "Yesterday" to mutableListOf(), "Earlier this week" to mutableListOf(), "Older" to mutableListOf())
       events.forEach { e ->
         val d = e.event.timestamp.toLocalDate()
@@ -413,36 +422,63 @@ fun TimeFoldEntry() {
         val list = byPeriod.getValue(key)
         if (list.none { it.id == e.song.id } && list.size < 30) list += e.song
       }
-      byPeriod.filterValues { it.isNotEmpty() }.entries.toList()
+      byPeriod.filterValues { it.isNotEmpty() }.entries.map { it.key to it.value.map { s -> FoldSong(s.id, s.song.title, s.artists.joinToString { a -> a.name }, s.song.thumbnailUrl, s.toMediaMetadata()) } }
     }
+    val eras = remember { listOf("Latest" to "new", "2010s" to "2010s hits", "2000s" to "2000s hits", "90s" to "90s hits") }
+    val selectedLang = languages.firstOrNull { it.code == lang }
+    val eraSongs by produceState<List<Pair<String, List<FoldSong>>>>(emptyList(), selectedLang?.code) {
+      val l = selectedLang
+      if (l == null) { value = emptyList(); return@produceState }
+      val key = "fold|${l.code}"
+      HomeCache.get<List<Pair<String, List<FoldSong>>>>(key)?.let { value = it; return@produceState }
+      value = coroutineScope {
+        eras.map { (name, q) ->
+          async {
+            name to withContext(Dispatchers.IO) {
+              YouTube.search("${l.query} $q", YouTube.SearchFilter.FILTER_SONG).getOrNull()?.items.orEmpty().filterIsInstance<SongItem>().take(14)
+                .map { FoldSong(it.id, it.title, it.artists.joinToString { a -> a.name }, it.thumbnail, null, it) }
+            }
+          }
+        }.awaitAll().filter { it.second.isNotEmpty() }
+      }
+      if (value.isNotEmpty()) HomeCache.put(key, value)
+    }
+    val groups = if (selectedLang == null) history else eraSongs
     AlertDialog(
       onDismissRequest = { open = false; HalloweenState.phase = HalloweenPhase.Idle },
       shape = RoundedCornerShape(28.dp),
       title = { Text("Time Fold") },
       text = {
-        if (groups.isEmpty()) {
-          Text("No listening history yet. Play some songs and they will appear here.")
-        } else {
-          val i = tab.coerceIn(0, groups.lastIndex)
-          Column(Modifier.pointerInput(groups.size) {
-            var dx = 0f
-            detectDragGestures(onDragStart = { dx = 0f }, onDragEnd = { if (dx < -80f) tab = min(groups.lastIndex, i + 1) else if (dx > 80f) tab = max(0, i - 1) }) { c, d -> dx += d.x }
-          }) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-              groups.forEachIndexed { idx, g ->
-                Box(Modifier.clip(RoundedCornerShape(50)).background(if (idx == i) Violet.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f)).clickable { tab = idx }.padding(horizontal = 12.dp, vertical = 6.dp)) { Text(g.key, fontSize = 12.sp) }
-              }
+        Column {
+          if (languages.isNotEmpty()) {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              item("hist") { FoldChip("My history", lang == null) { lang = null; tab = 0 } }
+              items(languages, key = { it.code }) { l -> FoldChip(l.label, lang == l.code) { lang = l.code; tab = 0 } }
             }
             Spacer(Modifier.height(10.dp))
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-              items(groups[i].value, key = { "tf_${groups[i].key}_${it.id}" }) { s ->
-                Column(Modifier.size(width = 110.dp, height = 150.dp).clip(RoundedCornerShape(14.dp)).clickable {
-                  connection?.playQueue(YouTubeQueue(WatchEndpoint(videoId = s.id), s.toMediaMetadata()))
-                  open = false
-                }) {
-                  AsyncImage(model = s.song.thumbnailUrl?.resize(360, 360), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(110.dp).clip(RoundedCornerShape(14.dp)))
-                  Text(s.song.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
-                  Text(s.artists.joinToString { it.name }, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+          }
+          if (groups.isEmpty()) {
+            Text(if (selectedLang == null) "No listening history yet. Play some songs and they will appear here." else "Loading ${selectedLang.label} songs through time…")
+          } else {
+            val i = tab.coerceIn(0, groups.lastIndex)
+            Column(Modifier.pointerInput(groups.size) {
+              var dx = 0f
+              detectDragGestures(onDragStart = { dx = 0f }, onDragEnd = { if (dx < -80f) tab = min(groups.lastIndex, i + 1) else if (dx > 80f) tab = max(0, i - 1) }) { _, d -> dx += d.x }
+            }) {
+              LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                itemsIndexed(groups) { idx, g -> FoldChip(g.first, idx == i) { tab = idx } }
+              }
+              Spacer(Modifier.height(10.dp))
+              LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(groups[i].second, key = { "tf_${lang}_${groups[i].first}_${it.id}" }) { s ->
+                  Column(Modifier.size(width = 110.dp, height = 150.dp).clip(RoundedCornerShape(14.dp)).clickable {
+                    connection?.playQueue(YouTubeQueue(WatchEndpoint(videoId = s.id), s.meta ?: s.item!!.toMediaMetadata()))
+                    open = false
+                  }) {
+                    AsyncImage(model = s.thumb?.resize(360, 360), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(110.dp).clip(RoundedCornerShape(14.dp)))
+                    Text(s.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                    Text(s.artist, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                  }
                 }
               }
             }
@@ -452,6 +488,13 @@ fun TimeFoldEntry() {
       confirmButton = { TextButton(onClick = { open = false }) { Text("Close") } },
     )
   }
+}
+
+private class FoldSong(val id: String, val title: String, val artist: String, val thumb: String?, val meta: echo.music.iad1tya.models.MediaMetadata?, val item: SongItem? = null)
+
+@Composable
+private fun FoldChip(label: String, selected: Boolean, onClick: () -> Unit) {
+  Box(Modifier.clip(RoundedCornerShape(50)).background(if (selected) Violet.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f)).clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 6.dp)) { Text(label, fontSize = 12.sp) }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -479,65 +522,49 @@ private fun recognize(pts: List<Offset>): Pair<Shape, Boolean> {
     if (sgn != 0) lastSign = sgn
   }
   return when {
-    closed && w / h in 0.6f..1.7f && len > diag * 2.2f -> Shape.Circle to true
-    straight > 0.88f && w > 60f && h > 60f && abs(w / h - 1f) < 0.7f -> Shape.Diagonal to true
+    closed && w > 200f && h > 200f && w / h in 0.6f..1.7f && len > diag * 2.2f -> Shape.Circle to true
+    straight > 0.93f && w > 250f && h > 250f && abs(w / h - 1f) < 0.4f -> Shape.Diagonal to true
     turns >= 3 && w > h * 1.4f -> Shape.Wave to (turns >= 4)
-    straight > 0.8f && w > 60f && h > 60f -> Shape.Diagonal to false
     closed -> Shape.Circle to false
     else -> Shape.Unknown to false
   }
 }
 
+/**
+ * Invisible gesture language: draw anywhere on screen. Nothing is drawn and touches are never consumed,
+ * so scrolling and taps behave normally. Only confident shapes run an action.
+ */
 @Composable
-fun GesturePad(navController: NavController) {
+fun Modifier.gestureMusicLanguage(navController: NavController): Modifier {
+  val (enabled, _) = rememberPreference(GestureDrawKey, false)
+  if (!enabled) return this
   val connection = LocalPlayerConnection.current
-  val trail = remember { mutableStateListOf<Offset>() }
-  var hint by remember { mutableStateOf("Draw a circle (Favorites), a wave (Recently played) or a diagonal flick (Shuffle)") }
-  var suggestion by remember { mutableStateOf<Shape?>(null) }
-  val (reducedPref, _) = rememberPreference(HalloweenReducedMotionKey, false)
-
-  fun run(s: Shape) {
-    when (s) {
-      Shape.Circle -> navController.navigate("auto_playlist/liked")
-      Shape.Wave -> navController.navigate("history")
-      Shape.Diagonal -> connection?.let { it.player.shuffleModeEnabled = !it.player.shuffleModeEnabled }
-      Shape.Unknown -> Unit
-    }
-  }
-  fun name(s: Shape) = when (s) { Shape.Circle -> "Open Favorites"; Shape.Wave -> "Open Recently played"; Shape.Diagonal -> "Toggle shuffle"; Shape.Unknown -> "" }
-
-  Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) {
-    Box(
-      Modifier.fillMaxWidth().height(110.dp).clip(RoundedCornerShape(22.dp)).background(Color.White.copy(alpha = 0.06f)).border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(22.dp))
-        .pointerInput(Unit) {
-          detectDragGestures(
-            onDragStart = { trail.clear(); suggestion = null },
-            onDragEnd = {
-              val (shape, sure) = recognize(trail.toList())
-              if (shape == Shape.Unknown) hint = "Not recognised. Use the buttons below."
-              else if (sure) { hint = name(shape); run(shape) } else { suggestion = shape; hint = "Did you mean: ${name(shape)}?" }
-              trail.clear()
-            },
-            onDragCancel = { trail.clear() },
-          ) { change, _ -> change.consume(); trail.add(change.position); if (trail.size > 240) trail.removeAt(0) }
-        },
-      contentAlignment = Alignment.Center,
-    ) {
-      Canvas(Modifier.fillMaxSize()) {
-        if (trail.size > 1) {
-          val path = Path().apply { moveTo(trail[0].x, trail[0].y); trail.drop(1).forEach { lineTo(it.x, it.y) } }
-          drawPath(path, Brush.linearGradient(listOf(Orange, Violet)), style = Stroke(width = 6f, cap = androidx.compose.ui.graphics.StrokeCap.Round))
+  val context = LocalContext.current
+  return this.pointerInput(connection) {
+    awaitEachGesture {
+      val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+      val pts = ArrayList<Offset>(128)
+      pts.add(down.position)
+      val t0 = down.uptimeMillis
+      var multi = false
+      var last = down.uptimeMillis
+      do {
+        val ev = awaitPointerEvent(PointerEventPass.Initial)
+        if (ev.changes.size > 1) multi = true
+        ev.changes.firstOrNull()?.let { pts.add(it.position); last = it.uptimeMillis }
+      } while (ev.changes.any { it.pressed })
+      if (multi || last - t0 < 300L || pts.size < 20) return@awaitEachGesture
+      val (shape, sure) = recognize(pts)
+      if (!sure) return@awaitEachGesture
+      when (shape) {
+        Shape.Circle -> { Toast.makeText(context, "Favorites", Toast.LENGTH_SHORT).show(); navController.navigate("auto_playlist/liked") }
+        Shape.Wave -> { Toast.makeText(context, "Recently played", Toast.LENGTH_SHORT).show(); navController.navigate("history") }
+        Shape.Diagonal -> connection?.let { c ->
+          c.player.shuffleModeEnabled = !c.player.shuffleModeEnabled
+          Toast.makeText(context, if (c.player.shuffleModeEnabled) "Shuffle on" else "Shuffle off", Toast.LENGTH_SHORT).show()
         }
+        Shape.Unknown -> Unit
       }
-      if (trail.isEmpty()) Text(hint, fontSize = 12.sp, color = Color.White.copy(alpha = 0.7f), modifier = Modifier.padding(16.dp))
-    }
-    suggestion?.let { s ->
-      Row(Modifier.padding(top = 6.dp)) { CapsuleButton(name(s), true) { run(s); suggestion = null; hint = name(s) } }
-    }
-    Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-      CapsuleButton("Favorites", false) { run(Shape.Circle) }
-      CapsuleButton("Recent", false) { run(Shape.Wave) }
-      CapsuleButton("Shuffle", false) { run(Shape.Diagonal) }
     }
   }
 }
@@ -550,9 +577,11 @@ fun HalloweenCollections(refreshKey: Any?) {
   val (langRaw, _) = rememberPreference(MusicLanguagesKey, "")
   val lang = remember(langRaw) { parseMusicLanguages(langRaw).firstOrNull()?.query.orEmpty() }
   val rows by
-    produceState<List<Pair<String, List<SongItem>>>>(emptyList(), lang, refreshKey) {
+    produceState<List<Pair<String, List<SongItem>>>>(HomeCache.get("halloween|$lang|$refreshKey") ?: emptyList(), lang, refreshKey) {
+      HomeCache.get<List<Pair<String, List<SongItem>>>>("halloween|$lang|$refreshKey")?.let { value = it; return@produceState }
       val names = listOf("Midnight Drive" to "midnight drive", "Haunted Frequencies" to "dark ambient eerie", "Dark Romance" to "dark romantic", "Moonlight Chill" to "moonlight chill", "Ghostly Echoes" to "echo reverb slow", "After Midnight" to "after midnight", "Halloween Mix" to "halloween spooky")
       value = coroutineScope { names.shuffled().take(4).map { (n, q) -> async { n to withContext(Dispatchers.IO) { YouTube.search("$lang $q".trim(), YouTube.SearchFilter.FILTER_SONG).getOrNull()?.items.orEmpty().filterIsInstance<SongItem>().take(14) } } }.awaitAll().filter { it.second.isNotEmpty() } }
+      if (value.isNotEmpty()) HomeCache.put("halloween|$lang|$refreshKey", value)
     }
   Column { rows.forEach { (t, s) -> SongCardRow(title = t, songs = s, subtitle = "Halloween collection") } }
 }
@@ -619,4 +648,69 @@ fun HalloweenChoiceDialog() {
     confirmButton = { TextButton(onClick = { pick("halloween") }) { Text("Halloween effects") } },
     dismissButton = { TextButton(onClick = { pick("original") }) { Text("Original theme") } },
   )
+}
+
+// ---------------------------------------------------------------------------------------------
+// 9. App-wide Halloween atmosphere: sits above every screen, never takes touches
+// ---------------------------------------------------------------------------------------------
+@Composable
+fun HalloweenGlobalOverlay() {
+  if (!rememberHalloweenOn()) return
+  val (reducedPref, _) = rememberPreference(HalloweenReducedMotionKey, false)
+  val still = reducedPref || rememberReduceMotion()
+  val t: State<Float> =
+    if (still) remember { mutableStateOf(0.3f) }
+    else rememberInfiniteTransition(label = "globalhaunt").animateFloat(0f, 1f, infiniteRepeatable(tween(24000, easing = LinearEasing), RepeatMode.Restart), label = "gt")
+  val sparks = remember { List(if (still) 10 else 22) { floatArrayOf(Random.nextFloat(), Random.nextFloat(), 0.5f + Random.nextFloat(), Random.nextFloat()) } }
+  Canvas(Modifier.fillMaxSize()) {
+    val w = size.width
+    val h = size.height
+    // cobwebs in the top corners
+    val web = Silver.copy(alpha = 0.16f)
+    for (corner in 0..1) {
+      val ox = if (corner == 0) 0f else w
+      val dir = if (corner == 0) 1f else -1f
+      val r = w * 0.20f
+      for (k in 0..4) {
+        val ang = (k * 22.5f) * (PI.toFloat() / 180f)
+        drawLine(web, Offset(ox, 0f), Offset(ox + dir * cos(ang) * r, sin(ang) * r), strokeWidth = 1.2f)
+      }
+      for (ring in 1..3) {
+        val rr = r * ring / 3f
+        val path = Path()
+        for (k in 0..4) {
+          val ang = (k * 22.5f) * (PI.toFloat() / 180f)
+          val x = ox + dir * cos(ang) * rr
+          val y = sin(ang) * rr
+          if (k == 0) path.moveTo(x, y) else path.quadraticTo(ox + dir * cos(ang - 0.2f) * rr * 0.85f, sin(ang - 0.2f) * rr * 0.85f, x, y)
+        }
+        drawPath(path, web, style = Stroke(width = 1f))
+      }
+    }
+    // rising embers and violet sparks
+    sparks.forEach { e ->
+      val ph = (t.value * (0.6f + e[2]) * 2f + e[3]) % 1f
+      val x = (e[0] + sin((ph + e[3]) * 6.283f) * 0.03f) * w
+      val y = h - ph * h
+      drawCircle((if (e[3] > 0.5f) Orange else Violet).copy(alpha = (1f - ph) * 0.35f), 1.8f + e[2] * 1.4f, Offset(x, y))
+    }
+    // a bat crossing the top now and then
+    if (!still) {
+      val f = (t.value * 2f) % 1f
+      if (f in 0.05f..0.35f) {
+        val p = (f - 0.05f) / 0.3f
+        val bx = -40f + p * (w + 80f)
+        val by = h * 0.08f + sin(p * 9f) * 18f + p * h * 0.04f
+        val flap = sin(p * 60f) * 6f
+        val bat = Path().apply {
+          moveTo(bx, by)
+          quadraticTo(bx - 14f, by - 10f - flap, bx - 26f, by + 2f)
+          quadraticTo(bx - 14f, by - 2f, bx, by + 6f)
+          quadraticTo(bx + 14f, by - 2f, bx + 26f, by + 2f)
+          quadraticTo(bx + 14f, by - 10f - flap, bx, by)
+        }
+        drawPath(bat, Color.Black.copy(alpha = 0.75f))
+      }
+    }
+  }
 }

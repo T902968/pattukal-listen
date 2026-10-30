@@ -18,7 +18,9 @@ enum class AppIconType(val value: Int, val alias: String) {
   SUNSET(7, "MainActivitySunset"),
   DISC(8, "MainActivityDisc"),
   PLANET(9, "MainActivityPlanet"),
-  SKETCH(10, "MainActivitySketch")
+  SKETCH(10, "MainActivitySketch"),
+  CLASSIC(11, "MainActivityClassic"),
+  GREEN(12, "MainActivityGreen")
 }
 
 object IconUtils {

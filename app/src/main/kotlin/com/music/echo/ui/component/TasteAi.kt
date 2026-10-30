@@ -46,8 +46,10 @@ fun TasteAiHomeRows(refreshKey: Any?, mood: String? = null) {
   val (discoverOn, _) = rememberPreference(TasteAiDiscoverKey, true)
   val database = LocalDatabase.current
 
+  val cacheKey = "taste|$enabled|$dailyOn|$moodOn|$discoverOn|$refreshKey|$mood"
   val rows by
-    produceState<List<Triple<String, String, List<SongItem>>>>(emptyList(), enabled, dailyOn, moodOn, discoverOn, refreshKey, mood) {
+    produceState<List<Triple<String, String, List<SongItem>>>>(HomeCache.get(cacheKey) ?: emptyList(), enabled, dailyOn, moodOn, discoverOn, refreshKey, mood) {
+      HomeCache.get<List<Triple<String, String, List<SongItem>>>>(cacheKey)?.let { value = it; return@produceState }
       val artists =
         withContext(Dispatchers.IO) {
           val liked = database.likedSongsByCreateDateAsc().first().takeLast(40)
@@ -73,6 +75,7 @@ fun TasteAiHomeRows(refreshKey: Any?, mood: String? = null) {
             }
           }.awaitAll().filter { it.third.isNotEmpty() }
         }
+      if (value.isNotEmpty()) HomeCache.put(cacheKey, value)
     }
 
   Column { rows.forEach { (t, sub, songs) -> SongCardRow(title = t, songs = songs, subtitle = sub) } }

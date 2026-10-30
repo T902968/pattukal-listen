@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import echo.music.iad1tya.ui.component.HomeCache
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -72,8 +73,10 @@ fun HomeMusicCube(navController: NavController, fallback: List<Song>, mood: Stri
   val (rawLang, _) = rememberPreference(MusicLanguagesKey, defaultValue = "")
   val picks = remember(rawPicks) { decodeCubePicks(rawPicks) }
   val language = remember(rawLang) { parseMusicLanguages(rawLang).firstOrNull() }
+  val cubeKey = "cube|${language?.code}|$mood"
   val langSongs by
-    produceState<List<CubePick>>(emptyList(), language?.code, picks.isEmpty(), mood) {
+    produceState<List<CubePick>>(HomeCache.get(cubeKey) ?: emptyList(), language?.code, picks.isEmpty(), mood) {
+      HomeCache.get<List<CubePick>>(cubeKey)?.let { value = it; return@produceState }
       value =
         if (language == null || picks.isNotEmpty()) emptyList()
         else
@@ -81,6 +84,7 @@ fun HomeMusicCube(navController: NavController, fallback: List<Song>, mood: Stri
             YouTube.search("${language.query} ${if (mood.isNullOrBlank()) "hits" else "$mood songs"}", YouTube.SearchFilter.FILTER_SONG)
               .getOrNull()?.items.orEmpty().filterIsInstance<SongItem>().take(MAX_CUBE_SONGS).map { it.toPick() }
           }
+      if (value.isNotEmpty()) HomeCache.put(cubeKey, value)
     }
   val songs =
     when {

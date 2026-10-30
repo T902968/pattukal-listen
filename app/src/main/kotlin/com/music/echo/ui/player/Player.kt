@@ -302,8 +302,7 @@ fun BottomSheetPlayer(
     rememberPreference(echo.music.iad1tya.constants.ShowCodecOnPlayerKey, false)
   val hidePlayerSlider by
     rememberPreference(echo.music.iad1tya.constants.HidePlayerSliderKey, false)
-  val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
-    rememberPreference(HidePlayerThumbnailKey, false)
+  val hidePlayerThumbnail = false // option removed; album art always shows
   val cropAlbumArt by rememberPreference(CropAlbumArtKey, true)
   val showAmbienceButton by rememberPreference(echo.music.iad1tya.constants.ShowAmbienceButtonKey, true)
   val showLyricsOnPlayer by rememberPreference(ShowLyricsOnPlayerKey, false)

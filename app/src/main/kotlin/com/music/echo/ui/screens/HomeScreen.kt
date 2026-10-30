@@ -1304,16 +1304,6 @@ fun HomeScreen(
                             .asPaddingValues()
                 ) {
 
-                    item(key = "home_music_cube") {
-                        androidx.compose.runtime.key(refreshCount, selectedChip?.title) {
-                            echo.music.iad1tya.ui.immersive.HomeMusicCube(
-                                navController,
-                                quickPicks.orEmpty(),
-                                mood = selectedChip?.title
-                            )
-                        }
-                    }
-
                     item {
                         ChipsRow(
                             chips =
@@ -1340,6 +1330,16 @@ fun HomeScreen(
                         )
                     }
 
+                    item(key = "home_music_cube") {
+                        androidx.compose.runtime.key(refreshCount, selectedChip?.title) {
+                            echo.music.iad1tya.ui.immersive.HomeMusicCube(
+                                navController,
+                                quickPicks.orEmpty(),
+                                mood = selectedChip?.title
+                            )
+                        }
+                    }
+
                     item(key = "language_song_rows") {
                         echo.music.iad1tya.ui.component.FirstLaunchMusicLanguagePrompt()
                         echo.music.iad1tya.ui.component.LanguageSongRows(
@@ -1353,7 +1353,6 @@ fun HomeScreen(
                         echo.music.iad1tya.ui.component.MysteryCapsule()
                         echo.music.iad1tya.ui.component.TimeFoldEntry()
                         if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) {
-                            echo.music.iad1tya.ui.component.GesturePad(navController)
                             echo.music.iad1tya.ui.component.HalloweenCollections(refreshCount)
                         }
                     }

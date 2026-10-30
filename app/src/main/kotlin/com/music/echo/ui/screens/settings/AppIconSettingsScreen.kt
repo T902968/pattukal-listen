@@ -172,9 +172,21 @@ fun AppIconSettingsScreen(
       listOf(
         AppIconOption(
           AppIconType.DEFAULT,
-          "Pattukal Official",
-          "Default Pattukal launcher icon",
+          "Pattukal Blue",
+          "New default: blue glass music note",
+          R.mipmap.icon_blue
+        ),
+        AppIconOption(
+          AppIconType.CLASSIC,
+          "Pattukal Classic",
+          "The original Pattukal launcher icon",
           R.mipmap.ic_launcher
+        ),
+        AppIconOption(
+          AppIconType.GREEN,
+          "Pattukal Green",
+          "Green and gold glass music note",
+          R.mipmap.icon_green
         ),
         AppIconOption(
           AppIconType.HEADPHONES,

@@ -154,8 +154,10 @@ fun LanguageSongRows(refreshKey: Any?, mood: String? = null) {
 
   val first = languages.first()
   val second = languages.getOrNull(1)
+  val cacheKey = "lang|$raw|$refreshKey|$mood"
   val rows by
-    produceState<List<Pair<String, List<SongItem>>>>(initialValue = emptyList(), raw, refreshKey, mood) {
+    produceState<List<Pair<String, List<SongItem>>>>(initialValue = HomeCache.get(cacheKey) ?: emptyList(), raw, refreshKey, mood) {
+      HomeCache.get<List<Pair<String, List<SongItem>>>>(cacheKey)?.let { value = it; return@produceState }
       val suffixes =
         if (mood.isNullOrBlank()) listOf("new", "hits", "top", "popular", "latest", "trending").shuffled()
         else listOf("$mood songs", "$mood hits")
@@ -174,6 +176,7 @@ fun LanguageSongRows(refreshKey: Any?, mood: String? = null) {
             .awaitAll()
             .filter { it.second.isNotEmpty() }
         }
+      if (value.isNotEmpty()) HomeCache.put(cacheKey, value)
     }
 
   rows.forEach { (title, songs) -> SongCardRow(title = title, songs = songs) }
