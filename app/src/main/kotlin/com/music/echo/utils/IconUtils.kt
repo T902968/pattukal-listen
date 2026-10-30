@@ -77,31 +77,7 @@ object NotificationIcon {
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_GALLERY, active).apply()
   }
 
+  /** The notification glyph is always the Pattukal mark, whichever launcher icon is chosen. */
   @androidx.annotation.DrawableRes
-  fun current(context: Context): Int {
-    if (context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_GALLERY, false)) {
-      return AppR.drawable.ic_stat_official
-    }
-    val pm = context.packageManager
-    fun on(type: AppIconType): Boolean {
-      val state =
-        runCatching {
-            pm.getComponentEnabledSetting(ComponentName(context, "echo.music.iad1tya.${type.alias}"))
-          }
-          .getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
-      return state == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-    }
-    return when {
-      on(AppIconType.WAVE) -> AppR.drawable.ic_stat_wave
-      on(AppIconType.ORNATE) -> AppR.drawable.ic_stat_ornate
-      on(AppIconType.NOTE_WAVE) -> AppR.drawable.ic_stat_notewave
-      on(AppIconType.SUNSET) -> AppR.drawable.ic_stat_sunset
-      on(AppIconType.DISC) -> AppR.drawable.ic_stat_disc
-      on(AppIconType.PLANET) -> AppR.drawable.ic_stat_planet
-      on(AppIconType.SKETCH) -> AppR.drawable.ic_stat_sketch
-      on(AppIconType.HEADPHONES) || on(AppIconType.BILLIE_EILISH) || on(AppIconType.MICHAEL) ->
-        AppR.drawable.ic_stat_headphones
-      else -> AppR.drawable.ic_stat_official
-    }
-  }
+  fun current(@Suppress("UNUSED_PARAMETER") context: Context): Int = AppR.drawable.ic_stat_official
 }
