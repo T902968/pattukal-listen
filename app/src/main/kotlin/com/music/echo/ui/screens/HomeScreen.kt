@@ -1230,9 +1230,16 @@ fun HomeScreen(
          */
         Box(modifier = Modifier.fillMaxSize()) {
 
-            PattukalLiquidBackground(
-                modifier = Modifier.matchParentSize()
-            )
+            if (echo.music.iad1tya.ui.halloween.rememberHalloweenOn()) {
+                echo.music.iad1tya.ui.halloween.HauntedBackground(
+                    modifier = Modifier.matchParentSize(),
+                    scroll = { lazylistState.firstVisibleItemScrollOffset.toFloat() + lazylistState.firstVisibleItemIndex * 600f }
+                )
+            } else {
+                PattukalLiquidBackground(
+                    modifier = Modifier.matchParentSize()
+                )
+            }
 
             BoxWithConstraints(
                 modifier = Modifier.fillMaxSize(),
@@ -1304,6 +1311,31 @@ fun HomeScreen(
                             navController,
                             quickPicks.orEmpty()
                         )
+                    }
+
+                    item(key = "halloween_block") {
+                        var capsuleSignal by rememberSaveable { mutableIntStateOf(0) }
+                        var foldSignal by rememberSaveable { mutableIntStateOf(0) }
+                        val hw = echo.music.iad1tya.ui.halloween.rememberHalloweenOn()
+                        androidx.compose.foundation.layout.Column {
+                            if (hw) {
+                                echo.music.iad1tya.ui.halloween.HauntedDoors(
+                                    navController,
+                                    onCapsule = { capsuleSignal++ },
+                                    onTimeFold = { foldSignal++ },
+                                    onCollections = { }
+                                )
+                                echo.music.iad1tya.ui.halloween.HauntedGesturePad(
+                                    navController,
+                                    onDiscover = { navController.navigate("mood_and_genres") }
+                                )
+                            }
+                            echo.music.iad1tya.ui.halloween.MysteryCapsuleCard(quickPicks.orEmpty(), capsuleSignal)
+                            if (hw) {
+                                echo.music.iad1tya.ui.halloween.TimeFoldCard(navController, foldSignal)
+                                echo.music.iad1tya.ui.halloween.HauntedCollections()
+                            }
+                        }
                     }
 
                     item {

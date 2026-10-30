@@ -988,3 +988,9 @@ val SkippedForeverKey = stringPreferencesKey("skipped_forever")
 val LowEndModeKey = booleanPreferencesKey("perf_low_end_mode")
 val BatterySaverKey = booleanPreferencesKey("perf_battery_saver")
 val ReduceAnimationsKey = booleanPreferencesKey("perf_reduce_animations")
+
+// Halloween Edition (seasonal theme). Switching these never touches playback, favourites, language or navigation.
+val HalloweenEditionKey = bk("halloween_edition")
+val HalloweenReducedMotionKey = bk("halloween_reduced_motion")
+val HalloweenAmbientSoundKey = bk("halloween_ambient_sound")   // off by default
+val HalloweenGesturesKey = bk("halloween_gestures")

@@ -123,6 +123,10 @@ fun ImmersiveSettingsScreen(navController: NavController) {
   val (cubeReduced, setCubeReduced) = rememberPreference(MusicCubeReducedMotionKey, false)
   val (cubeGrid, setCubeGrid) = rememberPreference(MusicCubeGridKey, false)
   val (pitch, setPitch) = rememberPreference(MiniPlayerPitchKey, true)
+  val (hwOn, setHwOn) = rememberPreference(HalloweenEditionKey, true)
+  val (hwReduced, setHwReduced) = rememberPreference(HalloweenReducedMotionKey, false)
+  val (hwSound, setHwSound) = rememberPreference(HalloweenAmbientSoundKey, false)
+  val (hwGestures, setHwGestures) = rememberPreference(HalloweenGesturesKey, true)
 
   var playerBg by rememberEnumPreference(PlayerBackgroundStyleKey, PlayerBackgroundStyle.LIQUID_GLASS)
 
@@ -204,6 +208,14 @@ fun ImmersiveSettingsScreen(navController: NavController) {
       SectionTitle("Cinema mode")
       OptionRow("Opens in", listOf("Artwork", "Lyrics", "Visualizer", "Minimal"), cinemaMode, setCinemaMode)
       SwitchRow("Parallax depth", "Layers shift gently as you touch the screen", parallax, setParallax)
+
+      // ---------- Halloween ----------
+      SectionTitle("Halloween Edition")
+      OptionRow("Theme", listOf("Halloween Edition", "Original Pattukal Theme"), if (hwOn) 0 else 1) { setHwOn(it == 0) }
+      SwitchRow("Reduced motion", "Still scenes and simple fades in the Halloween effects", hwReduced, setHwReduced)
+      SwitchRow("Ambient effects", "Soft chime and portal sound. Off by default, never louder than your music", hwSound, setHwSound)
+      SwitchRow("Haunted gestures", "Rune pad on Home. Every action also has a button", hwGestures, setHwGestures)
+      Text("Switching theme never changes playback, Favorites, language or where you are in the app. The theme stays on until you turn it off.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
 
       // ---------- Music Cube ----------
       SectionTitle("Music Cube")
