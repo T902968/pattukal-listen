@@ -61,6 +61,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -388,7 +389,7 @@ fun MysteryCapsule(modifier: Modifier = Modifier) {
                 lineTo(cx + cw / 2f, cy + ch / 2f - 4f); lineTo(cx - cw / 2f, cy + ch / 2f - 4f); close()
               }
               drawRoundRect(Color.White.copy(alpha = 0.06f), top.topLeft, androidx.compose.ui.geometry.Size(cw, ch + 2 * gap), rad)
-              androidx.compose.ui.graphics.drawscope.clipPath(Path().apply { addRoundRect(androidx.compose.ui.geometry.RoundRect(cx - cw / 2f, cy - ch / 2f, cx + cw / 2f, cy + ch / 2f, rad)) }) {
+              clipPath(Path().apply { addRoundRect(androidx.compose.ui.geometry.RoundRect(cx - cw / 2f, cy - ch / 2f, cx + cw / 2f, cy + ch / 2f, rad)) }) {
                 drawPath(wave, Brush.verticalGradient(listOf(liquid.copy(alpha = 0.85f), accent.copy(alpha = 0.75f)), fillTop, cy + ch / 2f))
                 for (i in 0 until 5) {
                   val ph = (sloshT.value * (1 + i % 3) + i * 0.21f) % 1f
