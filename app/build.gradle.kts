@@ -30,7 +30,7 @@ android {
   ndkVersion = "27.1.12297006"
 
   defaultConfig {
-    applicationId = "com.pattukal.akshay"
+    applicationId = "echo.music.iad1tya"
     minSdk = 26
     targetSdk = 36
     // Use the Android CI run number so every published APK can update existing installs.
