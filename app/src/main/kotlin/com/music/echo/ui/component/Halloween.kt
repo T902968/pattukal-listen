@@ -14,7 +14,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import echo.music.iad1tya.ui.component.glassSurface
-import echo.music.iad1tya.constants.GestureDrawKey
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -184,84 +183,6 @@ fun HalloweenBackdrop(modifier: Modifier = Modifier) {
       val ey = h - ph * h * 0.8f
       drawCircle((if (e[3] > 0.5f) Orange else Violet).copy(alpha = (1f - ph) * 0.65f), 1.6f + e[2] * 1.6f, Offset(ex, ey))
     }
-  }
-}
-
-// ---------------------------------------------------------------------------------------------
-// 2. Reality Tear + Song Manifestation overlay (plays when the current song changes)
-// ---------------------------------------------------------------------------------------------
-@Composable
-fun HalloweenPortalHost() {
-  val on = rememberHalloweenOn()
-  val (portalOn, _) = rememberPreference(HalloweenPortalKey, true)
-  val (reducedPref, _) = rememberPreference(HalloweenReducedMotionKey, false)
-  val lite = rememberReduceMotion()
-  if (!on || !portalOn) return
-  val connection = LocalPlayerConnection.current ?: return
-  val meta by connection.mediaMetadata.collectAsState()
-  var shownId by remember { mutableStateOf<String?>(null) }
-  var firstSeen by remember { mutableStateOf(false) }
-  val progress = remember { Animatable(0f) }
-  var art by remember { mutableStateOf<String?>(null) }
-  val seed = remember { Random(7) }
-
-  LaunchedEffect(meta?.id) {
-    val m = meta ?: return@LaunchedEffect
-    if (!firstSeen) { firstSeen = true; shownId = m.id; return@LaunchedEffect } // no animation for the restored song at start
-    if (m.id == shownId) return@LaunchedEffect
-    shownId = m.id
-    art = m.thumbnailUrl
-    if (HalloweenState.phase == HalloweenPhase.CapsuleOpening || HalloweenState.phase == HalloweenPhase.TimeFold) { /* still allowed: tear supersedes */ }
-    HalloweenState.phase = HalloweenPhase.RealityTear
-    progress.snapTo(0f)
-    // short and interruptible: a newer song restarts this effect, which cancels this animation
-    progress.animateTo(1f, tween(if (reducedPref || lite) 450 else 1100, easing = FastOutSlowInEasing))
-    HalloweenState.phase = HalloweenPhase.Idle
-    art = null
-  }
-  val p = progress.value
-  if (art == null || p <= 0f || p >= 1f) return
-  val particles = remember(art) { List(if (lite) 24 else 72) { floatArrayOf(seed.nextFloat() * 6.283f, 0.35f + seed.nextFloat() * 0.65f, seed.nextFloat()) } }
-  Box(Modifier.fillMaxSize()) {
-    Canvas(Modifier.fillMaxSize()) {
-      val c = Offset(size.width / 2f, size.height * 0.42f)
-      val dim = if (p < 0.5f) p * 2f else (1f - p) * 2f
-      drawRect(Color.Black.copy(alpha = 0.55f * dim))
-      // Phase 1: thin orange-violet crack
-      val crack = (p / 0.3f).coerceIn(0f, 1f)
-      if (crack > 0f && p < 0.7f) {
-        val path = Path().apply {
-          moveTo(c.x, c.y - size.height * 0.2f * crack)
-          var y = c.y - size.height * 0.2f * crack
-          val steps = 8
-          for (i in 1..steps) { y += size.height * 0.4f * crack / steps; lineTo(c.x + (if (i % 2 == 0) 14f else -14f) * crack, y) }
-        }
-        drawPath(path, Brush.verticalGradient(listOf(Orange, Violet)), style = Stroke(width = 3f + 4f * crack))
-      }
-      // Phase 2/3: portal opens, particles spiral inward and form the artwork
-      val open = ((p - 0.2f) / 0.5f).coerceIn(0f, 1f)
-      val r = size.minDimension * 0.52f * open
-      if (open > 0f) {
-        drawCircle(Brush.radialGradient(listOf(Violet.copy(alpha = 0.55f * (1f - p)), Orange.copy(alpha = 0.25f * (1f - p)), Color.Transparent), c, r * 1.3f + 1f), r * 1.3f, c)
-        drawCircle(Brush.sweepGradient(listOf(Orange, Violet, Crimson, Orange), c), r, c, style = Stroke(width = 4f))
-        particles.forEach { pt ->
-          val conv = ((p - 0.15f) / 0.6f).coerceIn(0f, 1f)
-          val ang = pt[0] + conv * 6f * pt[1] * 3f
-          val rad = r * (1.35f - conv * 1.3f) * pt[1]
-          drawCircle((if (pt[2] > 0.5f) Orange else Violet).copy(alpha = (1f - conv * 0.7f) * (1f - p)), 2.2f, Offset(c.x + cos(ang) * rad, c.y + sin(ang) * rad))
-        }
-      }
-    }
-    // the real album art forms inside the portal, then settles away into the player
-    val form = ((p - 0.45f) / 0.35f).coerceIn(0f, 1f)
-    val fade = if (p > 0.8f) (1f - (p - 0.8f) / 0.2f) else 1f
-    AsyncImage(
-      model = art?.resize(544, 544),
-      contentDescription = null,
-      contentScale = ContentScale.Crop,
-      modifier = Modifier.align(Alignment.Center).padding(bottom = 140.dp).size(210.dp).graphicsLayer { alpha = form * fade; scaleX = 0.5f + 0.5f * form; scaleY = 0.5f + 0.5f * form }
-        .clip(RoundedCornerShape(24.dp)).border(1.5.dp, Brush.sweepGradient(listOf(Orange, Violet, Orange)), RoundedCornerShape(24.dp)),
-    )
   }
 }
 
@@ -495,78 +416,6 @@ private class FoldSong(val id: String, val title: String, val artist: String, va
 @Composable
 private fun FoldChip(label: String, selected: Boolean, onClick: () -> Unit) {
   Box(Modifier.clip(RoundedCornerShape(50)).background(if (selected) Violet.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f)).clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 6.dp)) { Text(label, fontSize = 12.sp) }
-}
-
-// ---------------------------------------------------------------------------------------------
-// 5. Gesture Music Language: draw in the pad; ambiguous shapes only suggest an action
-// ---------------------------------------------------------------------------------------------
-private enum class Shape { Circle, Wave, Diagonal, Unknown }
-
-private fun recognize(pts: List<Offset>): Pair<Shape, Boolean> {
-  if (pts.size < 12) return Shape.Unknown to false
-  val minX = pts.minOf { it.x }; val maxX = pts.maxOf { it.x }; val minY = pts.minOf { it.y }; val maxY = pts.maxOf { it.y }
-  val w = maxX - minX; val h = maxY - minY
-  if (max(w, h) < 90f) return Shape.Unknown to false
-  var len = 0f
-  for (i in 1 until pts.size) len += (pts[i] - pts[i - 1]).getDistance()
-  val gap = (pts.first() - pts.last()).getDistance()
-  val diag = kotlin.math.hypot(w, h)
-  val straight = gap / len
-  val closed = gap < diag * 0.35f
-  var turns = 0
-  var lastSign = 0
-  for (i in 2 until pts.size step 2) {
-    val dy = pts[i].y - pts[i - 2].y
-    val sgn = if (dy > 3f) 1 else if (dy < -3f) -1 else 0
-    if (sgn != 0 && lastSign != 0 && sgn != lastSign) turns++
-    if (sgn != 0) lastSign = sgn
-  }
-  return when {
-    closed && w > 200f && h > 200f && w / h in 0.6f..1.7f && len > diag * 2.2f -> Shape.Circle to true
-    straight > 0.93f && w > 250f && h > 250f && abs(w / h - 1f) < 0.4f -> Shape.Diagonal to true
-    turns >= 3 && w > h * 1.4f -> Shape.Wave to (turns >= 4)
-    closed -> Shape.Circle to false
-    else -> Shape.Unknown to false
-  }
-}
-
-/**
- * Invisible gesture language: draw anywhere on screen. Nothing is drawn and touches are never consumed,
- * so scrolling and taps behave normally. Only confident shapes run an action.
- */
-@Composable
-fun Modifier.gestureMusicLanguage(navController: NavController): Modifier {
-  val (enabled, _) = rememberPreference(GestureDrawKey, false)
-  if (!enabled) return this
-  val connection = LocalPlayerConnection.current
-  val context = LocalContext.current
-  return this.pointerInput(connection) {
-    awaitEachGesture {
-      val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-      val pts = ArrayList<Offset>(128)
-      pts.add(down.position)
-      val t0 = down.uptimeMillis
-      var multi = false
-      var last = down.uptimeMillis
-      do {
-        val ev = awaitPointerEvent(PointerEventPass.Initial)
-        if (ev.changes.size > 1) multi = true
-        ev.changes.firstOrNull()?.let { pts.add(it.position); last = it.uptimeMillis }
-      } while (ev.changes.any { it.pressed })
-      if (multi || last - t0 < 300L || pts.size < 20) return@awaitEachGesture
-      val (shape, sure) = recognize(pts)
-      if (!sure) return@awaitEachGesture
-      when (shape) {
-        Shape.Circle -> { Toast.makeText(context, "Favorites", Toast.LENGTH_SHORT).show(); navController.navigate("auto_playlist/liked") }
-        Shape.Wave -> { Toast.makeText(context, "Recently played", Toast.LENGTH_SHORT).show(); navController.navigate("history") }
-        Shape.Diagonal -> connection?.let { c ->
-          c.player.shuffleModeEnabled = !c.player.shuffleModeEnabled
-          Toast.makeText(context, if (c.player.shuffleModeEnabled) "Shuffle on" else "Shuffle off", Toast.LENGTH_SHORT).show()
-        }
-        Shape.Unknown -> Unit
-      }
-    }
-  }
 }
 
 // ---------------------------------------------------------------------------------------------

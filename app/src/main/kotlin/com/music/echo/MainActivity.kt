@@ -3,7 +3,7 @@ package echo.music.iad1tya
 import echo.music.iad1tya.utils.onlinePlaylistIdFromUrl
 import echo.music.iad1tya.utils.onlinePlaylistRoute
 import echo.music.iad1tya.ui.component.PattukalStartupOverlay
-import echo.music.iad1tya.ui.component.gestureMusicLanguage
+import echo.music.iad1tya.ui.component.gestureMusic
 import echo.music.iad1tya.ui.component.pattukalStartupBlur
 import echo.music.iad1tya.ui.component.rememberPattukalStartup
 
@@ -1260,7 +1260,7 @@ class MainActivity : ComponentActivity() {
         ) {
           val startup = rememberPattukalStartup(playerReady = playerConnection != null)
           val buddyLook = remember { echo.music.iad1tya.ui.buddy.BuddyLook() }
-          Box(modifier = Modifier.fillMaxSize().buddyTapTracker(buddyLook).gestureMusicLanguage(navController)) {
+          Box(modifier = Modifier.fillMaxSize().buddyTapTracker(buddyLook).gestureMusic(navController)) {
             Box(
               modifier =
                 Modifier.fillMaxSize()
@@ -1654,7 +1654,9 @@ class MainActivity : ComponentActivity() {
             }
             if (!startup.visible) {
               echo.music.iad1tya.ui.component.HalloweenGlobalOverlay()
-              echo.music.iad1tya.ui.component.HalloweenPortalHost()
+              echo.music.iad1tya.ui.component.LiquidSongOpenHost(buddyLook)
+              echo.music.iad1tya.ui.component.GestureMusicOverlay()
+              echo.music.iad1tya.ui.component.GestureMusicFirstRun()
             }
             if (startup.visible) {
               PattukalStartupOverlay(progress = { startup.progress.value })

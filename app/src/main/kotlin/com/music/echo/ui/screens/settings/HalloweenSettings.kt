@@ -25,10 +25,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavController
 import echo.music.iad1tya.LocalPlayerAwareWindowInsets
 import echo.music.iad1tya.R
-import echo.music.iad1tya.constants.GestureDrawKey
 import echo.music.iad1tya.constants.HalloweenAmbientKey
 import echo.music.iad1tya.constants.HalloweenChoiceKey
-import echo.music.iad1tya.constants.HalloweenPortalKey
 import echo.music.iad1tya.constants.HalloweenReducedMotionKey
 import echo.music.iad1tya.ui.component.IconButton as AppIconButton
 import echo.music.iad1tya.ui.component.Material3SettingsGroup
@@ -74,8 +72,6 @@ fun HalloweenSettings(navController: NavController, scrollBehavior: TopAppBarScr
             onClick = { choice = if (enabled) "original" else "halloween" },
           ),
           boolItem("Reduced motion", "Shorter, simpler animations for Halloween effects", HalloweenReducedMotionKey, false),
-          boolItem("Song-opening portal", "Reality Tear transition when a new song starts", HalloweenPortalKey, true),
-          boolItem("Gesture music language", "Draw anywhere on screen, nothing is shown: circle = Favorites, wave = Recently played, big straight diagonal = shuffle. Works with or without Halloween", GestureDrawKey, false),
           boolItem("Ambient wind sound", "Quiet generated wind on Home. Off by default", HalloweenAmbientKey, false),
         ),
     )

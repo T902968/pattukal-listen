@@ -358,6 +358,10 @@ fun NavGraphBuilder.navigationBuilder(
     com.music.echo.ui.screens.settings.FontSelectionScreen(navController, scrollBehavior)
   }
 
+  composable("settings/gesture_music") {
+    echo.music.iad1tya.ui.screens.settings.GestureMusicSettings(navController, scrollBehavior)
+  }
+
   composable("settings/halloween") {
     echo.music.iad1tya.ui.screens.settings.HalloweenSettings(navController, scrollBehavior)
   }

@@ -294,6 +294,16 @@ fun SettingsScreen(
           )
         )
       }
+      if ("gesture music draw write double tap hold glitter".contains(searchLower)) {
+        add(
+          Material3SettingsItem(
+            icon = painterResource(R.drawable.sparks),
+            title = { Text("Gesture Music") },
+            description = { Text("Double tap and hold, then draw or write to control music") },
+            onClick = { navController.navigate("settings/gesture_music") }
+          )
+        )
+      }
       if ("halloween seasonal experimental spooky".contains(searchLower)) {
         add(
           Material3SettingsItem(

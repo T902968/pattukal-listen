@@ -995,3 +995,11 @@ val HalloweenReducedMotionKey = booleanPreferencesKey("halloween_reduced_motion"
 val HalloweenAmbientKey = booleanPreferencesKey("halloween_ambient")
 val HalloweenPortalKey = booleanPreferencesKey("halloween_portal")
 val GestureDrawKey = booleanPreferencesKey("gesture_draw_enabled")
+
+/** Gesture Music: double-tap-and-hold, then draw. Independent of the Halloween theme. */
+val GestureMusicEnabledKey = booleanPreferencesKey("gesture_music_enabled")
+val GestureMusicWriteKey = booleanPreferencesKey("gesture_music_write")
+val GestureMusicWriteLangKey = stringPreferencesKey("gesture_music_write_lang")
+val GestureMusicManualSeenKey = booleanPreferencesKey("gesture_music_manual_seen")
+val GestureMusicGlitterKey = booleanPreferencesKey("gesture_music_glitter")
+val LiquidOpenKey = booleanPreferencesKey("liquid_song_open")

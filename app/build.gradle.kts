@@ -273,6 +273,9 @@ dependencies {
   implementation(project(":playback"))
   implementation(project(":usbaudio"))
 
+  // Gesture Music "write a song name": on-device handwriting (model downloads once, then works offline)
+  implementation("com.google.mlkit:digital-ink-recognition:18.1.0")
+
   // Firebase - GMS flavor only (excluded from F-Droid / FOSS builds)
   "gmsImplementation"(platform("com.google.firebase:firebase-bom:34.19.0"))
   "gmsImplementation"("com.google.firebase:firebase-analytics")

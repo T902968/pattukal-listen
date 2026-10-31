@@ -123,6 +123,7 @@ fun ImmersiveSettingsScreen(navController: NavController) {
   val (cubeReduced, setCubeReduced) = rememberPreference(MusicCubeReducedMotionKey, false)
   val (cubeGrid, setCubeGrid) = rememberPreference(MusicCubeGridKey, false)
   val (pitch, setPitch) = rememberPreference(MiniPlayerPitchKey, true)
+  val (liquidOpen, setLiquidOpen) = rememberPreference(LiquidOpenKey, true)
 
   var playerBg by rememberEnumPreference(PlayerBackgroundStyleKey, PlayerBackgroundStyle.LIQUID_GLASS)
 
@@ -219,6 +220,7 @@ fun ImmersiveSettingsScreen(navController: NavController) {
 
       // ---------- Shared ----------
       SectionTitle("Mini player & performance")
+      SwitchRow("Liquid song-opening effect", "A liquid ripple spreads from your touch when you open a song", liquidOpen, setLiquidOpen)
       SwitchRow("Pitch bars in mini player", "Live level bars, only while music is playing", pitch, setPitch)
       SwitchRow("Battery-friendly mode", "Caps visualisations at about 30 fps", battery, setBattery)
       SwitchRow("Reduced motion", "Slower, calmer visuals; no beat flashes", reduced, setReduced)
