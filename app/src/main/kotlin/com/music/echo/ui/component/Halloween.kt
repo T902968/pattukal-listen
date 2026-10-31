@@ -134,54 +134,142 @@ object HalloweenState {
 fun HalloweenBackdrop(modifier: Modifier = Modifier) {
   val (reducedPref, _) = rememberPreference(HalloweenReducedMotionKey, false)
   val still = reducedPref || rememberReduceMotion()
-  val t: State<Float> =
-    if (still) remember { mutableStateOf(0f) }
-    else rememberInfiniteTransition(label = "haunt").animateFloat(0f, 1f, infiniteRepeatable(tween(40000, easing = LinearEasing), RepeatMode.Restart), label = "t")
-  val embers = remember { List(26) { floatArrayOf(Random.nextFloat(), Random.nextFloat(), 0.4f + Random.nextFloat(), Random.nextFloat()) } }
+  // seconds in a 60 s loop; every motion below uses a whole number of cycles per loop so it never jumps
+  val clock: State<Float> =
+    if (still) remember { mutableStateOf(12f) }
+    else rememberInfiniteTransition(label = "haunt").animateFloat(0f, 60f, infiniteRepeatable(tween(60000, easing = LinearEasing), RepeatMode.Restart), label = "t")
+  val stars = remember { List(70) { floatArrayOf(Random.nextFloat(), Random.nextFloat() * 0.55f, 0.5f + Random.nextFloat() * 1.4f, Random.nextFloat()) } }
+  val embers = remember { List(30) { floatArrayOf(Random.nextFloat(), Random.nextFloat(), 0.4f + Random.nextFloat(), Random.nextFloat()) } }
+  val wisps = remember { List(9) { floatArrayOf(Random.nextFloat(), 0.45f + Random.nextFloat() * 0.45f, Random.nextFloat(), 1f + Random.nextInt(3)) } }
   Canvas(modifier.fillMaxSize()) {
     val w = size.width
     val h = size.height
-    drawRect(Brush.verticalGradient(listOf(Color(0xFF000000), Color(0xFF0B0616), Color(0xFF1A0B12))))
-    // stars
-    for (i in 0 until 40) {
-      val sx = ((i * 97) % 100) / 100f * w
-      val sy = ((i * 53) % 60) / 100f * h
-      drawCircle(Silver.copy(alpha = 0.25f + (i % 4) * 0.06f), 1.2f, Offset(sx, sy))
+    val t = clock.value
+    val tau = 2f * PI.toFloat()
+    fun cyc(n: Int, phase: Float = 0f) = sin(tau * (t / 60f * n + phase))
+    fun loop(n: Int, phase: Float = 0f): Float = ((t / 60f * n) + phase) % 1f
+
+    // sky
+    drawRect(Brush.verticalGradient(listOf(Color(0xFF000000), Color(0xFF080414), Color(0xFF14081E), Color(0xFF220C1A)), 0f, h))
+    stars.forEach { st ->
+      val tw = 0.5f + 0.5f * sin(tau * (t / 60f * (2 + (st[3] * 5).toInt()) + st[3]))
+      drawCircle(Silver.copy(alpha = 0.15f + 0.5f * tw * st[3]), st[2], Offset(st[0] * w, st[1] * h))
     }
-    // moon
-    val mc = Offset(w * 0.78f, h * 0.13f)
-    drawCircle(Brush.radialGradient(listOf(Silver.copy(alpha = 0.35f), Color.Transparent), mc, w * 0.32f), w * 0.32f, mc)
-    drawCircle(Silver.copy(alpha = 0.92f), w * 0.09f, mc)
-    drawCircle(Color(0xFFB9C0D4).copy(alpha = 0.7f), w * 0.02f, mc + Offset(-w * 0.025f, w * 0.01f))
-    // castle + trees silhouettes along the bottom
+    // huge moon with a breathing halo
+    val mc = Offset(w * 0.72f, h * 0.17f)
+    val mr = w * 0.19f
+    val halo = 1f + 0.05f * cyc(2)
+    drawCircle(Brush.radialGradient(listOf(Silver.copy(alpha = 0.30f), Violet.copy(alpha = 0.12f), Color.Transparent), mc, mr * 3.4f * halo), mr * 3.4f * halo, mc)
+    drawCircle(Brush.radialGradient(listOf(Color(0xFFFFF3D6), Color(0xFFE6E8F4), Color(0xFFB7BED6)), mc - Offset(mr * 0.3f, mr * 0.3f), mr * 1.5f), mr, mc)
+    listOf(Triple(-0.35f, -0.2f, 0.20f), Triple(0.3f, 0.25f, 0.14f), Triple(-0.1f, 0.4f, 0.10f), Triple(0.35f, -0.35f, 0.08f)).forEach { (dx, dy, rr) ->
+      drawCircle(Color(0xFF8D94AE).copy(alpha = 0.32f), mr * rr, mc + Offset(mr * dx, mr * dy))
+    }
+    // thin clouds sliding across the moon
+    for (i in 0 until 3) {
+      val x = -w * 0.6f + loop(1, i * 0.33f) * w * 2.0f
+      val y = h * (0.10f + i * 0.07f)
+      drawOval(Brush.horizontalGradient(listOf(Color.Transparent, Color(0xFF2A1840).copy(alpha = 0.55f), Color.Transparent), x, x + w * 0.9f), Offset(x, y), androidx.compose.ui.geometry.Size(w * 0.9f, h * 0.04f))
+    }
+    // bats crossing the moon
+    for (b in 0 until 3) {
+      val p = loop(2 + b % 2, b * 0.31f)
+      val bx = -60f + p * (w + 120f)
+      val by = h * (0.08f + 0.07f * b) + sin(p * tau * 3f + b) * 20f
+      val flap = sin(t * 14f + b * 2f) * 7f
+      val sc = 0.8f + b * 0.25f
+      val bat = Path().apply {
+        moveTo(bx, by)
+        quadraticTo(bx - 14f * sc, by - 12f * sc - flap, bx - 30f * sc, by + 2f * sc)
+        quadraticTo(bx - 17f * sc, by - 2f * sc, bx - 8f * sc, by + 8f * sc)
+        lineTo(bx, by + 4f * sc)
+        lineTo(bx + 8f * sc, by + 8f * sc)
+        quadraticTo(bx + 17f * sc, by - 2f * sc, bx + 30f * sc, by + 2f * sc)
+        quadraticTo(bx + 14f * sc, by - 12f * sc - flap, bx, by)
+      }
+      drawPath(bat, Color.Black.copy(alpha = 0.92f))
+    }
+    // far mountains and hill
     val ground = h * 0.93f
-    val sil = Color(0xFF040208)
+    val far = Path().apply {
+      moveTo(0f, ground); lineTo(0f, h * 0.78f)
+      quadraticTo(w * 0.15f, h * 0.70f, w * 0.30f, h * 0.78f); quadraticTo(w * 0.45f, h * 0.72f, w * 0.60f, h * 0.80f)
+      quadraticTo(w * 0.80f, h * 0.70f, w, h * 0.78f); lineTo(w, ground); close()
+    }
+    drawPath(far, Color(0xFF0B0615))
+    // haunted castle on a hill with flickering windows
+    val sil = Color(0xFF030108)
+    val cx = w * 0.20f
+    val base = h * 0.82f
     val castle = Path().apply {
-      moveTo(w * 0.05f, ground); lineTo(w * 0.05f, ground - h * 0.10f); lineTo(w * 0.08f, ground - h * 0.10f)
-      lineTo(w * 0.08f, ground - h * 0.16f); lineTo(w * 0.095f, ground - h * 0.19f); lineTo(w * 0.11f, ground - h * 0.16f)
-      lineTo(w * 0.11f, ground - h * 0.08f); lineTo(w * 0.17f, ground - h * 0.08f); lineTo(w * 0.17f, ground)
-      close()
+      moveTo(cx - w * 0.20f, ground)
+      lineTo(cx - w * 0.20f, base)
+      quadraticTo(cx - w * 0.10f, base - h * 0.02f, cx - w * 0.07f, base - h * 0.03f)
+      lineTo(cx - w * 0.07f, base - h * 0.10f); lineTo(cx - w * 0.055f, base - h * 0.13f); lineTo(cx - w * 0.04f, base - h * 0.10f)
+      lineTo(cx - w * 0.04f, base - h * 0.06f)
+      var x = cx - w * 0.04f
+      while (x < cx + w * 0.07f) { lineTo(x, base - h * 0.06f); lineTo(x, base - h * 0.075f); lineTo(x + w * 0.012f, base - h * 0.075f); lineTo(x + w * 0.012f, base - h * 0.06f); x += w * 0.024f }
+      lineTo(cx + w * 0.07f, base - h * 0.15f); lineTo(cx + w * 0.085f, base - h * 0.205f); lineTo(cx + w * 0.10f, base - h * 0.15f)
+      lineTo(cx + w * 0.10f, base - h * 0.04f); lineTo(cx + w * 0.20f, base); lineTo(cx + w * 0.20f, ground); close()
     }
     drawPath(castle, sil)
-    for (k in 0 until 6) {
-      val bx = w * (0.45f + k * 0.10f)
-      val th = h * (0.07f + (k % 3) * 0.025f)
-      val tree = Path().apply { moveTo(bx, ground); lineTo(bx, ground - th); lineTo(bx - w * 0.03f, ground - th * 0.6f); moveTo(bx, ground - th * 0.8f); lineTo(bx + w * 0.035f, ground - th * 0.55f); moveTo(bx, ground - th * 0.5f); lineTo(bx - w * 0.025f, ground - th * 0.3f) }
-      drawPath(tree, sil, style = Stroke(width = 5f))
+    listOf(Offset(cx - w * 0.055f, base - h * 0.085f), Offset(cx + w * 0.085f, base - h * 0.125f), Offset(cx + w * 0.085f, base - h * 0.09f), Offset(cx, base - h * 0.04f)).forEachIndexed { i, o ->
+      val fl = 0.6f + 0.4f * sin(tau * (t / 60f * (6 + i) + i * 0.2f))
+      drawCircle(Orange.copy(alpha = 0.22f * fl), 14f, o)
+      drawCircle(Color(0xFFFFB347).copy(alpha = 0.95f * fl), 4.2f, o)
+    }
+    // gnarled trees swaying in the wind
+    for (k in 0 until 4) {
+      val bx = w * (0.55f + k * 0.14f)
+      val th = h * (0.13f + (k % 3) * 0.035f)
+      val sway = cyc(3 + k % 2, k * 0.2f) * 7f
+      val trunk = Path().apply { moveTo(bx - 7f, ground); quadraticTo(bx - 3f + sway * 0.3f, ground - th * 0.5f, bx + sway, ground - th); quadraticTo(bx + 3f + sway * 0.3f, ground - th * 0.5f, bx + 7f, ground); close() }
+      drawPath(trunk, sil)
+      val limbs = Path().apply {
+        moveTo(bx + sway * 0.7f, ground - th * 0.75f); quadraticTo(bx - w * 0.04f + sway, ground - th * 0.85f, bx - w * 0.07f + sway * 1.3f, ground - th * 0.78f - 20f)
+        moveTo(bx + sway * 0.6f, ground - th * 0.6f); quadraticTo(bx + w * 0.04f + sway, ground - th * 0.72f, bx + w * 0.075f + sway * 1.3f, ground - th * 0.62f - 26f)
+        moveTo(bx + sway, ground - th); quadraticTo(bx + sway * 1.3f - 10f, ground - th - 26f, bx + sway * 1.5f - 22f, ground - th - 44f)
+        moveTo(bx + sway, ground - th); quadraticTo(bx + sway * 1.3f + 12f, ground - th - 24f, bx + sway * 1.5f + 26f, ground - th - 40f)
+      }
+      drawPath(limbs, sil, style = Stroke(width = 5f, cap = androidx.compose.ui.graphics.StrokeCap.Round))
     }
     drawRect(sil, Offset(0f, ground), androidx.compose.ui.geometry.Size(w, h - ground))
-    // drifting fog bands
-    for (i in 0 until 3) {
-      val shift = ((t.value * (1 + i) + i * 0.33f) % 1f)
-      val fx = -w * 0.5f + shift * w * 1.5f
-      drawOval(Brush.horizontalGradient(listOf(Color.Transparent, Violet.copy(alpha = 0.10f), Color.Transparent), fx, fx + w * 0.9f), Offset(fx, ground - h * (0.05f + i * 0.035f)), androidx.compose.ui.geometry.Size(w * 0.9f, h * 0.07f))
+    // glowing jack-o-lanterns on the ground
+    listOf(0.08f to 1.0f, 0.46f to 0.75f, 0.88f to 1.2f).forEachIndexed { i, (px, sc) ->
+      val pc = Offset(w * px, ground + (h - ground) * 0.42f)
+      val rr = w * 0.045f * sc
+      val fl = 0.75f + 0.25f * sin(tau * (t / 60f * (9 + i * 2) + i))
+      drawCircle(Brush.radialGradient(listOf(Orange.copy(alpha = 0.40f * fl), Color.Transparent), pc, rr * 3.4f), rr * 3.4f, pc)
+      drawOval(Brush.radialGradient(listOf(Color(0xFFFF9A2E), Color(0xFFE2570C)), pc, rr * 1.3f), pc - Offset(rr * 1.15f, rr), androidx.compose.ui.geometry.Size(rr * 2.3f, rr * 2f))
+      val face = Color(0xFF2A0A00).copy(alpha = 0.95f)
+      listOf(-0.45f, 0.45f).forEach { dx ->
+        val ey = Path().apply { moveTo(pc.x + rr * dx, pc.y - rr * 0.55f); lineTo(pc.x + rr * (dx - 0.2f), pc.y - rr * 0.1f); lineTo(pc.x + rr * (dx + 0.2f), pc.y - rr * 0.1f); close() }
+        drawPath(ey, face)
+      }
+      val mouth = Path().apply { moveTo(pc.x - rr * 0.7f, pc.y + rr * 0.25f); for (z in 0..6) lineTo(pc.x - rr * 0.7f + z * rr * 0.233f, pc.y + rr * (if (z % 2 == 0) 0.25f else 0.62f)); lineTo(pc.x + rr * 0.7f, pc.y + rr * 0.8f); lineTo(pc.x - rr * 0.7f, pc.y + rr * 0.8f); close() }
+      drawPath(mouth, face)
+      drawRect(Color(0xFF3B5A1E), pc + Offset(-rr * 0.08f, -rr * 1.25f), androidx.compose.ui.geometry.Size(rr * 0.16f, rr * 0.28f))
     }
-    // embers
+    // two parallax fog layers
+    for (i in 0 until 4) {
+      val dir = if (i % 2 == 0) 1f else -1f
+      val x = -w * 0.6f + (if (dir > 0) loop(1, i * 0.25f) else 1f - loop(1, i * 0.25f)) * w * 1.6f
+      val y = ground - h * (0.02f + i * 0.045f)
+      drawOval(Brush.horizontalGradient(listOf(Color.Transparent, Color(0xFFB9A7E8).copy(alpha = 0.11f - i * 0.012f), Color.Transparent), x, x + w), Offset(x, y), androidx.compose.ui.geometry.Size(w, h * 0.08f))
+    }
+    // will-o-wisps drifting in the mist
+    wisps.forEach { ws ->
+      val wx = (ws[0] + 0.06f * sin(tau * (t / 60f * ws[3] + ws[2]))) * w
+      val wy = ws[1] * h + 14f * sin(tau * (t / 60f * (ws[3] + 1) + ws[2] * 2f))
+      val a = 0.35f + 0.35f * sin(tau * (t / 60f * (3 + ws[3]) + ws[2]))
+      drawCircle(Brush.radialGradient(listOf(Color(0xFF9DFFB8).copy(alpha = 0.30f * a), Color.Transparent), Offset(wx, wy), 26f), 26f, Offset(wx, wy))
+      drawCircle(Color(0xFFD8FFE4).copy(alpha = 0.85f * a), 2.2f, Offset(wx, wy))
+    }
+    // embers rising from the ground
     embers.forEach { e ->
-      val ph = (t.value * (0.5f + e[2]) * 3f + e[3]) % 1f
-      val ex = (e[0] + sin((ph + e[3]) * 2f * PI.toFloat()) * 0.02f) * w
-      val ey = h - ph * h * 0.8f
-      drawCircle((if (e[3] > 0.5f) Orange else Violet).copy(alpha = (1f - ph) * 0.65f), 1.6f + e[2] * 1.6f, Offset(ex, ey))
+      val ph = (t / 60f * (4 + (e[2] * 6).toInt()) + e[3]) % 1f
+      val ex = (e[0] + sin((ph + e[3]) * tau) * 0.02f) * w
+      val ey = ground - ph * h * 0.75f
+      drawCircle((if (e[3] > 0.5f) Orange else Violet).copy(alpha = (1f - ph) * 0.7f), 1.5f + e[2] * 1.8f, Offset(ex, ey))
     }
   }
 }
@@ -272,17 +360,53 @@ fun MysteryCapsule(modifier: Modifier = Modifier) {
       }
       else -> {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth().clickable(enabled = !busy) { reveal() }) {
-          Box(Modifier.size(78.dp), contentAlignment = Alignment.Center) {
+          Box(Modifier.size(84.dp), contentAlignment = Alignment.Center) {
             val tremble = if (state == "opening" && !still) sin(split.value * 40f) * 3f else 0f
-            Canvas(Modifier.size(70.dp).graphicsLayer { rotationZ = if (still) 0f else (if (state == "opening") split.value * 90f else spin.value * 0.2f); translationX = tremble }) {
-              val gap = split.value * 18f
+            val sloshT = rememberInfiniteTransition(label = "slosh").animateFloat(0f, 1f, infiniteRepeatable(tween(2600, easing = LinearEasing)), label = "slosh")
+            val accent = if (halloween) Orange else MaterialTheme.colorScheme.primary
+            val liquid = if (halloween) Violet else MaterialTheme.colorScheme.tertiary
+            Canvas(Modifier.size(78.dp).graphicsLayer { rotationZ = if (still) 0f else (if (state == "opening") split.value * 90f else 18f * sin(sloshT.value * 2f * PI.toFloat())); translationX = tremble }) {
+              val sp = split.value
               val cx = size.width / 2f
               val cy = size.height / 2f
-              drawRoundRect(Brush.verticalGradient(listOf(Color(0xFF1B1030), Color(0xFF07040E))), Offset(cx - 18f, cy - 32f - gap), androidx.compose.ui.geometry.Size(36f, 32f), androidx.compose.ui.geometry.CornerRadius(18f, 18f))
-              drawRoundRect(Brush.verticalGradient(listOf(Color(0xFF07040E), Color(0xFF1B1030))), Offset(cx - 18f, cy + gap), androidx.compose.ui.geometry.Size(36f, 32f), androidx.compose.ui.geometry.CornerRadius(18f, 18f))
-              drawLine(Orange, Offset(cx - 18f, cy), Offset(cx + 18f, cy), strokeWidth = 3f + split.value * 5f)
-              drawCircle(Violet.copy(alpha = 0.25f + split.value * 0.4f), 36f, Offset(cx, cy))
-              if (split.value > 0.3f) for (i in 0 until 10) { val a = i * 0.628f + split.value * 3f; drawCircle(Silver.copy(alpha = 0.8f - split.value * 0.5f), 2f, Offset(cx + cos(a) * split.value * 34f, cy + sin(a) * split.value * 34f)) }
+              val cw = size.width * 0.46f
+              val ch = size.height * 0.86f
+              val gap = sp * 16f
+              // glass shell halves (top and bottom) that part along the glowing seam
+              val top = androidx.compose.ui.geometry.Rect(cx - cw / 2f, cy - ch / 2f - gap, cx + cw / 2f, cy - gap)
+              val bot = androidx.compose.ui.geometry.Rect(cx - cw / 2f, cy + gap, cx + cw / 2f, cy + ch / 2f + gap)
+              val rad = androidx.compose.ui.geometry.CornerRadius(cw / 2f, cw / 2f)
+              // liquid inside, with a moving wave surface and bubbles
+              val fillTop = cy - ch * 0.18f
+              val wave = Path().apply {
+                moveTo(cx - cw / 2f, fillTop)
+                val steps = 14
+                for (i in 0..steps) {
+                  val x = cx - cw / 2f + cw * i / steps
+                  lineTo(x, fillTop + sin((i / steps.toFloat()) * 2f * PI.toFloat() * 1.3f + sloshT.value * 2f * PI.toFloat()) * 4f)
+                }
+                lineTo(cx + cw / 2f, cy + ch / 2f - 4f); lineTo(cx - cw / 2f, cy + ch / 2f - 4f); close()
+              }
+              drawRoundRect(Color.White.copy(alpha = 0.06f), top.topLeft, androidx.compose.ui.geometry.Size(cw, ch + 2 * gap), rad)
+              androidx.compose.ui.graphics.drawscope.clipPath(Path().apply { addRoundRect(androidx.compose.ui.geometry.RoundRect(cx - cw / 2f, cy - ch / 2f, cx + cw / 2f, cy + ch / 2f, rad)) }) {
+                drawPath(wave, Brush.verticalGradient(listOf(liquid.copy(alpha = 0.85f), accent.copy(alpha = 0.75f)), fillTop, cy + ch / 2f))
+                for (i in 0 until 5) {
+                  val ph = (sloshT.value * (1 + i % 3) + i * 0.21f) % 1f
+                  drawCircle(Color.White.copy(alpha = 0.55f * (1f - ph)), 1.6f + (i % 3), Offset(cx - cw * 0.25f + (i % 3) * cw * 0.22f, cy + ch * 0.42f - ph * ch * 0.5f))
+                }
+              }
+              drawRoundRect(Color.White.copy(alpha = 0.55f), top.topLeft, androidx.compose.ui.geometry.Size(cw, ch / 2f - gap), rad, style = Stroke(2f))
+              drawRoundRect(Color.White.copy(alpha = 0.55f), bot.topLeft, androidx.compose.ui.geometry.Size(cw, ch / 2f - gap + gap), rad, style = Stroke(2f))
+              // specular highlight on the glass
+              drawLine(Color.White.copy(alpha = 0.5f), Offset(cx - cw * 0.28f, cy - ch * 0.38f), Offset(cx - cw * 0.28f, cy + ch * 0.1f), strokeWidth = 3f, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+              // glowing seam
+              drawLine(accent, Offset(cx - cw / 2f - 2f, cy), Offset(cx + cw / 2f + 2f, cy), strokeWidth = 3f + sp * 6f)
+              // liquid droplets burst out when it opens
+              if (sp > 0.2f) for (i in 0 until 12) {
+                val a = i * 0.5236f + sp * 2f
+                val d = sp * (size.width * 0.5f)
+                drawCircle(liquid.copy(alpha = 0.9f - sp * 0.6f), 3f + (i % 3) * 1.5f, Offset(cx + cos(a) * d, cy + sin(a) * d))
+              }
             }
           }
           Column {
@@ -390,15 +514,36 @@ fun TimeFoldEntry() {
                 itemsIndexed(groups) { idx, g -> FoldChip(g.first, idx == i) { tab = idx } }
               }
               Spacer(Modifier.height(10.dp))
-              LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(groups[i].second, key = { "tf_${lang}_${groups[i].first}_${it.id}" }) { s ->
-                  Column(Modifier.size(width = 110.dp, height = 150.dp).clip(RoundedCornerShape(14.dp)).clickable {
-                    connection?.playQueue(YouTubeQueue(WatchEndpoint(videoId = s.id), s.meta ?: s.item!!.toMediaMetadata()))
-                    open = false
-                  }) {
-                    AsyncImage(model = s.thumb?.resize(360, 360), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(110.dp).clip(RoundedCornerShape(14.dp)))
-                    Text(s.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
-                    Text(s.artist, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+              Text("${groups[i].second.size} songs · swipe the cards", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+              androidx.compose.runtime.key(groups[i].first, lang) {
+                val ls = androidx.compose.foundation.lazy.rememberLazyListState()
+                LazyRow(state = ls, contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 70.dp), horizontalArrangement = Arrangement.spacedBy((-14).dp)) {
+                  items(groups[i].second, key = { "tf_${lang}_${groups[i].first}_${it.id}" }) { s ->
+                    val itemKey = "tf_${lang}_${groups[i].first}_${s.id}"
+                    Column(
+                      Modifier.size(width = 130.dp, height = 176.dp)
+                        .graphicsLayer {
+                          // 3D cover-flow: cards fold away from the centre like layers of time
+                          val info = ls.layoutInfo
+                          val me = info.visibleItemsInfo.firstOrNull { it.key == itemKey }
+                          val centre = (info.viewportStartOffset + info.viewportEndOffset) / 2f
+                          val d = if (me == null) 0f else ((me.offset + me.size / 2f) - centre) / me.size
+                          rotationY = (-d * 38f).coerceIn(-60f, 60f)
+                          val k = 1f - 0.14f * min(abs(d), 1.6f)
+                          scaleX = k; scaleY = k
+                          alpha = 1f - 0.28f * min(abs(d), 2f)
+                          cameraDistance = 14f * density
+                        }
+                        .clip(RoundedCornerShape(18.dp))
+                        .clickable {
+                          connection?.playQueue(YouTubeQueue(WatchEndpoint(videoId = s.id), s.meta ?: s.item!!.toMediaMetadata()))
+                          open = false
+                        }
+                    ) {
+                      AsyncImage(model = s.thumb?.resize(360, 360), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(130.dp).clip(RoundedCornerShape(18.dp)).border(1.dp, Brush.linearGradient(listOf(Orange.copy(alpha = 0.7f), Violet.copy(alpha = 0.7f))), RoundedCornerShape(18.dp)))
+                      Text(s.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                      Text(s.artist, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                   }
                 }
               }
