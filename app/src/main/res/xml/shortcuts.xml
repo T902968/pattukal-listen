@@ -8,7 +8,7 @@
         <intent
             android:action="echo.music.iad1tya.action.SEARCH"
             android:targetClass="echo.music.iad1tya.MainActivity"
-            android:targetPackage="echo.music.iad1tya" />
+            android:targetPackage="com.pattukal.akshay" />
     </shortcut>
     <shortcut
         android:enabled="true"
@@ -18,6 +18,6 @@
         <intent
             android:action="echo.music.iad1tya.action.LIBRARY"
             android:targetClass="echo.music.iad1tya.MainActivity"
-            android:targetPackage="echo.music.iad1tya" />
+            android:targetPackage="com.pattukal.akshay" />
     </shortcut>
 </shortcuts>
