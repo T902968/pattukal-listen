@@ -29,6 +29,7 @@ html.big .ib{width:52px;height:52px}html.big .tools .ib{width:48px;height:48px}h
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:8px}
 .srcap{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation}
 html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font:var(--fs)/1.4 var(--font);overscroll-behavior:none;transition:background-color calc(.3s*var(--dur))}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
 input{font:inherit;color:inherit}
@@ -274,18 +275,18 @@ let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.style.display
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
 /* ---------- settings ---------- */
-const SECTIONS=[['continue','Continue listening'],['quick','Quick Play'],['cube','Magic Cube'],['recent','Recently played'],['lang','Language songs'],['taste','Taste AI mixes'],['mood','Moods & genres'],['artists','Your artists'],['top','Top songs']];
+const SECTIONS=[['continue','Continue listening'],['quick','Quick Play'],['cube','Magic Cube'],['capsule','Mystery Capsule'],['fold','Time Fold'],['hwcol','Halloween collections'],['recent','Recently played'],['lang','Language songs'],['taste','Taste AI mixes'],['mood','Moods & genres'],['artists','Your artists'],['top','Top songs']];
 const THEMES=[['violet','Violet Galaxy',['#0d0620','#b07bff']],['amoled','AMOLED Black',['#000','#8b7bff']],['midnight','Midnight Blue',['#070d1f','#5aa2ff']],['crimson','Crimson',['#150608','#ff4d5e']],['frosted','Frosted Glass',['#10121c','#9fb4ff']],['liquid','Liquid Glass',['#06101a','#4de0d0']],['light','Minimal Light',['#f6f6fb','#5b45e0']],['cream','Warm Cream',['#f7efe0','#b8601f']],['dynamic','Dynamic Album',['#0b0b12','#ff6fb1']]];
 const LIGHT_THEMES=['light','cream'];
 const LAYOUTS=[['immersive','Immersive Artwork'],['minimal','Minimal'],['vinyl','Vinyl'],['neon','Neon'],['frosted','Frosted Glass'],['classic','Classic']];
 const GRADS=[['Default',null,null],['Sunset','#ff7a45','#ff3d8b'],['Ocean','#2fd0ff','#5a6bff'],['Aurora','#4dffb0','#7a5cff'],['Mango','#ffd24d','#ff6b3d']];
 const S=Object.assign({lowEnd:!!(navigator.deviceMemory&&navigator.deviceMemory<=2),battery:false,reduceAnim:false,tasteAi:true,daily:true,mood:true,discover:true,ambienceBtn:true,cropThumb:true,slider:'wavy',bg:'waves',langs:null,
   theme:'violet',themeLight:'light',themeDark:'violet',mode:'dark',accent:null,accent2:null,useGrad:false,blur:18,artR:22,contrast:false,big:false,fs:15,anim:1,layout:'immersive',dynCol:true,artFx:true,
-  autoRadio:true,restore:true,openFull:false,shufDef:false,repDef:'off',dataSaver:false,buddy:true},LS.get('settings',{}));
+  autoRadio:true,restore:true,openFull:false,shufDef:false,repDef:'off',dataSaver:false,buddy:true,hw:'on',hwReduce:false,hwSound:false,gest:true,gestGlitter:true,liquid:true,gestSeen:false},LS.get('settings',{}));
 if(!Array.isArray(S.sections))S.sections=[];
 SECTIONS.forEach(x=>{if(!S.sections.some(y=>y.id===x[0]))S.sections.push({id:x[0],on:true})});
 S.sections=S.sections.filter(y=>SECTIONS.some(x=>x[0]===y.id));
-const saveS=()=>{LS.set('settings',S);applyPerf()};
+const saveS=()=>{LS.set('settings',S);applyPerf();if(window.PK&&PK.hw)PK.hw.apply()};
 const lite=()=>S.lowEnd||S.battery;
 const still=()=>lite()||S.reduceAnim||S.anim===0;
 let ACC='#8b7bff',ACC2='#ff6fb1',BGC='#0b0b12';
@@ -362,7 +363,7 @@ let offline=false;
 async function sx(q){const r=await search(q);if(r===null){offline=true;return[]}offline=false;return r}
 
 /* ---------- player core: the YouTube embedded player is the single audio engine ---------- */
-const APP_VER='Web 1.3 · floating UI + language onboarding';
+const APP_VER='Web 1.5 · Halloween Edition, Gesture Music, liquid open';
 const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 let yt=null,ytReady=false,pending=null,status='idle',errRun=0,loadTok=0,restored=null,stallT=0,ytWait=0;
 const diag=[];const dlog=m=>{diag.push(new Date().toTimeString().slice(0,8)+' '+m);if(diag.length>60)diag.shift()};
@@ -455,6 +456,7 @@ function play(song,list){
 function load(s,startAt){
   if(!s)return;cur=s;seen.set(s.id,s);pos=startAt||0;dur=s.dur||0;const tok=++loadTok;status='loading';banner();
   const last=hist[hist.length-1];if(!last||last.id!==s.id||Date.now()-last.t>15000){hist.push({id:s.id,title:s.title,artist:s.artist,img:s.img,t:Date.now()});saveHist()}
+  if(window.PK&&PK.hw)try{PK.hw.onOpen(s)}catch(e){}
   playing=true;showNow();setMedia();loadLyrics();getPal(s.id).then(p=>{if(tok===loadTok)applyPal(p)});
   if(ytReady){try{yt.loadVideoById(startAt?{videoId:s.id,startSeconds:startAt}:s.id)}catch(e){dlog('load failed '+e);status='error';playing=false;banner('Could not start the player.','Retry',retry)}}
   else pending={id:s.id,t:startAt||0};
@@ -738,6 +740,7 @@ async function renderHome(){
   if(H.quick){const q=[...likes,...uniqHist(12)];const u=[...new Map(q.map(x=>[x.id,x])).values()].filter(x=>!skipped[x.id]).slice(0,6);
     if(u.length){const c=el(`<h2>Quick Play</h2><div class="qgrid">${u.map(s=>`<button data-sid="${esc(s.id)}"><img src="${thumb(s.id)}" data-id="${esc(s.id)}" referrerpolicy="no-referrer" loading="lazy" alt=""><b>${esc(s.title)}</b></button>`).join('')}</div>`);bindSongs(c,()=>u);put('quick',c)}
     else put('quick',el(`<h2>Quick Play</h2><div class="note">Favourite or play a few songs and they appear here for one-tap listening.</div>`))}
+  if(H.capsule||H.fold||H.hwcol){loadHW().then(()=>{if(!live())return;if(H.capsule)put('capsule',PK.hw.capsule());if(H.fold)put('fold',PK.hw.fold());if(H.hwcol){PK.hw.collections().then(n=>{if(n)put('hwcol',n);else H.hwcol.remove()}).catch(()=>H.hwcol.remove())}}).catch(()=>{['capsule','fold','hwcol'].forEach(k=>H[k]&&H[k].remove())})}
   if(H.recent){const u=uniqHist(15);if(u.length){const c=el(`<h2>Recently played</h2><div class="row">${u.map(cardH).join('')}</div>`);bindSongs(c,()=>u);put('recent',c)}else H.recent.remove()}
   if(H.artists){const a=topArtists().slice(0,10);if(a.length){const c=el(`<h2>Your artists</h2><p class="sub">From what you play and favourite</p><div class="chips">${a.map(x=>`<button class="chip" data-a="${esc(x)}">${esc(x)}</button>`).join('')}</div>`);c.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>openSearch(b.dataset.a));put('artists',c)}else H.artists.remove()}
   if(H.mood){const c=el(`<h2>Moods & genres</h2><p class="sub">Tap one to explore. Results come from the music servers' search, not a chart.</p><div class="chips" id="mc">${MOODS.map(m=>`<button class="chip" data-q="${esc(m[1])}" data-t="${esc(m[0])}">${m[0]}</button>`).join('')}</div><div class="chips" id="gc">${GENRES.map(m=>`<button class="chip" data-q="${esc(m[1])}" data-t="${esc(m[0])}">${m[0]}</button>`).join('')}</div><div id="mres"></div>`);
@@ -830,6 +833,13 @@ function renderSettings(){
   <div class="opt"><span>Player background</span></div>${chipsH('bg',BGS,S.bg)}
   ${sw('cropThumb','Crop thumbnail','Fills the artwork square')}${sw('ambienceBtn','Ambience button','Show the ambience button in the player')}
 
+  ${H2('Halloween Edition & Gesture Music')}
+  <div class="opt"><span>Theme<small>Switching never changes your music, favourites, language or where you are</small></span></div>${chipsH('hw',[['on','Halloween Edition'],['off','Original Pattukal theme']],S.hw)}
+  ${sw('hwReduce','Reduced motion','Still haunted scene, simple fades')}${sw('hwSound','Ambient sound effects','Soft wind, chimes and portal sound. Off by default, always quiet')}
+  ${sw('liquid','Liquid song-opening effect','A liquid ripple spreads from your touch when you open a song')}
+  ${sw('gest','Gesture Music','Double tap and hold, then draw: circle = Favorites, wave = Recently played, diagonal = shuffle, heart = like')}${sw('gestGlitter','Glitter glitch trail','Sparkles and glitch while you draw')}
+  <button class="chip" data-act="gman">How to use Gesture Music</button>
+
   ${H2('Playback')}
   ${sw('autoRadio','Keep playing similar songs','When the queue ends, add similar songs')}${sw('restore','Resume where I stopped','Remember queue and position')}${sw('openFull','Open the full player when a song starts','Otherwise only the mini player shows')}
   ${sw('shufDef','Shuffle by default','Applies to new queues')}<div class="opt"><span>Repeat by default</span></div>${chipsH('repDef',[['off','Off'],['all','All'],['one','One']],S.repDef)}
@@ -872,6 +882,7 @@ function renderSettings(){
     else if(a==='lang'){const set=new Set(S.langs||[]);set.has(v)?set.delete(v):set.add(v);S.langs=[...set];saveS();renderSettings()}
     else if(a==='up'||a==='dn'){const i=+v,j=a==='up'?i-1:i+1;if(j>=0&&j<S.sections.length){[S.sections[i],S.sections[j]]=[S.sections[j],S.sections[i]];saveS();renderSettings()}}
     else if(a==='vis'){S.sections[+v].on=!S.sections[+v].on;saveS();renderSettings()}
+    else if(a==='gman'){loadHW().then(()=>PK.hw.manual())}
     else if(a==='clearcache'){(async()=>{try{for(const k of await caches.keys())await caches.delete(k)}catch(e){}cache.clear();for(const k in palCache)delete palCache[k];toast('Cache cleared');renderSettings()})()}
     else if(a==='copydg'){const t=dgText();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Copied'),()=>toast("Couldn't copy"))}
     else if(a==='retrycur'){if(cur){retry();toast('Retrying…')}else toast('Nothing is playing')}
@@ -885,9 +896,13 @@ function dgText(){return [APP_VER,'platform: '+navigator.userAgent.slice(0,90),'
 
 /* ---------- lazy extras (Galaxy, Buddy) are only fetched when used ---------- */
 let extrasP=null;
-function loadExtras(){if(window.PK&&PK.galaxy)return Promise.resolve();if(extrasP)return extrasP;
-  window.PK={S,LS,toast,sheet,closeSheet,search,sx,visible,play,playNext,addQueue,hist,likes,seen,LANGS,MOODS,GENRES,esc,thumb,shuffle,topArtists,openSearch,go:t=>go(t),getCur:()=>cur,isPlaying:()=>playing,still,loadQueue,sessions,MOODQ:langPart,uniqHist,toggle,openPlayer,effAcc:()=>ACC};
+function ensurePK(){if(!window.PK)window.PK={};Object.assign(window.PK,{S,LS,toast,sheet,closeSheet,search,sx,visible,play,playNext,addQueue,hist,likes,seen,LANGS,MOODS,GENRES,esc,thumb,shuffle,topArtists,openSearch,go:t=>go(t),getCur:()=>cur,isPlaying:()=>playing,still,loadQueue,sessions,MOODQ:langPart,uniqHist,toggle,openPlayer,effAcc:()=>ACC,like,setShuffle:(v)=>setShuffle(v),shuf:()=>shuf,getTab:()=>tab,save:saveS})}
+function loadExtras(){if(window.PK&&PK.galaxy)return Promise.resolve();if(extrasP)return extrasP;ensurePK();
   extrasP=new Promise((res,rej)=>{const s=document.createElement('script');s.src='extras.js?v=1';s.onload=res;s.onerror=()=>{extrasP=null;rej()};document.head.appendChild(s)});return extrasP}
+/* Halloween Edition, Gesture Music, Capsule, Time Fold: loaded right after first paint */
+let hwP=null;
+function loadHW(){if(window.PK&&PK.hw)return Promise.resolve();if(hwP)return hwP;ensurePK();
+  hwP=new Promise((res,rej)=>{const s=document.createElement('script');s.src='halloween.js?v=1';s.onload=res;s.onerror=()=>{hwP=null;rej()};document.head.appendChild(s)});return hwP}
 function syncBuddy(){const b=$('#buddy');b.style.display=S.buddy?'':'none'}
 /* Buddy floats above everything: drag it anywhere, the spot is remembered */
 (function(){const b=$('#buddy');let sx=0,sy=0,ox=0,oy=0,moved=0,drag=false;
@@ -909,6 +924,7 @@ function go(t){tab=t;history.replaceState(history.state&&history.state.pl?histor
 addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(TABS.includes(t)&&t!==tab)go(t)});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js?v=9').catch(()=>{});
 restoreSession();
+loadHW().then(()=>PK.hw.init()).catch(()=>{});
 document.querySelectorAll('[title]').forEach(b=>{if(b.tagName==='BUTTON'&&!b.getAttribute('aria-label'))b.setAttribute('aria-label',b.title)});
 $('#pclose').setAttribute('aria-label','Close player');$('#pmenu').setAttribute('aria-label','Song menu');$('#mplay').setAttribute('aria-label','Play');
 if(!S.langs||!S.langs.length){tab='home';go('home')}else go(tab);

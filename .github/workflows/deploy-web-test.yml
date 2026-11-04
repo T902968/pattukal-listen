@@ -2,7 +2,7 @@ name: Deploy Pattukal Web (test)
 
 on:
   push:
-    branches: [feature/pattukal-web]
+    branches: [feature/pattukal-web, feature/pattukal-web-full]
   workflow_dispatch:
 
 permissions:
