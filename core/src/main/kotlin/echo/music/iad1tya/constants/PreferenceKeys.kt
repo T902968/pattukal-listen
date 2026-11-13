@@ -989,14 +989,23 @@ val LowEndModeKey = booleanPreferencesKey("perf_low_end_mode")
 val BatterySaverKey = booleanPreferencesKey("perf_battery_saver")
 val ReduceAnimationsKey = booleanPreferencesKey("perf_reduce_animations")
 
-/** Seasonal Halloween edition (experimental). "" = not chosen yet, "halloween" or "original" once the user picked. */
-val HalloweenChoiceKey = stringPreferencesKey("halloween_choice")
-val HalloweenReducedMotionKey = booleanPreferencesKey("halloween_reduced_motion")
-val HalloweenAmbientKey = booleanPreferencesKey("halloween_ambient")
-val HalloweenPortalKey = booleanPreferencesKey("halloween_portal")
+/** Winter edition (default theme). */
+val WinterEnabledKey = booleanPreferencesKey("winter_enabled")
+/** frozen, aurora, midnight, snowwhite, christmas, newyear */
+val WinterVariantKey = stringPreferencesKey("winter_variant")
+/** off, snow, fire, leaves, spin, water */
+val EffectKindKey = stringPreferencesKey("effect_kind")
+val SnowIntensityKey = intPreferencesKey("snow_intensity")
+/** gentle or storm */
+val SnowModeKey = stringPreferencesKey("snow_mode")
+val FrostEdgesKey = booleanPreferencesKey("frost_edges")
+val EffectTouchKey = booleanPreferencesKey("effect_touch")
+val WinterLowPerfKey = booleanPreferencesKey("winter_low_perf")
+val WaterFillKey = booleanPreferencesKey("water_fill_enabled")
+val EasterEggsFoundKey = intPreferencesKey("winter_eggs_found")
 val GestureDrawKey = booleanPreferencesKey("gesture_draw_enabled")
 
-/** Gesture Music: double-tap-and-hold, then draw. Independent of the Halloween theme. */
+/** Gesture Music: double-tap-and-hold, then draw. Independent of the seasonal theme. */
 val GestureMusicEnabledKey = booleanPreferencesKey("gesture_music_enabled")
 val GestureMusicWriteKey = booleanPreferencesKey("gesture_music_write")
 val GestureMusicWriteLangKey = stringPreferencesKey("gesture_music_write_lang")

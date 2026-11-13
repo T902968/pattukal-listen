@@ -1233,10 +1233,8 @@ fun HomeScreen(
             PattukalLiquidBackground(
                 modifier = Modifier.matchParentSize()
             )
-            if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) {
-                echo.music.iad1tya.ui.component.HalloweenBackdrop(Modifier.matchParentSize())
-                val ambientOn by echo.music.iad1tya.utils.rememberPreference(echo.music.iad1tya.constants.HalloweenAmbientKey, false)
-                echo.music.iad1tya.ui.component.HalloweenAmbientWind(ambientOn)
+            if (echo.music.iad1tya.ui.component.rememberWinterOn()) {
+                echo.music.iad1tya.ui.component.WinterBackdrop(Modifier.matchParentSize())
             }
 
             BoxWithConstraints(
@@ -1348,12 +1346,11 @@ fun HomeScreen(
                         )
                     }
 
-                    item(key = "halloween_extras") {
-                        echo.music.iad1tya.ui.component.HalloweenChoiceDialog()
+                    item(key = "winter_extras") {
                         echo.music.iad1tya.ui.component.MysteryCapsule()
                         echo.music.iad1tya.ui.component.TimeFoldEntry()
-                        if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) {
-                            echo.music.iad1tya.ui.component.HalloweenCollections(refreshCount)
+                        if (echo.music.iad1tya.ui.component.rememberWinterOn()) {
+                            echo.music.iad1tya.ui.component.SnowGlobe()
                         }
                     }
 
@@ -3324,6 +3321,7 @@ fun HomeScreen(
                     }
                 }
             }
+            echo.music.iad1tya.ui.component.WaterFillLayer(Modifier.matchParentSize())
         }
     }
 }

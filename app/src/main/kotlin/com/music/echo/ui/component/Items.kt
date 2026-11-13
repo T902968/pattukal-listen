@@ -301,12 +301,13 @@ fun GridItem(
   forceCrop: Boolean = false,
 ) {
   val gridHeight = currentGridThumbnailHeight()
+  val floatSeed = remember { (0..15).random() }
   Column(
     modifier =
       if (fillMaxWidth) {
-        modifier.padding(12.dp).fillMaxWidth()
+        modifier.waterFloat(floatSeed).padding(12.dp).fillMaxWidth()
       } else {
-        modifier.padding(12.dp).width(gridHeight * thumbnailRatio)
+        modifier.waterFloat(floatSeed).padding(12.dp).width(gridHeight * thumbnailRatio)
       }
   ) {
     BoxWithConstraints(

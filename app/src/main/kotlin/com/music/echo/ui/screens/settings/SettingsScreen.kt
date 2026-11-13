@@ -304,13 +304,13 @@ fun SettingsScreen(
           )
         )
       }
-      if ("halloween seasonal experimental spooky".contains(searchLower)) {
+      if ("winter snow effects aurora frozen christmas theme water fire leaves".contains(searchLower)) {
         add(
           Material3SettingsItem(
             icon = painterResource(R.drawable.sparks),
-            title = { Text("Seasonal Halloween Test (Experimental)") },
-            description = { Text("Halloween effects, reduced motion, ambient sound") },
-            onClick = { navController.navigate("settings/halloween") }
+            title = { Text("Winter & Effects") },
+            description = { Text("Winter theme, snow, 5 particle effects, water fill") },
+            onClick = { navController.navigate("settings/winter") }
           )
         )
       }

@@ -123,7 +123,7 @@ fun SongCardRow(title: String, songs: List<SongItem>, subtitle: String? = null) 
         var menu by remember { mutableStateOf(false) }
         Box {
           Column(
-            Modifier.width(140.dp)
+            Modifier.waterFloat(song.id.hashCode() and 15).width(140.dp)
               .clip(RoundedCornerShape(16.dp))
               .combinedClickable(
                 onClick = {

@@ -362,8 +362,8 @@ fun NavGraphBuilder.navigationBuilder(
     echo.music.iad1tya.ui.screens.settings.GestureMusicSettings(navController, scrollBehavior)
   }
 
-  composable("settings/halloween") {
-    echo.music.iad1tya.ui.screens.settings.HalloweenSettings(navController, scrollBehavior)
+  composable("settings/winter") {
+    echo.music.iad1tya.ui.screens.settings.WinterSettings(navController, scrollBehavior)
   }
   composable("settings/performance") {
     echo.music.iad1tya.ui.screens.settings.PerformanceSettings(navController, scrollBehavior)

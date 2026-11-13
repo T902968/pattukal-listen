@@ -187,7 +187,7 @@ fun MusicCubeHomeCard(
       .clip(shape)
       .background(
         Brush.linearGradient(
-          listOf(Color.White.copy(alpha = 0.16f), (if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) Color(0xFFFF7A1A) else Color(0xFF9FE8FF)).copy(alpha = 0.09f), Color.White.copy(alpha = 0.10f))
+          listOf(Color.White.copy(alpha = 0.16f), (if (echo.music.iad1tya.ui.component.rememberWinterOn()) Color(0xFF7FD6FF) else Color(0xFF9FE8FF)).copy(alpha = 0.09f), Color.White.copy(alpha = 0.10f))
         )
       )
       .border(

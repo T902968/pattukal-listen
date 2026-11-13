@@ -75,7 +75,7 @@ import echo.music.iad1tya.constants.GestureMusicGlitterKey
 import echo.music.iad1tya.constants.GestureMusicManualSeenKey
 import echo.music.iad1tya.constants.GestureMusicWriteKey
 import echo.music.iad1tya.constants.GestureMusicWriteLangKey
-import echo.music.iad1tya.constants.HalloweenChoiceKey
+import echo.music.iad1tya.constants.WinterEnabledKey
 import echo.music.iad1tya.models.toMediaMetadata
 import echo.music.iad1tya.playback.queues.YouTubeQueue
 import echo.music.iad1tya.utils.rememberPreference
@@ -390,8 +390,8 @@ fun GestureMusicManual(onDismiss: () -> Unit) {
 fun GestureMusicFirstRun() {
   val (enabled, _) = rememberPreference(GestureMusicEnabledKey, true)
   var seen by rememberPreference(GestureMusicManualSeenKey, false)
-  val (choice, _) = rememberPreference(HalloweenChoiceKey, "")
+  val (choice, _) = rememberPreference(WinterEnabledKey, true)
   var shown by remember { mutableStateOf(false) }
-  if (!enabled || seen || choice.isEmpty() || shown) return
+  if (!enabled || seen || shown) return
   GestureMusicManual(onDismiss = { shown = true; seen = true })
 }
