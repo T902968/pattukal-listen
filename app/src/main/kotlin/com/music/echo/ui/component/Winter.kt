@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -540,7 +541,7 @@ fun WaterFillLayer(modifier: Modifier = Modifier) {
     }
   }
   Box(modifier.fillMaxSize().onSizeChanged { boxSize = it }) {
-    val topInset = androidx.compose.foundation.layout.WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 92.dp // below the PATTUKAL header
+    val topInset = androidx.compose.foundation.layout.WindowInsets.Companion.statusBars.asPaddingValues().calculateTopPadding() + 92.dp // below the PATTUKAL header
     val maxPull = boxSize.height * 0.30f
     Canvas(Modifier.fillMaxSize()) {
       val level = WaterFill.level
