@@ -520,7 +520,7 @@ fun WaterFillLayer(modifier: Modifier = Modifier) {
   val (lowPerf, _) = rememberPreference(WinterLowPerfKey, false)
   val reduced = rememberReduceMotion() || lowPerf
   val resumed = rememberAppResumed()
-  var size by remember { mutableStateOf(IntSize.Zero) }
+  var boxSize by remember { mutableStateOf(IntSize.Zero) }
   val scope = rememberCoroutineScope()
   val anim = remember { Animatable(WaterFill.level) }
   val bubbles = remember { List(18) { floatArrayOf(Random.nextFloat(), Random.nextFloat(), 0.4f + Random.nextFloat()) } }
@@ -538,8 +538,8 @@ fun WaterFillLayer(modifier: Modifier = Modifier) {
       }
     }
   }
-  Box(modifier.fillMaxSize().onSizeChanged { size = it }) {
-    val maxPull = size.height * 0.30f
+  Box(modifier.fillMaxSize().onSizeChanged { boxSize = it }) {
+    val maxPull = boxSize.height * 0.30f
     Canvas(Modifier.fillMaxSize()) {
       val level = WaterFill.level
       val t = WaterFill.time
