@@ -17,6 +17,7 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -539,6 +540,7 @@ fun WaterFillLayer(modifier: Modifier = Modifier) {
     }
   }
   Box(modifier.fillMaxSize().onSizeChanged { boxSize = it }) {
+    val topInset = androidx.compose.foundation.layout.WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 92.dp // below the PATTUKAL header
     val maxPull = boxSize.height * 0.30f
     Canvas(Modifier.fillMaxSize()) {
       val level = WaterFill.level
@@ -562,14 +564,14 @@ fun WaterFillLayer(modifier: Modifier = Modifier) {
     }
     // the cord: hangs from the top edge, drag it down to fill, drag it back up to drain
     val knobY = WaterFill.level * maxPull + 40f
-    Canvas(Modifier.align(Alignment.TopEnd).padding(end = 28.dp).size(44.dp, with(LocalDensity.current) { (knobY + 34f).toDp() })) {
+    Canvas(Modifier.align(Alignment.TopEnd).padding(top = topInset, end = 28.dp).size(44.dp, with(LocalDensity.current) { (knobY + 34f).toDp() })) {
       val cx = size.width / 2f
       drawLine(Color(0xFFCFE6FF).copy(alpha = 0.85f), Offset(cx, 0f), Offset(cx, knobY), strokeWidth = 3f, cap = StrokeCap.Round)
       drawCircle(Brush.radialGradient(listOf(Color.White, v.bands[0]), Offset(cx, knobY), 18f), 15f, Offset(cx, knobY))
       drawCircle(Color.White.copy(alpha = 0.6f), 15f, Offset(cx, knobY), style = Stroke(2f))
     }
     Box(
-      Modifier.align(Alignment.TopEnd).padding(end = 12.dp).size(76.dp, with(LocalDensity.current) { (knobY + 70f).toDp() })
+      Modifier.align(Alignment.TopEnd).padding(top = topInset, end = 12.dp).size(76.dp, with(LocalDensity.current) { (knobY + 70f).toDp() })
         .pointerInput(maxPull) {
           detectVerticalDragGestures(
             onDragStart = { scope.launch { anim.stop() } },
