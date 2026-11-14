@@ -63,10 +63,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import echo.music.iad1tya.constants.EasterEggsFoundKey
-import echo.music.iad1tya.constants.EffectKindKey
+import echo.music.iad1tya.constants.OverlayEffectKey
+import echo.music.iad1tya.constants.OverlayEnabledKey
+import echo.music.iad1tya.constants.OverlayIntensityKey
 import echo.music.iad1tya.constants.EffectTouchKey
 import echo.music.iad1tya.constants.FrostEdgesKey
-import echo.music.iad1tya.constants.SnowIntensityKey
 import echo.music.iad1tya.constants.SnowModeKey
 import echo.music.iad1tya.constants.WaterFillKey
 import echo.music.iad1tya.constants.WinterEnabledKey
@@ -158,7 +159,8 @@ private fun spawn(kind: String, w: Float, h: Float, anywhere: Boolean, d: Float,
     "fire" -> P(x, if (anywhere) r.nextFloat() * h else h + 10f, (r.nextFloat() - 0.5f) * 30f * d, -(60f + r.nextFloat() * 150f) * d, (1.2f + r.nextFloat() * 2.8f) * d, 0f, 0f, r.nextFloat() * 6.28f, hue = r.nextInt(3))
     "leaves" -> P(x, if (anywhere) r.nextFloat() * h else -30f, (r.nextFloat() - 0.3f) * 25f * d, (40f + r.nextFloat() * 50f) * d, (7f + r.nextFloat() * 8f) * d, r.nextFloat() * 6.28f, (r.nextFloat() - 0.5f) * 3f, r.nextFloat() * 6.28f, hue = r.nextInt(LeafColors.size))
     "spin" -> P(x, if (anywhere) r.nextFloat() * h else -20f, (r.nextFloat() - 0.5f) * 20f * d, (30f + r.nextFloat() * 60f) * d, (6f + r.nextFloat() * 10f) * d, r.nextFloat() * 6.28f, (2f + r.nextFloat() * 5f) * (if (r.nextBoolean()) 1 else -1), r.nextFloat() * 6.28f, hue = r.nextInt(3))
-    "water" -> P(x, if (anywhere) r.nextFloat() * h else -20f, 0f, (160f + r.nextFloat() * 260f) * d, (1.5f + r.nextFloat() * 2.5f) * d, 0f, 0f, r.nextFloat() * 6.28f)
+    // a bead of water resting on the glass; big ones will start to run down after a while
+    "water" -> { val q = r.nextFloat(); P(x, r.nextFloat() * h * (if (anywhere) 1f else 0.6f), 0f, 0f, (1.6f + q * q * 7.5f) * d, 0f, 0f, 3f + r.nextFloat() * 28f) }
     else -> { // snow
       val big = r.nextFloat()
       val size = (if (big > 0.85f) 5.5f + r.nextFloat() * 3f else 1.6f + r.nextFloat() * 3.2f) * d
@@ -170,22 +172,23 @@ private fun spawn(kind: String, w: Float, h: Float, anywhere: Boolean, d: Float,
 @Composable
 fun WinterEffectsOverlay() {
   val (winterOn, _) = rememberPreference(WinterEnabledKey, true)
-  val (kind, _) = rememberPreference(EffectKindKey, "snow")
-  val (intensity, _) = rememberPreference(SnowIntensityKey, 60)
+  val (overlayOn, _) = rememberPreference(OverlayEnabledKey, true)
+  val (kind, _) = rememberPreference(OverlayEffectKey, "snow")
+  val (intensity, _) = rememberPreference(OverlayIntensityKey, 12)
   val (mode, _) = rememberPreference(SnowModeKey, "gentle")
   val (lowPerf, _) = rememberPreference(WinterLowPerfKey, false)
   val (touchOn, _) = rememberPreference(EffectTouchKey, true)
-  val (frost, _) = rememberPreference(FrostEdgesKey, true)
+  val (frost, _) = rememberPreference(FrostEdgesKey, false)
   val (eggs, setEggs) = rememberPreference(EasterEggsFoundKey, 0)
   val variant = rememberWinterVariant()
   val reduced = rememberReduceMotion()
   val resumed = rememberAppResumed()
   val context = LocalContext.current
   var size by remember { mutableStateOf(IntSize.Zero) }
-  val effectKind = if (!winterOn) "off" else kind
+  val effectKind = if (!overlayOn) "off" else kind
   val storm = mode == "storm" && effectKind == "snow"
   val perfScale = if (lowPerf || reduced) 0.35f else 1f
-  val base = when (effectKind) { "snow" -> 120; "fire" -> 70; "leaves" -> 36; "spin" -> 34; "water" -> 90; else -> 0 }
+  val base = when (effectKind) { "snow" -> 120; "fire" -> 70; "leaves" -> 36; "spin" -> 34; "water" -> 140; else -> 0 }
   val count = (base * (intensity.coerceIn(5, 100) / 60f) * perfScale * (if (storm) 2.2f else 1f)).toInt().coerceIn(0, 420)
   val d = LocalDensity.current.density
   val particles = remember(effectKind, count, size, storm) {
@@ -222,7 +225,17 @@ fun WinterEffectsOverlay() {
         fun update(p: P) {
           when (effectKind) {
             "fire" -> { p.x += (p.vx + sin(clock * 3f + p.phase) * 18f * d) * dt; p.y += p.vy * dt; if (p.y < -10f) { p.y = h + 10f; p.x = Random.nextFloat() * w } }
-            "water" -> { p.y += p.vy * dt; if (p.y > h + 20f) { p.y = -20f; p.x = Random.nextFloat() * w } }
+            "water" -> {
+              if (p.vy == 0f) {
+                p.phase -= dt
+                if (p.phase < 0f && p.size > 4.2f * d) { p.vy = (35f + Random.nextFloat() * 55f) * d; p.vrot = p.y }
+              } else {
+                p.vy = min(p.vy + 40f * d * dt, 230f * d)
+                p.y += p.vy * dt
+                if (Random.nextFloat() < 0.012f && p.vy > 70f * d) { p.vy = 0f; p.phase = 5f + Random.nextFloat() * 25f; p.size *= 0.9f } // stalls on the glass
+                if (p.y > h + 20f) { val q = Random.nextFloat(); p.y = Random.nextFloat() * h * 0.5f; p.x = Random.nextFloat() * w; p.vy = 0f; p.size = (1.6f + q * q * 7.5f) * d; p.phase = 4f + Random.nextFloat() * 30f }
+              }
+            }
             else -> {
               p.x += (p.vx + wind + sin(clock * 1.2f + p.phase) * 18f * d) * dt
               p.y += p.vy * dt
@@ -263,7 +276,7 @@ fun WinterEffectsOverlay() {
     @Suppress("UNUSED_EXPRESSION") frame
     if (frost && winterOn) drawFrost(variant)
     when (effectKind) {
-      "water" -> drawWaterMist(clock, particles)
+      "water" -> { drawWaterMist(clock); particles.forEach { drawWaterDrop(it) } }
       else -> particles.forEach { drawParticle(effectKind, it, clock, variant) }
     }
     golden.forEach { drawSnowflake(Offset(it.x, it.y), it.size, it.rot, Color(0xFFFFE08A).copy(alpha = 0.55f), 1.6f) }
@@ -316,22 +329,38 @@ private fun DrawScope.drawParticle(kind: String, p: P, clock: Float, v: WinterVa
   }
 }
 
-private fun DrawScope.drawWaterMist(clock: Float, drops: List<P>) {
+private fun DrawScope.drawWaterMist(clock: Float) {
   val w = size.width
   val h = size.height
-  // cloudy fog: slow drifting soft blobs
-  for (i in 0 until 5) {
-    val cx = ((i * 0.27f + clock * 0.012f * (1 + i % 2)) % 1.3f - 0.15f) * w
-    val cy = h * (0.12f + 0.2f * i)
-    drawCircle(Brush.radialGradient(listOf(Color(0xFFCFE6FF).copy(alpha = 0.10f), Color.Transparent), Offset(cx, cy), w * 0.55f), w * 0.55f, Offset(cx, cy))
+  // faint condensation haze that drifts slowly
+  for (i in 0 until 4) {
+    val cx = ((i * 0.31f + clock * 0.010f * (1 + i % 2)) % 1.3f - 0.15f) * w
+    val cy = h * (0.15f + 0.25f * i)
+    drawCircle(Brush.radialGradient(listOf(Color(0xFFD8EBFF).copy(alpha = 0.055f), Color.Transparent), Offset(cx, cy), w * 0.6f), w * 0.6f, Offset(cx, cy))
   }
-  drawRect(Color(0xFFBFDFFF).copy(alpha = 0.035f))
-  drops.forEach { p ->
-    val c = Offset(p.x, p.y)
-    drawLine(Brush.verticalGradient(listOf(Color.Transparent, Color(0xFFDDF1FF).copy(alpha = 0.55f)), p.y - p.size * 9f, p.y), Offset(p.x, p.y - p.size * 9f), c, strokeWidth = p.size * 0.7f, cap = StrokeCap.Round)
-    drawCircle(Color(0xFFEFF9FF).copy(alpha = 0.7f), p.size, c)
-    drawCircle(Color.White.copy(alpha = 0.9f), p.size * 0.35f, c + Offset(-p.size * 0.3f, -p.size * 0.3f))
+  drawRect(Color(0xFFC8E0F8).copy(alpha = 0.018f))
+}
+
+private fun DrawScope.drawWaterDrop(p: P) {
+  val r = p.size
+  val running = p.vy > 0f
+  val c = Offset(p.x, p.y)
+  val hh = r * (if (running) 1.55f else 1.15f)
+  // wet trail left behind by a running drop
+  if (running && p.y - p.vrot > 4f) {
+    drawLine(Brush.verticalGradient(listOf(Color.Transparent, Color(0xFFDDEEFF).copy(alpha = 0.16f)), p.vrot, p.y), Offset(p.x, p.vrot), c, strokeWidth = r * 0.85f, cap = StrokeCap.Round)
   }
+  // glass-like body: clear in the middle, brighter toward the lower edge (it focuses light)
+  drawOval(
+    Brush.radialGradient(listOf(Color.White.copy(alpha = 0.03f), Color(0xFFBFE0FF).copy(alpha = 0.10f), Color(0xFFD8EEFF).copy(alpha = 0.30f)), Offset(c.x, c.y + hh * 0.25f), r * 1.25f),
+    Offset(c.x - r, c.y - hh), Size(r * 2f, hh * 2f),
+  )
+  // dark thin rim on the top (the edge refracts the dark background), bright rim on the bottom
+  drawArc(Color.Black.copy(alpha = 0.30f), 200f, 140f, false, Offset(c.x - r, c.y - hh), Size(r * 2f, hh * 2f), style = Stroke(max(1f, r * 0.16f)))
+  drawArc(Color.White.copy(alpha = 0.40f), 25f, 130f, false, Offset(c.x - r, c.y - hh), Size(r * 2f, hh * 2f), style = Stroke(max(1f, r * 0.12f)))
+  // specular highlights
+  drawOval(Color.White.copy(alpha = 0.85f), Offset(c.x - r * 0.55f, c.y - hh * 0.62f), Size(r * 0.5f, r * 0.32f))
+  drawCircle(Color.White.copy(alpha = 0.35f), max(0.8f, r * 0.12f), Offset(c.x + r * 0.38f, c.y + hh * 0.5f))
 }
 
 private fun DrawScope.drawFrost(v: WinterVariant) {

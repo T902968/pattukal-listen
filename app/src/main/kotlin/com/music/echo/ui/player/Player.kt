@@ -3063,6 +3063,10 @@ fun BottomSheetPlayer(
               .padding(bottom = bottomPadding)
               .animateContentSize(),
         ) {
+          val customThumbScale by rememberPreference(echo.music.iad1tya.constants.PlayerThumbScaleKey, 1f)
+          val customThumbY by rememberPreference(echo.music.iad1tya.constants.PlayerThumbOffsetYKey, 0f)
+          val customCtrlY by rememberPreference(echo.music.iad1tya.constants.PlayerControlsOffsetYKey, 0f)
+          var showCustomizer by remember { mutableStateOf(false) }
           Box(
             contentAlignment = Alignment.TopCenter,
             modifier = Modifier.weight(1f),
@@ -3084,13 +3088,27 @@ fun BottomSheetPlayer(
               } else {
                 Thumbnail(
                   sliderPositionProvider = sliderPositionProvider,
-                  modifier = Modifier.nestedScroll(state.preUpPostDownNestedScrollConnection),
+                  modifier = Modifier.nestedScroll(state.preUpPostDownNestedScrollConnection)
+                    .graphicsLayer { scaleX = customThumbScale; scaleY = customThumbScale; translationY = customThumbY * density },
                   isPlayerExpanded = isExpandedProvider,
                   isListenTogetherGuest = isListenTogetherGuest
                 )
               }
             }
+            // Small pencil, top left: opens the player customizer.
+            androidx.compose.material3.IconButton(
+              onClick = { showCustomizer = true },
+              modifier = Modifier.align(Alignment.TopStart).padding(start = 6.dp, top = 4.dp).size(34.dp),
+            ) {
+              Icon(
+                painter = painterResource(R.drawable.edit),
+                contentDescription = "Customize player",
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.size(18.dp),
+              )
+            }
           }
+          if (showCustomizer) PlayerCustomizerSheet(onDismiss = { showCustomizer = false })
 
           if (showLyricsOnPlayer && !showInlineLyrics) {
             PlayerSyncedLyricsView(
@@ -3100,7 +3118,7 @@ fun BottomSheetPlayer(
             )
           }
 
-          mediaMetadata?.let { controlsContent(it) }
+          Box(Modifier.graphicsLayer { translationY = customCtrlY * density }) { mediaMetadata?.let { controlsContent(it) } }
 
 
           Spacer(Modifier.height(if (useNewPlayerDesign) 30.dp else 8.dp))

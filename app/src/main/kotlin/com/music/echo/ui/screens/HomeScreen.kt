@@ -1349,6 +1349,7 @@ fun HomeScreen(
                     item(key = "winter_extras") {
                         echo.music.iad1tya.ui.component.MysteryCapsule()
                         echo.music.iad1tya.ui.component.TimeFoldEntry()
+                        echo.music.iad1tya.ui.component.WrappedEntry(navController)
                         if (echo.music.iad1tya.ui.component.rememberWinterOn()) {
                             echo.music.iad1tya.ui.component.SnowGlobe()
                         }

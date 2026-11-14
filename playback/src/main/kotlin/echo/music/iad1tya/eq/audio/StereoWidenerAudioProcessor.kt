@@ -32,8 +32,39 @@ class StereoWidenerAudioProcessor : AudioProcessor {
    */
   @Volatile var vocalRemoval: Boolean = false
 
+  // Two cascaded one-pole filters per band edge (12 dB/octave). Coefficients are recomputed per sample rate.
+  private var bassA = 0.03
   private var bassState = 0.0
+  private var bassState2 = 0.0
+  private var airA = 0.45
   private var airState = 0.0
+  private var airState2 = 0.0
+
+  // Song analyzer: how much of the song sits in the centre (where vocals are) versus the stereo sides.
+  private var midEnergy = 0.0
+  private var sideEnergy = 0.0
+  private var voiceEnergy = 0.0
+  @Volatile private var analyzedSamples = 0L
+
+  /** Clears the analysis (call when karaoke turns on or the track changes). */
+  fun resetAnalysis() {
+    midEnergy = 0.0; sideEnergy = 0.0; voiceEnergy = 0.0; analyzedSamples = 0L
+  }
+
+  /** Short human text about how well vocals can be removed from the audio analysed so far, or null if too little audio. */
+  fun analysisSummary(): String? {
+    if (analyzedSamples < 44100L * 3) return null
+    val total = midEnergy + sideEnergy
+    if (total <= 0.0) return null
+    val sideRatio = sideEnergy / total
+    val voiceShare = voiceEnergy / total
+    return when {
+      sideRatio < 0.02 -> "Karaoke: this song is almost mono, so the voice can't be separated"
+      voiceShare > 0.30 && sideRatio > 0.08 -> "Karaoke: clean centre vocal found, strong removal"
+      voiceShare > 0.15 -> "Karaoke: vocals mostly removed, a little may remain"
+      else -> "Karaoke: vocals are spread wide or mixed with reverb, partial removal only"
+    }
+  }
 
   private var channelCount = 0
   private var encoding = C.ENCODING_INVALID
@@ -50,6 +81,9 @@ class StereoWidenerAudioProcessor : AudioProcessor {
   override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
     channelCount = inputAudioFormat.channelCount
     encoding = inputAudioFormat.encoding
+    val rate = inputAudioFormat.sampleRate.coerceAtLeast(8000).toDouble()
+    bassA = 1.0 - Math.exp(-2.0 * Math.PI * 130.0 / rate) // ~130 Hz
+    airA = 1.0 - Math.exp(-2.0 * Math.PI * 9500.0 / rate) // ~9.5 kHz
 
     if (encoding != C.ENCODING_PCM_16BIT || channelCount > 2) {
       throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)
@@ -88,15 +122,21 @@ class StereoWidenerAudioProcessor : AudioProcessor {
           var side = (left - right) * 0.5 * widthNow
 
           if (karaoke) {
-            // Split the centre channel into bass (<~200 Hz), voice band (~200 Hz-4.5 kHz) and air
-            // (>~4.5 kHz). The voice band is almost fully removed; bass and cymbals/air stay, so the
-            // instrumental keeps its punch. Stereo side (guitars, pads, reverb) is lifted slightly.
-            bassState += 0.03 * (mid - bassState)
-            airState += 0.45 * (mid - airState)
-            val voice = airState - bassState
-            val air = mid - airState
-            mid = bassState + voice * 0.04 + air * 0.85
-            side *= 1.6
+            // Split the centre signal into bass (<~130 Hz), the voice band and air (>~9.5 kHz). The whole voice
+            // band is removed; bass and air stay so the instrumental keeps its punch and shimmer. Stereo sides
+            // (guitars, pads, reverb) are lifted a little to fill the gap.
+            bassState += bassA * (mid - bassState)
+            bassState2 += bassA * (bassState - bassState2)
+            airState += airA * (mid - airState)
+            airState2 += airA * (airState - airState2)
+            val voice = airState2 - bassState2
+            val air = mid - airState2
+            midEnergy += mid * mid
+            sideEnergy += side * side
+            voiceEnergy += voice * voice
+            analyzedSamples++
+            mid = bassState2 + air * 0.9
+            side *= 1.5
           }
 
           var outLeft = mid + side
@@ -134,6 +174,7 @@ class StereoWidenerAudioProcessor : AudioProcessor {
 
   @Deprecated("Deprecated in Java")
   override fun flush() {
+    resetAnalysis()
     outputBuffer = EMPTY_BUFFER
     inputEnded = false
   }

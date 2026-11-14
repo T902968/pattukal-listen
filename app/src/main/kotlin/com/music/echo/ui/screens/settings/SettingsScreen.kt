@@ -304,12 +304,32 @@ fun SettingsScreen(
           )
         )
       }
+      if ("wrapped year top songs artists minutes listening".contains(searchLower)) {
+        add(
+          Material3SettingsItem(
+            icon = painterResource(R.drawable.sparks),
+            title = { Text("Pattukal Wrapped") },
+            description = { Text("Your year in music, from your real listening history") },
+            onClick = { navController.navigate("wrapped") }
+          )
+        )
+      }
+      if ("overlay effect snow fire leaves spin water drops intensity".contains(searchLower)) {
+        add(
+          Material3SettingsItem(
+            icon = painterResource(R.drawable.sparks),
+            title = { Text("Overlay effects") },
+            description = { Text("Snow, fire sparks, falling leaves, spin and water drops over the app") },
+            onClick = { navController.navigate("settings/overlay") }
+          )
+        )
+      }
       if ("winter snow effects aurora frozen christmas theme water fire leaves".contains(searchLower)) {
         add(
           Material3SettingsItem(
             icon = painterResource(R.drawable.sparks),
-            title = { Text("Winter & Effects") },
-            description = { Text("Winter theme, snow, 5 particle effects, water fill") },
+            title = { Text("Winter theme") },
+            description = { Text("Winter theme, aurora, snow globe, water fill") },
             onClick = { navController.navigate("settings/winter") }
           )
         )

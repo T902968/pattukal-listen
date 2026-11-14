@@ -1121,7 +1121,7 @@ fun PlayerMenu(
                 Material3MenuItemData(
                   title = { Text(text = if (karaokeOn) "Karaoke: on" else "Karaoke", fontWeight = FontWeight.SemiBold) },
                   description = {
-                    Text(text = "Reduces the vocals and shows lyrics in English letters (best on stereo songs)")
+                    Text(text = "Removes the centre vocal and analyses the song to tell you how well it worked. Shows lyrics in English letters")
                   },
                   icon = { Icon(painter = painterResource(R.drawable.mic), contentDescription = null, modifier = Modifier.size(24.dp)) },
                   onClick = {

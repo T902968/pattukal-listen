@@ -362,6 +362,10 @@ fun NavGraphBuilder.navigationBuilder(
     echo.music.iad1tya.ui.screens.settings.GestureMusicSettings(navController, scrollBehavior)
   }
 
+  composable("wrapped") { echo.music.iad1tya.ui.screens.WrappedScreen(navController) }
+  composable("settings/overlay") {
+    echo.music.iad1tya.ui.screens.settings.OverlaySettings(navController, scrollBehavior)
+  }
   composable("settings/winter") {
     echo.music.iad1tya.ui.screens.settings.WinterSettings(navController, scrollBehavior)
   }

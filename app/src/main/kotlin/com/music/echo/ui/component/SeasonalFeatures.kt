@@ -417,3 +417,19 @@ private fun FoldChip(label: String, selected: Boolean, onClick: () -> Unit) {
   Box(Modifier.clip(RoundedCornerShape(50)).background(if (selected) Violet.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f)).clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 6.dp)) { Text(label, fontSize = 12.sp) }
 }
 
+
+/** Home entry that opens Pattukal Wrapped. */
+@Composable
+fun WrappedEntry(navController: NavController) {
+  Row(
+    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
+      .glassSurface(RoundedCornerShape(22.dp), Color(0xFF0B1E3D))
+      .border(1.dp, Orange.copy(alpha = 0.6f), RoundedCornerShape(22.dp))
+      .clickable { navController.navigate("wrapped") }.padding(14.dp),
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.spacedBy(12.dp),
+  ) {
+    Text("🎁", fontSize = 26.sp)
+    Column { Text("Pattukal Wrapped", fontWeight = FontWeight.Bold); Text("Your year in music", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+  }
+}

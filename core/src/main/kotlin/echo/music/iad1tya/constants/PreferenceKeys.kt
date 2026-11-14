@@ -1012,3 +1012,14 @@ val GestureMusicWriteLangKey = stringPreferencesKey("gesture_music_write_lang")
 val GestureMusicManualSeenKey = booleanPreferencesKey("gesture_music_manual_seen")
 val GestureMusicGlitterKey = booleanPreferencesKey("gesture_music_glitter")
 val LiquidOpenKey = booleanPreferencesKey("liquid_song_open")
+
+/** Overlay effects (separate from the Winter theme). */
+val OverlayEnabledKey = booleanPreferencesKey("overlay_enabled")
+/** snow, fire, leaves, spin, water */
+val OverlayEffectKey = stringPreferencesKey("overlay_effect")
+val OverlayIntensityKey = intPreferencesKey("overlay_intensity")
+
+/** Player customizer. */
+val PlayerThumbScaleKey = floatPreferencesKey("player_thumb_scale")
+val PlayerThumbOffsetYKey = floatPreferencesKey("player_thumb_offset_y")
+val PlayerControlsOffsetYKey = floatPreferencesKey("player_controls_offset_y")

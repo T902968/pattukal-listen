@@ -938,7 +938,15 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
       .map { it[echo.music.iad1tya.constants.KaraokeModeKey] ?: false }
       .distinctUntilChanged()
       .collectLatest(scope) { karaoke ->
-        playerStereoWideners.values.forEach { it.vocalRemoval = karaoke }
+        playerStereoWideners.values.forEach { it.vocalRemoval = karaoke; it.resetAnalysis() }
+        if (karaoke) {
+          val main = android.os.Handler(android.os.Looper.getMainLooper())
+          main.post { android.widget.Toast.makeText(this@MusicService, "Karaoke: analyzing this song…", android.widget.Toast.LENGTH_SHORT).show() }
+          // Listen to a few seconds of the real audio, then tell the user how well the voice could be removed.
+          kotlinx.coroutines.delay(9000)
+          val text = playerStereoWideners.values.firstNotNullOfOrNull { it.analysisSummary() }
+          if (text != null) main.post { android.widget.Toast.makeText(this@MusicService, text, android.widget.Toast.LENGTH_LONG).show() }
+        }
       }
 
     dataStore.data
