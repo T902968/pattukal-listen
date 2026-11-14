@@ -38,7 +38,7 @@ private fun moodNow(): Pair<String, String> =
 
 /** Pattukal Taste AI rows for Home: daily mix, mood, discover. Built from favourites and listening history. */
 @Composable
-fun TasteAiHomeRows(refreshKey: Any?) {
+fun TasteAiHomeRows(refreshKey: Any?, mood: String? = null) {
   val (enabled, _) = rememberPreference(TasteAiEnabledKey, true)
   if (!enabled) return
   val (dailyOn, _) = rememberPreference(TasteAiDailyMixKey, true)
@@ -46,8 +46,10 @@ fun TasteAiHomeRows(refreshKey: Any?) {
   val (discoverOn, _) = rememberPreference(TasteAiDiscoverKey, true)
   val database = LocalDatabase.current
 
+  val cacheKey = "taste|$enabled|$dailyOn|$moodOn|$discoverOn|$refreshKey|$mood"
   val rows by
-    produceState<List<Triple<String, String, List<SongItem>>>>(emptyList(), enabled, dailyOn, moodOn, discoverOn, refreshKey) {
+    produceState<List<Triple<String, String, List<SongItem>>>>(HomeCache.get(cacheKey) ?: emptyList(), enabled, dailyOn, moodOn, discoverOn, refreshKey, mood) {
+      HomeCache.get<List<Triple<String, String, List<SongItem>>>>(cacheKey)?.let { value = it; return@produceState }
       val artists =
         withContext(Dispatchers.IO) {
           val liked = database.likedSongsByCreateDateAsc().first().takeLast(40)
@@ -55,16 +57,16 @@ fun TasteAiHomeRows(refreshKey: Any?) {
           (liked + played).flatMap { it.artists }.map { it.name }.filter { it.isNotBlank() }
         }
       val top = artists.groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.map { it.key }
-      val rnd = Random(LocalDate.now().toEpochDay() + if (refreshKey == true) 1 else 0)
+      val rnd = Random(LocalDate.now().toEpochDay() + ((refreshKey as? Int) ?: 0))
       value =
         coroutineScope {
           buildList {
             if (dailyOn && top.isNotEmpty()) {
               val seeds = top.shuffled(rnd).take(3)
-              add(async { Triple("Daily Mix", "Made from your favourites", seeds.flatMap { tasteSearch("$it songs").take(5) }.distinctBy { it.id }.shuffled(rnd)) })
+              add(async { Triple("Daily Mix", "Made from your favourites", seeds.flatMap { tasteSearch(if (mood.isNullOrBlank()) "$it songs" else "$it $mood").take(5) }.distinctBy { it.id }.shuffled(rnd)) })
             }
-            if (moodOn) {
-              val (label, q) = moodNow()
+            if (moodOn || !mood.isNullOrBlank()) {
+              val (label, q) = if (mood.isNullOrBlank()) moodNow() else mood to "$mood songs"
               add(async { Triple(label, "Picked for this time of day", tasteSearch(q).take(14)) })
             }
             if (discoverOn && top.size > 1) {
@@ -73,6 +75,7 @@ fun TasteAiHomeRows(refreshKey: Any?) {
             }
           }.awaitAll().filter { it.third.isNotEmpty() }
         }
+      if (value.isNotEmpty()) HomeCache.put(cacheKey, value)
     }
 
   Column { rows.forEach { (t, sub, songs) -> SongCardRow(title = t, songs = songs, subtitle = sub) } }

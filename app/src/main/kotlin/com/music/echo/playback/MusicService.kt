@@ -646,6 +646,7 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
           .setContentTitle(getString(R.string.music_player))
           .setContentText("")
           .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(this))
+          .setColor(0xFF2F7BFF.toInt())
           .setContentIntent(pending)
           .setOngoing(true)
           .build()

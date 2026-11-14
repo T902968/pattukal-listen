@@ -37,6 +37,17 @@ jobs:
             cp docs/pattukal-official-music-app-download.html _site/pattukal-official-music-app-download.html
           fi
 
+      - name: Keep the web app preview under /app-test/
+        run: |
+          # Pages replaces the whole site on every deploy, so re-attach the web app from its branch.
+          if git fetch --depth=1 origin feature/pattukal-web 2>/dev/null; then
+            git archive FETCH_HEAD web-app | tar -x -C "$RUNNER_TEMP"
+            mkdir -p _site/app-test
+            cp -r "$RUNNER_TEMP/web-app/." _site/app-test/
+          else
+            echo "web app branch not found; skipping /app-test/"
+          fi
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 

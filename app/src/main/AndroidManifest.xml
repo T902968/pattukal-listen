@@ -212,9 +212,37 @@
             android:name=".MainActivityAlias"
             android:enabled="true"
             android:exported="true"
+            android:icon="@mipmap/icon_blue"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/icon_blue"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".MainActivityClassic"
+            android:enabled="false"
+            android:exported="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".MainActivityGreen"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/icon_green"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/icon_green"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

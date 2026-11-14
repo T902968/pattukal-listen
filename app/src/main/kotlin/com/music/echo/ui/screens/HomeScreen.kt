@@ -816,6 +816,15 @@ fun HomeScreen(
         }
     }
 
+    // Counts finished refreshes. The Home rows and the Magic Cube reload when this changes, instead of
+    // being re-keyed while the pull-to-refresh gesture is still in progress (that made the list jump).
+    var refreshCount by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    var wasRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(isRefreshing) {
+        if (wasRefreshing && !isRefreshing) refreshCount++
+        wasRefreshing = isRefreshing
+    }
+
     LaunchedEffect(scrollToTop?.value) {
         if (scrollToTop?.value == true) {
             lazylistState.animateScrollToItem(0)
@@ -1224,6 +1233,11 @@ fun HomeScreen(
             PattukalLiquidBackground(
                 modifier = Modifier.matchParentSize()
             )
+            if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) {
+                echo.music.iad1tya.ui.component.HalloweenBackdrop(Modifier.matchParentSize())
+                val ambientOn by echo.music.iad1tya.utils.rememberPreference(echo.music.iad1tya.constants.HalloweenAmbientKey, false)
+                echo.music.iad1tya.ui.component.HalloweenAmbientWind(ambientOn)
+            }
 
             BoxWithConstraints(
                 modifier = Modifier.fillMaxSize(),
@@ -1290,13 +1304,6 @@ fun HomeScreen(
                             .asPaddingValues()
                 ) {
 
-                    item(key = "home_music_cube_$isRefreshing") {
-                        echo.music.iad1tya.ui.immersive.HomeMusicCube(
-                            navController,
-                            quickPicks.orEmpty()
-                        )
-                    }
-
                     item {
                         ChipsRow(
                             chips =
@@ -1323,16 +1330,37 @@ fun HomeScreen(
                         )
                     }
 
+                    item(key = "home_music_cube") {
+                        androidx.compose.runtime.key(refreshCount, selectedChip?.title) {
+                            echo.music.iad1tya.ui.immersive.HomeMusicCube(
+                                navController,
+                                quickPicks.orEmpty(),
+                                mood = selectedChip?.title
+                            )
+                        }
+                    }
+
                     item(key = "language_song_rows") {
                         echo.music.iad1tya.ui.component.FirstLaunchMusicLanguagePrompt()
                         echo.music.iad1tya.ui.component.LanguageSongRows(
-                            refreshKey = isRefreshing
+                            refreshKey = refreshCount,
+                            mood = selectedChip?.title
                         )
+                    }
+
+                    item(key = "halloween_extras") {
+                        echo.music.iad1tya.ui.component.HalloweenChoiceDialog()
+                        echo.music.iad1tya.ui.component.MysteryCapsule()
+                        echo.music.iad1tya.ui.component.TimeFoldEntry()
+                        if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) {
+                            echo.music.iad1tya.ui.component.HalloweenCollections(refreshCount)
+                        }
                     }
 
                     item(key = "taste_ai_rows") {
                         echo.music.iad1tya.ui.component.TasteAiHomeRows(
-                            refreshKey = isRefreshing
+                            refreshKey = refreshCount,
+                            mood = selectedChip?.title
                         )
                     }
 

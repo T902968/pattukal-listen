@@ -198,8 +198,6 @@ fun AppearanceSettings(
     rememberPreference(echo.music.iad1tya.constants.HidePlayerSliderKey, defaultValue = false)
   val (showAmbienceButton, onShowAmbienceButtonChange) =
     rememberPreference(echo.music.iad1tya.constants.ShowAmbienceButtonKey, defaultValue = true)
-  val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
-    rememberPreference(HidePlayerThumbnailKey, defaultValue = false)
   val (cropAlbumArt, onCropAlbumArtChange) =
     rememberPreference(CropAlbumArtKey, defaultValue = true)
   val (playerBackground, onPlayerBackgroundChange) =
@@ -559,7 +557,16 @@ fun AppearanceSettings(
           PlayerBackgroundStyle.LIVE_MESH -> stringResource(R.string.live_mesh)
           PlayerBackgroundStyle.LIQUID_GLASS ->
             stringResource(R.string.player_background_liquid_glass)
-          else -> stringResource(R.string.unknown)
+          PlayerBackgroundStyle.APPLE_MUSIC -> stringResource(R.string.apple_music)
+          PlayerBackgroundStyle.NATURE -> "Nature"
+          PlayerBackgroundStyle.LAVA -> "Lava flow"
+          PlayerBackgroundStyle.LIQUID_SOUND -> "Liquid Sound"
+          PlayerBackgroundStyle.BEAT_CITY -> "Beat City"
+          PlayerBackgroundStyle.SNOWLAND -> "Snowland"
+          PlayerBackgroundStyle.TOKYO -> "Tokyo"
+          PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
+          PlayerBackgroundStyle.CLASSIC_CAR -> "Car drift"
+          else -> it.name.lowercase().replace('_', ' ').replaceFirstChar { c -> c.uppercase() }
         }
       }
     )
@@ -1192,31 +1199,6 @@ fun AppearanceSettings(
             },
             onClick = { showPlayerBackgroundDialog = true }
           ),
-          if (playerBackground != PlayerBackgroundStyle.APPLE_MUSIC)
-            Material3SettingsItem(
-              isHighlighted = (highlightKey == stringResource(R.string.hide_player_thumbnail)),
-              icon = painterResource(R.drawable.hide_image),
-              title = { Text(stringResource(R.string.hide_player_thumbnail)) },
-              description = { Text(stringResource(R.string.hide_player_thumbnail_desc)) },
-              trailingContent = {
-                Switch(
-                  checked = hidePlayerThumbnail,
-                  onCheckedChange = onHidePlayerThumbnailChange,
-                  thumbContent = {
-                    Icon(
-                      painter =
-                        painterResource(
-                          id = if (hidePlayerThumbnail) R.drawable.check else R.drawable.close
-                        ),
-                      contentDescription = null,
-                      modifier = Modifier.size(SwitchDefaults.IconSize)
-                    )
-                  }
-                )
-              },
-              onClick = { onHidePlayerThumbnailChange(!hidePlayerThumbnail) }
-            )
-          else null,
           Material3SettingsItem(
             icon = painterResource(R.drawable.music_note),
             title = { Text("Ambience button") },

@@ -41,6 +41,7 @@ import com.music.innertube.models.WatchEndpoint
 import echo.music.iad1tya.LocalPlayerConnection
 import echo.music.iad1tya.constants.SkippedForeverKey
 import echo.music.iad1tya.extensions.toMediaItem
+import echo.music.iad1tya.ui.utils.resize
 import echo.music.iad1tya.models.toMediaMetadata
 import echo.music.iad1tya.playback.queues.YouTubeQueue
 import echo.music.iad1tya.utils.dataStore
@@ -138,7 +139,11 @@ fun SongCardRow(title: String, songs: List<SongItem>, subtitle: String? = null) 
           ) {
             Box(Modifier.size(140.dp).clip(RoundedCornerShape(16.dp))) {
               AsyncImage(
-                model = song.thumbnail,
+                model =
+                  coil3.request.ImageRequest.Builder(context)
+                    .data(song.thumbnail.resize(360, 360))
+                    .size(coil3.size.Size(360, 360))
+                    .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth().height(140.dp),

@@ -281,7 +281,7 @@ fun Thumbnail(
 
   val swipeThumbnailPref by rememberPreference(SwipeThumbnailKey, true)
   val swipeThumbnail = swipeThumbnailPref && !isListenTogetherGuest
-  val hidePlayerThumbnail by rememberPreference(HidePlayerThumbnailKey, false)
+  val hidePlayerThumbnail = false // option removed; album art always shows
   val cropAlbumArt by rememberPreference(CropAlbumArtKey, true)
   val playerBackgroundPref by
     rememberEnumPreference(

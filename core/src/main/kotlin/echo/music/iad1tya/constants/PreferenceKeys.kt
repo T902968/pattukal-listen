@@ -988,3 +988,18 @@ val SkippedForeverKey = stringPreferencesKey("skipped_forever")
 val LowEndModeKey = booleanPreferencesKey("perf_low_end_mode")
 val BatterySaverKey = booleanPreferencesKey("perf_battery_saver")
 val ReduceAnimationsKey = booleanPreferencesKey("perf_reduce_animations")
+
+/** Seasonal Halloween edition (experimental). "" = not chosen yet, "halloween" or "original" once the user picked. */
+val HalloweenChoiceKey = stringPreferencesKey("halloween_choice")
+val HalloweenReducedMotionKey = booleanPreferencesKey("halloween_reduced_motion")
+val HalloweenAmbientKey = booleanPreferencesKey("halloween_ambient")
+val HalloweenPortalKey = booleanPreferencesKey("halloween_portal")
+val GestureDrawKey = booleanPreferencesKey("gesture_draw_enabled")
+
+/** Gesture Music: double-tap-and-hold, then draw. Independent of the Halloween theme. */
+val GestureMusicEnabledKey = booleanPreferencesKey("gesture_music_enabled")
+val GestureMusicWriteKey = booleanPreferencesKey("gesture_music_write")
+val GestureMusicWriteLangKey = stringPreferencesKey("gesture_music_write_lang")
+val GestureMusicManualSeenKey = booleanPreferencesKey("gesture_music_manual_seen")
+val GestureMusicGlitterKey = booleanPreferencesKey("gesture_music_glitter")
+val LiquidOpenKey = booleanPreferencesKey("liquid_song_open")

@@ -100,7 +100,7 @@ fun BottomSheet(
           clip = true
         }
   ) {
-    if (!state.isCollapsed && !state.isDismissed) {
+    if (!state.isRestingClosed) {
       BackHandler(onBack = state::collapseSoft)
     }
 
@@ -152,6 +152,15 @@ class BottomSheetState(
   val isCollapsed by derivedStateOf { value == collapsedBound }
 
   val isExpanded by derivedStateOf { value == animatable.upperBound }
+
+  /**
+   * Closed or collapsed, with a small tolerance. Exact equality can fail by a fraction of a dp after insets
+   * change (for example when opening a Settings page), which left the sheet's back handler on and swallowed Back.
+   */
+  val isRestingClosed by derivedStateOf {
+    kotlin.math.abs((value - collapsedBound).value) < 1f ||
+      kotlin.math.abs((value - animatable.lowerBound!!).value) < 1f
+  }
 
   val progress by derivedStateOf {
     1f - (animatable.upperBound!! - animatable.value) / (animatable.upperBound!! - collapsedBound)
