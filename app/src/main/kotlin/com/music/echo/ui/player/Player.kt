@@ -3118,7 +3118,7 @@ fun BottomSheetPlayer(
             )
           }
 
-          Box(Modifier.graphicsLayer { translationY = customCtrlY * density }) { mediaMetadata?.let { controlsContent(it) } }
+          Column(Modifier.graphicsLayer { translationY = customCtrlY * density }, horizontalAlignment = Alignment.CenterHorizontally) { mediaMetadata?.let { controlsContent(it) } }
 
 
           Spacer(Modifier.height(if (useNewPlayerDesign) 30.dp else 8.dp))
