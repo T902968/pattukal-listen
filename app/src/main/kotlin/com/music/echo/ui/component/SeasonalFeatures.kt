@@ -288,6 +288,7 @@ private fun CapsuleButton(label: String, primary: Boolean, onClick: () -> Unit) 
 // ---------------------------------------------------------------------------------------------
 @Composable
 fun TimeFoldEntry() {
+  val context = LocalContext.current
   val database = LocalDatabase.current
   val connection = LocalPlayerConnection.current
   val halloween = rememberWinterOn()

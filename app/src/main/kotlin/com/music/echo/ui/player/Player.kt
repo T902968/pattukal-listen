@@ -58,6 +58,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -3129,7 +3130,7 @@ fun BottomSheetPlayer(
             androidx.compose.material3.FilledTonalIconButton(
               onClick = { editMode = !editMode },
               modifier = Modifier.align(Alignment.TopStart)
-                .windowInsetsPadding(WindowInsets.statusBars)
+                .windowInsetsPadding(WindowInsets.Companion.statusBars)
                 .padding(start = 10.dp, top = 56.dp).size(38.dp),
             ) {
               Icon(

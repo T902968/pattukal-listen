@@ -993,6 +993,7 @@ fun AppearanceSettings(
               trailingContent = {
                 val fontLabel =
                   when (AppFont.fromValue(selectedFontValue)) {
+                    AppFont.DUNE_RISE -> "Dune Rise"
                     AppFont.IMPACTED -> "Impacted"
                     AppFont.SPOTABE -> "Spotabe"
                     AppFont.PAYBACK -> "Payback"
