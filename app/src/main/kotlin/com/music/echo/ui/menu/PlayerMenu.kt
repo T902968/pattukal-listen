@@ -387,6 +387,7 @@ fun PlayerMenu(
           echo.music.iad1tya.constants.PlayerBackgroundStyle.TOKYO -> "Tokyo"
           echo.music.iad1tya.constants.PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
           echo.music.iad1tya.constants.PlayerBackgroundStyle.CLASSIC_CAR -> "Car drift"
+          echo.music.iad1tya.constants.PlayerBackgroundStyle.GTA_VI -> "GTA VI"
         }
       }
     )

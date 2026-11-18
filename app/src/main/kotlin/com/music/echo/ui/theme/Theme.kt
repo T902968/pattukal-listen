@@ -39,6 +39,7 @@ val NatureThemeColor = Color(0xFF3FAE6A)
 val LavaThemeColor = Color(0xFFFF5A12)
 val LiquidThemeColor = Color(0xFF9FB2FF)
 val CityThemeColor = Color(0xFF19D8FF)
+val GtaThemeColor = Color(0xFFFF4FA3)
 
 private fun ColorScheme.liquidSurfaces(): ColorScheme =
   copy(
@@ -72,6 +73,23 @@ private fun ColorScheme.winterSurfaces(): ColorScheme =
     onSurface = Color(0xFFEAF6FF),
     onSurfaceVariant = Color(0xFFB4CCE8),
     outlineVariant = Color(0xFF2A4470),
+  )
+
+private fun ColorScheme.gtaSurfaces(): ColorScheme =
+  copy(
+    background = Color(0xFF12041F),
+    surface = Color(0xFF12041F),
+    surfaceDim = Color(0xFF0B0214),
+    surfaceBright = Color(0xFF3A1550),
+    surfaceContainerLowest = Color(0xFF0B0214),
+    surfaceContainerLow = Color(0xFF1A0830),
+    surfaceContainer = Color(0xFF220C3C),
+    surfaceContainerHigh = Color(0xFF2D1049),
+    surfaceContainerHighest = Color(0xFF391660),
+    onBackground = Color(0xFFFFE9F5),
+    onSurface = Color(0xFFFFE9F5),
+    onSurfaceVariant = Color(0xFFE3B4D6),
+    outlineVariant = Color(0xFF5A2A78),
   )
 
 private fun ColorScheme.citySurfaces(): ColorScheme =
@@ -151,11 +169,12 @@ fun echomusicTheme(
   content: @Composable () -> Unit,
 ) {
   val context = LocalContext.current
-  val selectedFontValue by rememberPreference(SelectedFontKey, AppFont.IMPACTED.value)
+  val selectedFontValue by rememberPreference(SelectedFontKey, AppFont.DUNE_RISE.value)
   val natureTheme by rememberPreference(echo.music.iad1tya.constants.NatureThemeKey, false)
   val lavaTheme by rememberPreference(echo.music.iad1tya.constants.LavaThemeKey, false)
   val liquidTheme by rememberPreference(echo.music.iad1tya.constants.LiquidThemeKey, false)
   val cityTheme by rememberPreference(echo.music.iad1tya.constants.CityThemeKey, false)
+  val gtaTheme by rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, false)
   val winterOn by rememberPreference(echo.music.iad1tya.constants.WinterEnabledKey, true)
   val winterVariantKey by rememberPreference(echo.music.iad1tya.constants.WinterVariantKey, "frozen")
   val winterTheme = winterOn && darkTheme
@@ -166,6 +185,7 @@ fun echomusicTheme(
     remember(selectedFontValue, customFontPathValue) {
       when (AppFont.fromValue(selectedFontValue)) {
         AppFont.SYSTEM -> FontFamily.Default
+        AppFont.DUNE_RISE -> DuneRiseFont
         AppFont.IMPACTED -> ImpactedFont
         AppFont.SPOTABE -> SpotabeFont
         AppFont.PAYBACK -> PaybackFont
@@ -201,7 +221,7 @@ fun echomusicTheme(
     } else {
 
       rememberDynamicColorScheme(
-        seedColor = if (winterTheme) winterVariant.seed else if (liquidTheme && darkTheme) LiquidThemeColor else if (cityTheme && darkTheme) CityThemeColor else if (lavaTheme && darkTheme) LavaThemeColor else if (natureTheme && darkTheme) NatureThemeColor else themeColor,
+        seedColor = if (winterTheme) winterVariant.seed else if (gtaTheme && darkTheme) GtaThemeColor else if (liquidTheme && darkTheme) LiquidThemeColor else if (cityTheme && darkTheme) CityThemeColor else if (lavaTheme && darkTheme) LavaThemeColor else if (natureTheme && darkTheme) NatureThemeColor else themeColor,
         isDark = darkTheme,
         specVersion = ColorSpec.SpecVersion.SPEC_2025,
         style = PaletteStyle.TonalSpot
@@ -209,9 +229,10 @@ fun echomusicTheme(
     }
 
   val colorScheme =
-    remember(baseColorScheme, pureBlack, darkTheme, natureTheme, lavaTheme, liquidTheme, cityTheme, winterTheme, winterVariantKey) {
+    remember(baseColorScheme, pureBlack, darkTheme, natureTheme, lavaTheme, liquidTheme, cityTheme, gtaTheme, winterTheme, winterVariantKey) {
       when {
         winterTheme -> baseColorScheme.winterSurfaces()
+        darkTheme && gtaTheme -> baseColorScheme.gtaSurfaces()
         darkTheme && liquidTheme -> baseColorScheme.liquidSurfaces()
         darkTheme && cityTheme -> baseColorScheme.citySurfaces()
         darkTheme && lavaTheme -> baseColorScheme.lavaSurfaces()

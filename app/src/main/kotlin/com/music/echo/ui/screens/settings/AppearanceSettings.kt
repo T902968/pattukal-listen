@@ -147,7 +147,7 @@ fun AppearanceSettings(
 ) {
   val scrollState = androidx.compose.foundation.rememberScrollState()
 
-  val (selectedFontValue) = rememberPreference(SelectedFontKey, defaultValue = AppFont.IMPACTED.value)
+  val (selectedFontValue) = rememberPreference(SelectedFontKey, defaultValue = AppFont.DUNE_RISE.value)
   val (dynamicTheme, onDynamicThemeChange) =
     rememberPreference(DynamicThemeKey, defaultValue = false)
   val (enableLegacyIcon, onEnableLegacyIconChange) =
@@ -531,6 +531,7 @@ fun AppearanceSettings(
           PlayerBackgroundStyle.TOKYO -> "Tokyo"
           PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
           PlayerBackgroundStyle.CLASSIC_CAR -> "Car drift"
+          PlayerBackgroundStyle.GTA_VI -> "GTA VI"
           PlayerBackgroundStyle.LIQUID_GLASS ->
             stringResource(R.string.player_background_liquid_glass)
         }
@@ -566,6 +567,7 @@ fun AppearanceSettings(
           PlayerBackgroundStyle.TOKYO -> "Tokyo"
           PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
           PlayerBackgroundStyle.CLASSIC_CAR -> "Car drift"
+          PlayerBackgroundStyle.GTA_VI -> "GTA VI"
           else -> it.name.lowercase().replace('_', ' ').replaceFirstChar { c -> c.uppercase() }
         }
       }
@@ -1086,6 +1088,7 @@ fun AppearanceSettings(
                     PlayerBackgroundStyle.TOKYO -> "Tokyo"
                     PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
                     PlayerBackgroundStyle.CLASSIC_CAR -> "Car drift"
+                    PlayerBackgroundStyle.GTA_VI -> "GTA VI"
                     PlayerBackgroundStyle.LIQUID_GLASS ->
                       stringResource(R.string.player_background_liquid_glass)
                     else -> stringResource(R.string.follow_theme)
@@ -1192,6 +1195,7 @@ fun AppearanceSettings(
                   PlayerBackgroundStyle.TOKYO -> "Tokyo"
                   PlayerBackgroundStyle.FIREWORKS -> "Fireworks"
                   PlayerBackgroundStyle.CLASSIC_CAR -> "Car drift"
+                  PlayerBackgroundStyle.GTA_VI -> "GTA VI"
                   PlayerBackgroundStyle.LIQUID_GLASS ->
                     stringResource(R.string.player_background_liquid_glass)
                 }

@@ -48,7 +48,7 @@ fun OverlaySettings(navController: NavController, scrollBehavior: TopAppBarScrol
   var enabled by rememberPreference(OverlayEnabledKey, true)
   var effect by rememberPreference(OverlayEffectKey, "snow")
   var mode by rememberPreference(SnowModeKey, "gentle")
-  var intensity by rememberPreference(OverlayIntensityKey, 12)
+  var intensity by rememberPreference(OverlayIntensityKey, 6)
   var touch by rememberPreference(EffectTouchKey, true)
   var lowPerf by rememberPreference(WinterLowPerfKey, false)
   Column(

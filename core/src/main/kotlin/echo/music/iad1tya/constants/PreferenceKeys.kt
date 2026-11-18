@@ -458,6 +458,7 @@ enum class PlayerBackgroundStyle {
   TOKYO,
   FIREWORKS,
   CLASSIC_CAR,
+  GTA_VI,
 }
 
 /** Styles shown in the player-background pickers (older styles stay readable but are hidden). */
@@ -474,6 +475,7 @@ val SelectablePlayerBackgroundStyles: List<PlayerBackgroundStyle> =
     PlayerBackgroundStyle.LAVA,
     PlayerBackgroundStyle.LIQUID_SOUND,
     PlayerBackgroundStyle.BEAT_CITY,
+    PlayerBackgroundStyle.GTA_VI,
   )
 
 val TopSize = stringPreferencesKey("topSize")
@@ -852,6 +854,7 @@ val AmbientFullScreenArtKey = booleanPreferencesKey("ambient_full_screen_art")
 val AmbientSpacingKey = floatPreferencesKey("ambient_spacing")
 
 enum class AppFont(val value: String) {
+  DUNE_RISE("dune_rise"),
   IMPACTED("impacted"),
   SPOTABE("spotabe"),
   PAYBACK("payback"),
@@ -865,7 +868,7 @@ enum class AppFont(val value: String) {
   CUSTOM("custom");
 
   companion object {
-    fun fromValue(value: String): AppFont = entries.find { it.value == value } ?: IMPACTED
+    fun fromValue(value: String): AppFont = entries.find { it.value == value } ?: DUNE_RISE
   }
 }
 
@@ -906,6 +909,7 @@ private fun bk(n: String) = androidx.datastore.preferences.core.booleanPreferenc
 
 val LiquidThemeKey = bk("liquid_theme_enabled")
 val CityThemeKey = bk("city_theme_enabled")
+val GtaThemeKey = bk("gta_vi_theme_enabled")
 
 val LiquidStyleKey = ik("liquid_style")          // 0 orb, 1 chrome waves, 2 liquid glass
 val LiquidMaterialKey = ik("liquid_material")    // 0 chrome, 1 liquid glass, 2 holographic, 3 matte

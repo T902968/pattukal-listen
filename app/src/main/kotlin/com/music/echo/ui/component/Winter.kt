@@ -102,7 +102,7 @@ enum class WinterVariant(val key: String, val label: String, val seed: Color, va
 
 @Composable
 fun rememberWinterVariant(): WinterVariant {
-  val (key, _) = rememberPreference(WinterVariantKey, "frozen")
+  val (key, _) = rememberPreference(WinterVariantKey, "midnight")
   return WinterVariant.from(key)
 }
 
@@ -174,7 +174,7 @@ fun WinterEffectsOverlay() {
   val (winterOn, _) = rememberPreference(WinterEnabledKey, true)
   val (overlayOn, _) = rememberPreference(OverlayEnabledKey, true)
   val (kind, _) = rememberPreference(OverlayEffectKey, "snow")
-  val (intensity, _) = rememberPreference(OverlayIntensityKey, 12)
+  val (intensity, _) = rememberPreference(OverlayIntensityKey, 6)
   val (mode, _) = rememberPreference(SnowModeKey, "gentle")
   val (lowPerf, _) = rememberPreference(WinterLowPerfKey, false)
   val (touchOn, _) = rememberPreference(EffectTouchKey, true)
@@ -545,7 +545,7 @@ fun Modifier.waterFloat(seed: Int = 0): Modifier =
 
 @Composable
 fun WaterFillLayer(modifier: Modifier = Modifier) {
-  val (enabled, _) = rememberPreference(WaterFillKey, false)
+  val (enabled, _) = rememberPreference(WaterFillKey, true)
   if (!enabled) { WaterFill.level = 0f; return }
   val v = rememberWinterVariant()
   val (lowPerf, _) = rememberPreference(WinterLowPerfKey, false)

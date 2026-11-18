@@ -1425,6 +1425,7 @@ private fun PlayerQueueButton(
             PlayerBackgroundStyle.TOKYO,
             PlayerBackgroundStyle.FIREWORKS,
             PlayerBackgroundStyle.CLASSIC_CAR,
+            PlayerBackgroundStyle.GTA_VI,
             PlayerBackgroundStyle.LIQUID_GLASS -> Color.White
             PlayerBackgroundStyle.DEFAULT -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
           }

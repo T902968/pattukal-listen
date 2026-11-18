@@ -66,6 +66,11 @@ class StereoWidenerAudioProcessor : AudioProcessor {
     }
   }
 
+  private var sBass = 0.0
+  private var sBass2 = 0.0
+  private var sAir = 0.0
+  private var sAir2 = 0.0
+
   private var channelCount = 0
   private var encoding = C.ENCODING_INVALID
   private var isActive = false
@@ -135,8 +140,16 @@ class StereoWidenerAudioProcessor : AudioProcessor {
             sideEnergy += side * side
             voiceEnergy += voice * voice
             analyzedSamples++
+            // Vocal reverb, doubles and wide backing vocals sit in the side channel: take most of the voice band
+            // out of it too (keeping bass and air), so less of the singer leaks through.
+            sBass += bassA * (side - sBass)
+            sBass2 += bassA * (sBass - sBass2)
+            sAir += airA * (side - sAir)
+            sAir2 += airA * (sAir - sAir2)
+            val sideVoice = sAir2 - sBass2
+            val sideAir = side - sAir2
             mid = bassState2 + air * 0.9
-            side *= 1.5
+            side = sBass2 + sideAir + sideVoice * 0.3
           }
 
           var outLeft = mid + side

@@ -206,6 +206,7 @@ private fun getTextColor(playerBackground: PlayerBackgroundStyle): Color {
     PlayerBackgroundStyle.TOKYO,
     PlayerBackgroundStyle.FIREWORKS,
     PlayerBackgroundStyle.CLASSIC_CAR,
+    PlayerBackgroundStyle.GTA_VI,
     PlayerBackgroundStyle.LIQUID_GLASS -> Color.White
   }
 }

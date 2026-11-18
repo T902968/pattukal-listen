@@ -1350,9 +1350,6 @@ fun HomeScreen(
                         echo.music.iad1tya.ui.component.MysteryCapsule()
                         echo.music.iad1tya.ui.component.TimeFoldEntry()
                         echo.music.iad1tya.ui.component.WrappedEntry(navController)
-                        if (echo.music.iad1tya.ui.component.rememberWinterOn()) {
-                            echo.music.iad1tya.ui.component.SnowGlobe()
-                        }
                     }
 
                     item(key = "taste_ai_rows") {

@@ -13,8 +13,28 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
+import com.music.innertube.YouTube
+import com.music.innertube.models.SongItem
+import com.music.innertube.models.WatchEndpoint
+import echo.music.iad1tya.LocalPlayerConnection
+import echo.music.iad1tya.extensions.toMediaItem
+import echo.music.iad1tya.models.MediaMetadata
+import echo.music.iad1tya.models.toMediaMetadata
+import echo.music.iad1tya.playback.queues.YouTubeQueue
+import echo.music.iad1tya.playback.queues.ListQueue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -50,81 +70,107 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-/** Pattukal Wrapped: your year in music, built only from your real listening history on this device. */
-@OptIn(ExperimentalFoundationApi::class)
+private class WTile(val id: String, val title: String, val artist: String, val thumb: String?, val meta: MediaMetadata)
+
+/**
+ * Pattukal Wrapped: square tiles of your top 11 songs from your real history. New listeners (little history)
+ * get a recommended set instead. Tap tiles to select them, then Play / Play next / Add to queue.
+ */
 @Composable
 fun WrappedScreen(navController: NavController) {
   val database = LocalDatabase.current
   val variant = rememberWinterVariant()
+  val connection = LocalPlayerConnection.current
+  val context = LocalContext.current
   val year = remember { LocalDate.now().year }
   val from = remember { LocalDate.of(year, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli() }
   val to = remember { LocalDateTime.now().plusDays(1).toInstant(ZoneOffset.UTC).toEpochMilli() }
-  val songs by remember { database.mostPlayedSongs(from, 5, 0, to) }.collectAsState(initial = emptyList())
-  val artists by remember { database.mostPlayedArtists(from, 5, 0, to) }.collectAsState(initial = emptyList())
+  val history by remember { database.mostPlayedSongs(from, 11, 0, to) }.collectAsState(initial = null)
   val totalMs by remember { database.getTotalPlayTimeInRange(from, to) }.collectAsState(initial = 0L)
   val minutes = ((totalMs ?: 0L) / 60000L)
-  val pages = 4
-  val pager = rememberPagerState { pages }
+  val isNew = history != null && history!!.size < 3
+
+  val recs by produceState<List<WTile>>(emptyList(), isNew) {
+    if (!isNew) return@produceState
+    value = withContext(Dispatchers.IO) {
+      YouTube.search("top trending songs $year", YouTube.SearchFilter.FILTER_SONG).getOrNull()?.items.orEmpty()
+        .filterIsInstance<SongItem>().take(11)
+        .map { WTile(it.id, it.title, it.artists.joinToString { a -> a.name }, it.thumbnail, it.toMediaMetadata()) }
+    }
+  }
+  val tiles: List<WTile> = if (isNew) recs else history.orEmpty().map { WTile(it.id, it.song.title, it.artists.joinToString { a -> a.name }, it.song.thumbnailUrl, it.toMediaMetadata()) }
+  val selected = remember { mutableStateListOf<String>() }
+  val chosen = tiles.filter { it.id in selected }
 
   Box(Modifier.fillMaxSize().background(Brush.verticalGradient(variant.sky))) {
-    HorizontalPager(pager, Modifier.fillMaxSize()) { page ->
-      Column(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp, 72.dp, 24.dp, 48.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-        when (page) {
-          0 -> {
-            Text("PATTUKAL WRAPPED $year", fontSize = 12.sp, letterSpacing = 2.sp, color = variant.bands[0], fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(18.dp))
-            Text(if (minutes == 0L) "No listening yet" else "$minutes", fontSize = 76.sp, fontWeight = FontWeight.Black, color = Color.White)
-            Text(if (minutes == 0L) "Play some songs and come back" else "minutes of music this year", fontSize = 18.sp, color = Color.White.copy(alpha = 0.8f))
-            if (minutes >= 60) Text("That is about ${minutes / 60} hours", fontSize = 14.sp, color = Color.White.copy(alpha = 0.6f), modifier = Modifier.padding(top = 8.dp))
-            Text("Swipe  →", fontSize = 13.sp, color = Color.White.copy(alpha = 0.5f), modifier = Modifier.padding(top = 40.dp))
-          }
-          1 -> {
-            val s = songs.firstOrNull()
-            Text("YOUR TOP SONG", fontSize = 12.sp, letterSpacing = 2.sp, color = variant.bands[0], fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(18.dp))
-            if (s == null) Text("Nothing yet", color = Color.White, fontSize = 22.sp)
-            else {
-              AsyncImage(model = s.song.thumbnailUrl?.resize(544, 544), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(240.dp).clip(RoundedCornerShape(28.dp)))
-              Spacer(Modifier.height(18.dp))
-              Text(s.song.title, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
-              Text(s.artists.joinToString { it.name }, fontSize = 15.sp, color = Color.White.copy(alpha = 0.7f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-          }
-          2 -> {
-            Text("TOP SONGS", fontSize = 12.sp, letterSpacing = 2.sp, color = variant.bands[0], fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(14.dp))
-            if (songs.isEmpty()) Text("Nothing yet", color = Color.White, fontSize = 22.sp)
-            songs.forEachIndexed { i, s ->
-              Row(Modifier.fillMaxWidth().padding(vertical = 5.dp).glassSurface(RoundedCornerShape(18.dp), Color.White).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("${i + 1}", fontSize = 20.sp, fontWeight = FontWeight.Black, color = variant.bands[0], modifier = Modifier.padding(horizontal = 8.dp))
-                AsyncImage(model = s.song.thumbnailUrl?.resize(180, 180), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(48.dp).clip(RoundedCornerShape(10.dp)))
-                Column(Modifier.padding(start = 12.dp)) {
-                  Text(s.song.title, color = Color.White, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                  Text(s.artists.joinToString { it.name }, color = Color.White.copy(alpha = 0.65f), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).statusBarsPadding().padding(start = 16.dp, end = 16.dp, top = 64.dp, bottom = 120.dp)) {
+      Text(if (isNew) "WELCOME TO PATTUKAL" else "PATTUKAL WRAPPED $year", fontSize = 12.sp, letterSpacing = 3.sp, color = variant.bands[0], fontWeight = FontWeight.Bold)
+      Text(
+        if (isNew) "Songs to start your story" else if (minutes <= 0L) "Your year in music" else "$minutes minutes",
+        fontSize = 38.sp, fontWeight = FontWeight.Black, color = Color.White, lineHeight = 42.sp, modifier = Modifier.padding(top = 6.dp),
+      )
+      Text(
+        if (isNew) "You are new here, so these are picks for you. Listen a little and your own Wrapped will fill in."
+        else "of music this year · your top ${tiles.size} songs",
+        fontSize = 14.sp, color = Color.White.copy(alpha = 0.7f), modifier = Modifier.padding(top = 4.dp, bottom = 18.dp),
+      )
+      if (tiles.isEmpty()) {
+        Text(if (history == null || isNew) "Loading…" else "Nothing yet", color = Color.White.copy(alpha = 0.7f))
+      }
+      val rows = tiles.chunked(3)
+      rows.forEachIndexed { r, row ->
+        Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+          row.forEachIndexed { c, t ->
+            val rank = r * 3 + c + 1
+            val on = t.id in selected
+            Box(
+              Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(18.dp))
+                .border(if (on) 3.dp else 1.dp, if (on) variant.bands[0] else Color.White.copy(alpha = 0.25f), RoundedCornerShape(18.dp))
+                .clickable { if (on) selected.remove(t.id) else selected.add(t.id) },
+            ) {
+              AsyncImage(model = t.thumb?.resize(400, 400), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+              Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = if (on) 0.75f else 0.7f)), startY = 120f)))
+              Text("$rank", fontSize = 18.sp, fontWeight = FontWeight.Black, color = Color.White, modifier = Modifier.align(Alignment.TopStart).padding(8.dp))
+              if (on) Text("✓", fontSize = 18.sp, fontWeight = FontWeight.Black, color = variant.bands[0], modifier = Modifier.align(Alignment.TopEnd).padding(8.dp))
+              Column(Modifier.align(Alignment.BottomStart).padding(8.dp)) {
+                Text(t.title, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(t.artist, color = Color.White.copy(alpha = 0.7f), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
               }
             }
           }
-          else -> {
-            Text("TOP ARTISTS", fontSize = 12.sp, letterSpacing = 2.sp, color = variant.bands[0], fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(14.dp))
-            if (artists.isEmpty()) Text("Nothing yet", color = Color.White, fontSize = 22.sp)
-            artists.forEachIndexed { i, a ->
-              Row(Modifier.fillMaxWidth().padding(vertical = 5.dp).glassSurface(RoundedCornerShape(18.dp), Color.White).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("${i + 1}", fontSize = 20.sp, fontWeight = FontWeight.Black, color = variant.bands[0], modifier = Modifier.padding(horizontal = 8.dp))
-                AsyncImage(model = a.artist.thumbnailUrl?.resize(180, 180), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(48.dp).clip(CircleShape))
-                Text(a.artist.name, color = Color.White, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 12.dp))
-              }
-            }
-          }
+          repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
         }
       }
     }
-    Row(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-      repeat(pages) { i -> Box(Modifier.size(width = if (i == pager.currentPage) 22.dp else 8.dp, height = 4.dp).clip(CircleShape).background(Color.White.copy(alpha = if (i == pager.currentPage) 0.95f else 0.35f))) }
-    }
-    IconButton(onClick = { navController.navigateUp() }, modifier = Modifier.align(Alignment.TopStart).statusBarsPadding().padding(top = 18.dp, start = 4.dp)) {
+    IconButton(onClick = { navController.navigateUp() }, modifier = Modifier.align(Alignment.TopStart).statusBarsPadding().padding(top = 8.dp, start = 4.dp)) {
       Icon(painterResource(R.drawable.arrow_back), contentDescription = null, tint = Color.White)
     }
+    Row(
+      Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(16.dp).fillMaxWidth()
+        .glassSurface(RoundedCornerShape(26.dp), Color(0xFF0B1E3D)).padding(10.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically,
+    ) {
+      val all = tiles.isNotEmpty()
+      val targets = if (chosen.isNotEmpty()) chosen else tiles
+      Text(if (chosen.isEmpty()) "Select songs" else "${chosen.size} selected", color = Color.White, fontSize = 13.sp, modifier = Modifier.weight(1f).padding(start = 8.dp).clickable { if (all) { if (chosen.size == tiles.size) selected.clear() else { selected.clear(); selected.addAll(tiles.map { it.id }) } } })
+      WBtn("Play", true) {
+        if (targets.isNotEmpty()) connection?.playQueue(ListQueue(title = "Wrapped", items = targets.map { it.meta.toMediaItem() }))
+      }
+      WBtn("Next", false) {
+        if (targets.isNotEmpty()) { connection?.playNext(targets.map { it.meta.toMediaItem() }); Toast.makeText(context, "Playing next", Toast.LENGTH_SHORT).show() }
+      }
+      WBtn("+Queue", false) {
+        if (targets.isNotEmpty()) { connection?.addToQueue(targets.map { it.meta.toMediaItem() }); Toast.makeText(context, "Added to queue", Toast.LENGTH_SHORT).show() }
+      }
+    }
   }
+}
+
+@Composable
+private fun WBtn(label: String, primary: Boolean, onClick: () -> Unit) {
+  Text(
+    label, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+    color = if (primary) Color(0xFF0B1E3D) else Color.White,
+    modifier = Modifier.clip(CircleShape).background(if (primary) Color.White else Color.White.copy(alpha = 0.16f)).clickable { onClick() }.padding(horizontal = 14.dp, vertical = 9.dp),
+  )
 }

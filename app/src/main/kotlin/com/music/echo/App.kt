@@ -96,6 +96,7 @@ class App : Application(), SingletonImageLoader.Factory {
     CrashHandler.install(this)
 
     AppContextHolder.initialize(this)
+    runCatching { echo.music.iad1tya.utils.GtaLaunchNotifier.check(this) }
     echo.music.iad1tya.utils.cipher.CipherDeobfuscator.initialize(this)
     echo.music.iad1tya.utils.YTPlayerUtils.initialize()
 

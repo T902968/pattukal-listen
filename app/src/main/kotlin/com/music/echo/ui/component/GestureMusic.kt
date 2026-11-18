@@ -311,11 +311,6 @@ fun GestureMusicOverlay() {
   val t = rememberInfiniteTransition(label = "gm").animateFloat(0f, 1f, infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Restart), label = "gmt")
   Box(Modifier.fillMaxSize()) {
     Canvas(Modifier.fillMaxSize()) { drawTrail(alpha.value, t.value, glitter) }
-    st.message?.let { m ->
-      Box(Modifier.align(Alignment.TopCenter).padding(top = 90.dp).clip(RoundedCornerShape(50)).background(Color.Black.copy(alpha = 0.72f)).padding(horizontal = 18.dp, vertical = 10.dp)) {
-        Text(m, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-      }
-    }
   }
 }
 
@@ -392,6 +387,6 @@ fun GestureMusicFirstRun() {
   var seen by rememberPreference(GestureMusicManualSeenKey, false)
   val (choice, _) = rememberPreference(WinterEnabledKey, true)
   var shown by remember { mutableStateOf(false) }
-  if (!enabled || seen || shown) return
-  GestureMusicManual(onDismiss = { shown = true; seen = true })
+  // The first-run manual popup was removed: gestures just work, no popup or status bubble.
+  return
 }

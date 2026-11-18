@@ -99,13 +99,13 @@ private fun Swatches(selected: Int, onSelect: (Int) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImmersiveSettingsScreen(navController: NavController) {
-  val (liquidStyle, setLiquidStyle) = rememberPreference(LiquidStyleKey, 0)
-  val (material, setMaterial) = rememberPreference(LiquidMaterialKey, 0)
+  val (liquidStyle, setLiquidStyle) = rememberPreference(LiquidStyleKey, 1)
+  val (material, setMaterial) = rememberPreference(LiquidMaterialKey, 1)
   val (colorMode, setColorMode) = rememberPreference(LiquidColorModeKey, 0)
   val (custom, setCustom) = rememberPreference(LiquidCustomColorKey, LiquidOptions.customSwatches[0])
   val (intensity, setIntensity) = rememberPreference(LiquidIntensityKey, 1)
-  val (bg, setBg) = rememberPreference(LiquidBackgroundKey, 0)
-  val (quality, setQuality) = rememberPreference(LiquidQualityKey, 1)
+  val (bg, setBg) = rememberPreference(LiquidBackgroundKey, 2)
+  val (quality, setQuality) = rememberPreference(LiquidQualityKey, 2)
   val (layout, setLayout) = rememberPreference(LiquidLayoutKey, 0)
   val (battery, setBattery) = rememberPreference(ImmersiveBatterySaverKey, false)
   val (reduced, setReduced) = rememberPreference(ImmersiveReducedMotionKey, false)
@@ -123,6 +123,11 @@ fun ImmersiveSettingsScreen(navController: NavController) {
   val (cubeReduced, setCubeReduced) = rememberPreference(MusicCubeReducedMotionKey, false)
   val (cubeGrid, setCubeGrid) = rememberPreference(MusicCubeGridKey, false)
   val (pitch, setPitch) = rememberPreference(MiniPlayerPitchKey, true)
+  val (_, setWinterOff) = rememberPreference(WinterEnabledKey, true)
+  val (_, setNature) = rememberPreference(NatureThemeKey, false)
+  val (_, setLava) = rememberPreference(LavaThemeKey, false)
+  val (_, setLiquidT) = rememberPreference(LiquidThemeKey, false)
+  val (_, setCityT) = rememberPreference(CityThemeKey, false)
   val (liquidOpen, setLiquidOpen) = rememberPreference(LiquidOpenKey, true)
 
   var playerBg by rememberEnumPreference(PlayerBackgroundStyleKey, PlayerBackgroundStyle.LIQUID_GLASS)
@@ -164,7 +169,15 @@ fun ImmersiveSettingsScreen(navController: NavController) {
       SwitchRow(
         "Use as player background", "Show Liquid Sound behind the player",
         playerBg == PlayerBackgroundStyle.LIQUID_SOUND,
-      ) { playerBg = if (it) PlayerBackgroundStyle.LIQUID_SOUND else PlayerBackgroundStyle.LIQUID_GLASS }
+      ) { on ->
+        if (on) {
+          setWinterOff(false)
+          setNature(false); setLava(false); setLiquidT(false); setCityT(false)
+          setLiquidStyle(1); setMaterial(1); setColorMode(0); setIntensity(1)
+          setBg(2); setQuality(2); setLayout(0)
+          playerBg = PlayerBackgroundStyle.LIQUID_SOUND
+        } else playerBg = PlayerBackgroundStyle.LIQUID_GLASS
+      }
       OptionRow("Style", LiquidOptions.styles, liquidStyle, setLiquidStyle)
       OptionRow("Material", LiquidOptions.materials, material, setMaterial)
       OptionRow("Colors", LiquidOptions.colorModes, colorMode, setColorMode)

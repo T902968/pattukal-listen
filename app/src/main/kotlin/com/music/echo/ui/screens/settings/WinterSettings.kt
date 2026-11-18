@@ -59,7 +59,7 @@ private fun boolItem(title: String, desc: String, key: Preferences.Key<Boolean>,
 @Composable
 fun WinterSettings(navController: NavController, scrollBehavior: TopAppBarScrollBehavior) {
   val scroll = rememberScrollState()
-  var variant by rememberPreference(WinterVariantKey, "frozen")
+  var variant by rememberPreference(WinterVariantKey, "midnight")
   val (eggs, _) = rememberPreference(EasterEggsFoundKey, 0)
   Column(
     Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal))
@@ -76,7 +76,7 @@ fun WinterSettings(navController: NavController, scrollBehavior: TopAppBarScroll
           boolItem("Winter mode", "Icy navy theme, aurora Home and winter effects. Turn off to return to your normal theme", WinterEnabledKey, true),
           boolItem("Frost edges", "Frosted glow around the screen edges", FrostEdgesKey, false),
           boolItem("Touch reacts", "Flakes and particles move away from your finger", EffectTouchKey, true),
-          boolItem("Water fill", "Pull the cord at the top of Home to fill the screen with water. Albums float on it", WaterFillKey, false),
+          boolItem("Water fill", "Pull the cord at the top of Home to fill the screen with water. Albums float on it", WaterFillKey, true),
           boolItem("Low-performance mode", "Fewer particles, 30 fps and a still aurora. Effects also pause when the app is in the background", WinterLowPerfKey, false),
         ),
     )

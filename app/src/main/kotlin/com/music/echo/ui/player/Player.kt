@@ -42,6 +42,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -346,6 +348,7 @@ fun BottomSheetPlayer(
         PlayerBackgroundStyle.TOKYO,
         PlayerBackgroundStyle.FIREWORKS,
         PlayerBackgroundStyle.CLASSIC_CAR,
+        PlayerBackgroundStyle.GTA_VI,
         PlayerBackgroundStyle.LIQUID_GLASS -> true
         PlayerBackgroundStyle.DEFAULT -> useDarkTheme
       }
@@ -795,6 +798,7 @@ fun BottomSheetPlayer(
         playerBackground == PlayerBackgroundStyle.TOKYO ||
         playerBackground == PlayerBackgroundStyle.FIREWORKS ||
         playerBackground == PlayerBackgroundStyle.CLASSIC_CAR ||
+        playerBackground == PlayerBackgroundStyle.GTA_VI ||
         playerBackground == PlayerBackgroundStyle.LIQUID_GLASS -> {
         when (playerButtonsStyle) {
           PlayerButtonsStyle.DEFAULT -> Pair(Color.White, Color.Black)
@@ -1067,6 +1071,7 @@ fun BottomSheetPlayer(
         playerBackground == PlayerBackgroundStyle.TOKYO ||
         playerBackground == PlayerBackgroundStyle.FIREWORKS ||
         playerBackground == PlayerBackgroundStyle.CLASSIC_CAR ||
+        playerBackground == PlayerBackgroundStyle.GTA_VI ||
         playerBackground == PlayerBackgroundStyle.LIQUID_GLASS -> Color.Black
       else -> if (useBlackBackground) Color.Black else MaterialTheme.colorScheme.surfaceContainer
     }
@@ -1679,6 +1684,11 @@ fun BottomSheetPlayer(
             echo.music.iad1tya.ui.component.ClassicCarBackground(
               modifier = Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() },
               running = !state.isCollapsed,
+            )
+          }
+          PlayerBackgroundStyle.GTA_VI -> {
+            echo.music.iad1tya.ui.component.GtaViBackground(
+              modifier = Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() },
             )
           }
           PlayerBackgroundStyle.DEFAULT -> {}
@@ -3064,9 +3074,10 @@ fun BottomSheetPlayer(
               .animateContentSize(),
         ) {
           val customThumbScale by rememberPreference(echo.music.iad1tya.constants.PlayerThumbScaleKey, 1f)
-          val customThumbY by rememberPreference(echo.music.iad1tya.constants.PlayerThumbOffsetYKey, 0f)
-          val customCtrlY by rememberPreference(echo.music.iad1tya.constants.PlayerControlsOffsetYKey, 0f)
+          var customThumbY by rememberPreference(echo.music.iad1tya.constants.PlayerThumbOffsetYKey, 0f)
+          var customCtrlY by rememberPreference(echo.music.iad1tya.constants.PlayerControlsOffsetYKey, 0f)
           var showCustomizer by remember { mutableStateOf(false) }
+          var editMode by remember { mutableStateOf(false) }
           Box(
             contentAlignment = Alignment.TopCenter,
             modifier = Modifier.weight(1f),
@@ -3095,15 +3106,35 @@ fun BottomSheetPlayer(
                 )
               }
             }
-            // Small pencil, top left: opens the player customizer.
-            androidx.compose.material3.IconButton(
-              onClick = { showCustomizer = true },
-              modifier = Modifier.align(Alignment.TopStart).padding(start = 6.dp, top = 4.dp).size(34.dp),
+            // Edit mode (like Android home-screen editing): tap or drag the thumbnail to restyle / move it.
+            if (editMode) {
+              Box(
+                Modifier.matchParentSize()
+                  .graphicsLayer { translationY = customThumbY * density }
+                  .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp))
+                  .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), RoundedCornerShape(24.dp))
+                  .pointerInput(Unit) { detectTapGestures { showCustomizer = true } }
+                  .pointerInput(Unit) {
+                    detectDragGestures { change, drag ->
+                      change.consume()
+                      customThumbY = (customThumbY + drag.y / density).coerceIn(-120f, 160f)
+                    }
+                  },
+                contentAlignment = Alignment.Center,
+              ) {
+                Text("Tap to customize · drag to move", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+              }
+            }
+            // Pencil: toggles edit mode. Sits below the status bar so it is always reachable.
+            androidx.compose.material3.FilledTonalIconButton(
+              onClick = { editMode = !editMode },
+              modifier = Modifier.align(Alignment.TopStart)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(start = 10.dp, top = 56.dp).size(38.dp),
             ) {
               Icon(
-                painter = painterResource(R.drawable.edit),
+                painter = painterResource(if (editMode) R.drawable.close else R.drawable.edit),
                 contentDescription = "Customize player",
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.size(18.dp),
               )
             }
@@ -3118,7 +3149,27 @@ fun BottomSheetPlayer(
             )
           }
 
-          Column(Modifier.graphicsLayer { translationY = customCtrlY * density }, horizontalAlignment = Alignment.CenterHorizontally) { mediaMetadata?.let { controlsContent(it) } }
+          Box {
+            Column(Modifier.graphicsLayer { translationY = customCtrlY * density }, horizontalAlignment = Alignment.CenterHorizontally) { mediaMetadata?.let { controlsContent(it) } }
+            if (editMode) {
+              Box(
+                Modifier.matchParentSize()
+                  .graphicsLayer { translationY = customCtrlY * density }
+                  .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(20.dp))
+                  .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.08f), RoundedCornerShape(20.dp))
+                  .pointerInput(Unit) { detectTapGestures { showCustomizer = true } }
+                  .pointerInput(Unit) {
+                    detectDragGestures { change, drag ->
+                      change.consume()
+                      customCtrlY = (customCtrlY + drag.y / density).coerceIn(-160f, 120f)
+                    }
+                  },
+                contentAlignment = Alignment.Center,
+              ) {
+                Text("Controls · tap to customize · drag to move", color = MaterialTheme.colorScheme.tertiary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+              }
+            }
+          }
 
 
           Spacer(Modifier.height(if (useNewPlayerDesign) 30.dp else 8.dp))

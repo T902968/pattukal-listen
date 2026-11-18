@@ -60,7 +60,7 @@ fun FontSelectionScreen(
   navController: NavController,
   scrollBehavior: TopAppBarScrollBehavior,
 ) {
-  val selectedFontState = rememberPreference(SelectedFontKey, defaultValue = AppFont.IMPACTED.value)
+  val selectedFontState = rememberPreference(SelectedFontKey, defaultValue = AppFont.DUNE_RISE.value)
   val selectedFont = selectedFontState.value
   val onSelectedFontChange: (String) -> Unit = { selectedFontState.value = it }
   val context = LocalContext.current
@@ -96,6 +96,7 @@ fun FontSelectionScreen(
     remember(selectedFont, customFontPath) {
       when (AppFont.fromValue(selectedFont)) {
         AppFont.SYSTEM -> FontFamily.Default
+        AppFont.DUNE_RISE -> echo.music.iad1tya.ui.theme.DuneRiseFont
         AppFont.IMPACTED -> echo.music.iad1tya.ui.theme.ImpactedFont
         AppFont.SPOTABE -> echo.music.iad1tya.ui.theme.SpotabeFont
         AppFont.PAYBACK -> echo.music.iad1tya.ui.theme.PaybackFont
@@ -184,13 +185,25 @@ fun FontSelectionScreen(
           listOf(
             Material3SettingsItem(
               customIcon = {
+                AnimatedRadioButton(selected = selectedFont == AppFont.DUNE_RISE.value, onClick = null)
+              },
+              title = {
+                Text(text = "Dune Rise", fontFamily = echo.music.iad1tya.ui.theme.DuneRiseFont)
+              },
+              description = {
+                Text(text = "The new Pattukal default font", fontFamily = echo.music.iad1tya.ui.theme.DuneRiseFont)
+              },
+              onClick = { onSelectedFontChange(AppFont.DUNE_RISE.value) }
+            ),
+            Material3SettingsItem(
+              customIcon = {
                 AnimatedRadioButton(selected = selectedFont == AppFont.IMPACTED.value, onClick = null)
               },
               title = {
                 Text(text = "Impacted", fontFamily = echo.music.iad1tya.ui.theme.ImpactedFont)
               },
               description = {
-                Text(text = "The Pattukal default font", fontFamily = echo.music.iad1tya.ui.theme.ImpactedFont)
+                Text(text = "Previous default font", fontFamily = echo.music.iad1tya.ui.theme.ImpactedFont)
               },
               onClick = { onSelectedFontChange(AppFont.IMPACTED.value) }
             ),

@@ -390,6 +390,8 @@
             </intent-filter>
         </activity-alias>
 
+        <receiver android:name=".utils.GtaLaunchReceiver" android:exported="false" />
+
         <receiver
             android:name=".utils.IconRepairReceiver"
             android:exported="true">

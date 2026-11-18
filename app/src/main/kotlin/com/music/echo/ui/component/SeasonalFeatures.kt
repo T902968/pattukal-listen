@@ -86,6 +86,7 @@ import echo.music.iad1tya.constants.MusicLanguagesKey
 import echo.music.iad1tya.constants.WinterEnabledKey
 import echo.music.iad1tya.constants.WinterLowPerfKey
 import echo.music.iad1tya.models.toMediaMetadata
+import echo.music.iad1tya.extensions.toMediaItem
 import echo.music.iad1tya.playback.queues.YouTubeQueue
 import echo.music.iad1tya.ui.utils.resize
 import echo.music.iad1tya.utils.dataStore
@@ -193,6 +194,7 @@ fun MysteryCapsule(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
           CapsuleButton("Play", true) { connection?.playQueue(YouTubeQueue(WatchEndpoint(videoId = s.id), s.toMediaMetadata())) }
+          CapsuleButton("Play next", false) { connection?.playNext(listOf(s.toMediaMetadata().toMediaItem())); Toast.makeText(context, "Playing next", Toast.LENGTH_SHORT).show() }
           CapsuleButton("Save", false) {
             scope.launch(Dispatchers.IO) {
               val existing = database.song(s.id).first()
@@ -375,7 +377,7 @@ fun TimeFoldEntry() {
                   items(groups[i].second, key = { "tf_${lang}_${groups[i].first}_${it.id}" }) { s ->
                     val itemKey = "tf_${lang}_${groups[i].first}_${s.id}"
                     Column(
-                      Modifier.size(width = 130.dp, height = 176.dp)
+                      Modifier.size(width = 130.dp, height = 204.dp)
                         .graphicsLayer {
                           // 3D cover-flow: cards fold away from the centre like layers of time
                           val info = ls.layoutInfo
@@ -397,6 +399,11 @@ fun TimeFoldEntry() {
                       AsyncImage(model = s.thumb?.resize(360, 360), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(130.dp).clip(RoundedCornerShape(18.dp)).border(1.dp, Brush.linearGradient(listOf(Orange.copy(alpha = 0.7f), Violet.copy(alpha = 0.7f))), RoundedCornerShape(18.dp)))
                       Text(s.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
                       Text(s.artist, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                      Text("＋ Play next", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable {
+                          connection?.playNext(listOf((s.meta ?: s.item!!.toMediaMetadata()).toMediaItem()))
+                          Toast.makeText(context, "Playing next", Toast.LENGTH_SHORT).show()
+                        }.padding(vertical = 4.dp))
                     }
                   }
                 }
