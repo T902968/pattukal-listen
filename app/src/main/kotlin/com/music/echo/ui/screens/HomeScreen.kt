@@ -1230,7 +1230,10 @@ fun HomeScreen(
          */
         Box(modifier = Modifier.fillMaxSize()) {
 
-            PattukalLiquidBackground(
+            val gtaHome by echo.music.iad1tya.utils.rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, false)
+            if (gtaHome) {
+                echo.music.iad1tya.ui.component.GtaViBackground(Modifier.matchParentSize(), scrim = 0.42f)
+            } else PattukalLiquidBackground(
                 modifier = Modifier.matchParentSize()
             )
             if (echo.music.iad1tya.ui.component.rememberWinterOn()) {
@@ -1326,6 +1329,11 @@ fun HomeScreen(
                                 viewModel.toggleChip(it)
                             }
                         )
+                    }
+
+                    item(key = "dev_remote_home") {
+                        val remoteCfg by echo.music.iad1tya.devmode.HomeConfigRepository.config.collectAsState()
+                        remoteCfg?.let { echo.music.iad1tya.devmode.RemoteHomeSections(it, navController, Modifier.padding(bottom = 8.dp)) }
                     }
 
                     item(key = "home_music_cube") {

@@ -1282,10 +1282,12 @@ class MainActivity : ComponentActivity() {
                   TopAppBar(
                     title = {
                       if (currentTitle.isNotEmpty()) {
+                        val (gtaTitle, _) = echo.music.iad1tya.utils.rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, false)
                         Text(
                           text = currentTitle,
                           style =
                             MaterialTheme.typography.titleLarge.copy(
+                              brush = if (gtaTitle && currentTitle == "PATTUKAL") androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(androidx.compose.ui.graphics.Color(0xFFFF4FA3), androidx.compose.ui.graphics.Color(0xFFFF9A3C), androidx.compose.ui.graphics.Color(0xFFFFD86B))) else null,
                               fontWeight = FontWeight.Bold,
                               fontSize = if (currentTitle == "PATTUKAL") 28.sp else 24.sp,
                               letterSpacing = if (currentTitle == "PATTUKAL") 3.sp else 0.sp

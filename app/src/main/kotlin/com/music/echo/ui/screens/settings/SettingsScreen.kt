@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -103,12 +104,20 @@ fun SettingsScreen(
     Spacer(
       Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Top))
     )
+    var devTaps by androidx.compose.runtime.remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    var devDialog by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val (devUnlocked, setDevUnlocked) = echo.music.iad1tya.utils.rememberPreference(echo.music.iad1tya.constants.DevModeUnlockedKey, false)
     Text(
       text = stringResource(R.string.settings),
       style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.SemiBold),
       color = MaterialTheme.colorScheme.onBackground,
-      modifier = Modifier.padding(start = 8.dp, top = 24.dp, bottom = 16.dp)
+      modifier = Modifier
+        .padding(start = 8.dp, top = 24.dp, bottom = 16.dp)
+        .androidx_clickableNoRipple { devTaps++; if (devTaps >= 7) { devTaps = 0; if (devUnlocked) navController.navigate("settings/developer") else devDialog = true } }
     )
+    if (devDialog) {
+      echo.music.iad1tya.devmode.DeveloperUnlockDialog(onDismiss = { devDialog = false }, onUnlocked = { setDevUnlocked(true); devDialog = false; navController.navigate("settings/developer") })
+    }
 
     TextField(
       value = searchQuery,
@@ -331,6 +340,16 @@ fun SettingsScreen(
             title = { Text("Winter theme") },
             description = { Text("Winter theme, aurora, snow globe, water fill") },
             onClick = { navController.navigate("settings/winter") }
+          )
+        )
+      }
+      if (devUnlocked && "developer mode home studio publish".contains(searchLower)) {
+        add(
+          Material3SettingsItem(
+            icon = painterResource(R.drawable.sparks),
+            title = { Text("Developer mode") },
+            description = { Text("Manage Songs home content") },
+            onClick = { navController.navigate("settings/developer") }
           )
         )
       }
@@ -564,3 +583,8 @@ fun SettingsScreen(
     }
   )
 }
+
+
+@androidx.compose.runtime.Composable
+private fun Modifier.androidx_clickableNoRipple(onClick: () -> Unit): Modifier =
+  this.then(Modifier.clickable(indication = null, interactionSource = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, onClick = onClick))

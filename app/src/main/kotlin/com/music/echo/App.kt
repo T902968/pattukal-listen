@@ -97,6 +97,10 @@ class App : Application(), SingletonImageLoader.Factory {
 
     AppContextHolder.initialize(this)
     runCatching { echo.music.iad1tya.utils.GtaLaunchNotifier.check(this) }
+    runCatching {
+      echo.music.iad1tya.devmode.HomeConfigRepository.init(this)
+      kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch { echo.music.iad1tya.devmode.HomeConfigRepository.refresh(this@App) }
+    }
     echo.music.iad1tya.utils.cipher.CipherDeobfuscator.initialize(this)
     echo.music.iad1tya.utils.YTPlayerUtils.initialize()
 

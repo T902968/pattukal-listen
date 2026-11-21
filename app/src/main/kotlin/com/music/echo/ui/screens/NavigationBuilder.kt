@@ -366,6 +366,7 @@ fun NavGraphBuilder.navigationBuilder(
   composable("settings/overlay") {
     echo.music.iad1tya.ui.screens.settings.OverlaySettings(navController, scrollBehavior)
   }
+  composable("settings/developer") { echo.music.iad1tya.devmode.DeveloperDashboardScreen(navController) }
   composable("settings/winter") {
     echo.music.iad1tya.ui.screens.settings.WinterSettings(navController, scrollBehavior)
   }

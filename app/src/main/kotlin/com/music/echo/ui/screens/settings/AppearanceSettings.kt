@@ -1026,6 +1026,15 @@ fun AppearanceSettings(
 
           add(
             Material3SettingsItem(
+              icon = painterResource(R.drawable.sparks),
+              title = { Text("Winter mode") },
+              description = { Text("Winter theme, aurora, snow and water fill") },
+              onClick = { navController.navigate("settings/winter") }
+            )
+          )
+
+          add(
+            Material3SettingsItem(
               icon = painterResource(R.drawable.water_drop),
               title = { Text(stringResource(R.string.liquid_glass)) },
               description = { Text(stringResource(R.string.liquid_glass_settings)) },
