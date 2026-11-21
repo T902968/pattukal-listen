@@ -1027,3 +1027,15 @@ val OverlayIntensityKey = intPreferencesKey("overlay_intensity")
 val PlayerThumbScaleKey = floatPreferencesKey("player_thumb_scale")
 val PlayerThumbOffsetYKey = floatPreferencesKey("player_thumb_offset_y")
 val PlayerControlsOffsetYKey = floatPreferencesKey("player_controls_offset_y")
+
+/** Player Garage (Now Playing customization studio). */
+val GarageGlowKey = booleanPreferencesKey("garage_glow")
+val GarageGlowPulseKey = booleanPreferencesKey("garage_glow_pulse")
+val GarageGlowStrengthKey = floatPreferencesKey("garage_glow_strength")
+val GarageAccentKey = intPreferencesKey("garage_accent") // 0 = follow theme, otherwise ARGB
+val GarageArtShadowKey = floatPreferencesKey("garage_art_shadow")
+val GarageArtAlphaKey = floatPreferencesKey("garage_art_alpha")
+val GarageControlsScaleKey = floatPreferencesKey("garage_controls_scale")
+val GarageFontScaleKey = floatPreferencesKey("garage_font_scale")
+val GarageBuildsKey = stringPreferencesKey("garage_builds")
+val GarageActiveBuildKey = stringPreferencesKey("garage_active_build")

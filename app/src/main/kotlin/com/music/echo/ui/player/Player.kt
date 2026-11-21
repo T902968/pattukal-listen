@@ -72,6 +72,8 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -3015,6 +3017,16 @@ fun BottomSheetPlayer(
             val currentSliderPosition by rememberUpdatedState(sliderPosition)
             val sliderPositionProvider = remember { { currentSliderPosition } }
             val isExpandedProvider = remember(state) { { state.isExpanded } }
+            if (gGlow) {
+              val glowAnim = androidx.compose.animation.core.rememberInfiniteTransition(label = "garage-glow")
+              val breathe by glowAnim.animateFloat(0.7f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(2400), androidx.compose.animation.core.RepeatMode.Reverse), label = "b")
+              val gc = if (gAccent == 0) Color(0xFF22D3EE) else Color(gAccent)
+              Box(
+                Modifier.align(Alignment.Center).fillMaxWidth(0.95f).aspectRatio(1f)
+                  .graphicsLayer { translationY = customThumbY * density; alpha = (gGlowStrength * (if (gPulse) breathe else 1f)).coerceIn(0f, 1f) }
+                  .background(Brush.radialGradient(listOf(gc.copy(alpha = 0.7f), Color.Transparent)), CircleShape),
+              )
+            }
             AnimatedContent(
               targetState = showInlineLyrics,
               label = "Lyrics",
@@ -3079,6 +3091,14 @@ fun BottomSheetPlayer(
           var customCtrlY by rememberPreference(echo.music.iad1tya.constants.PlayerControlsOffsetYKey, 0f)
           var showCustomizer by remember { mutableStateOf(false) }
           var editMode by remember { mutableStateOf(false) }
+          val gArtAlpha by rememberPreference(echo.music.iad1tya.constants.GarageArtAlphaKey, 1f)
+          val gShadow by rememberPreference(echo.music.iad1tya.constants.GarageArtShadowKey, 0f)
+          val gGlow by rememberPreference(echo.music.iad1tya.constants.GarageGlowKey, false)
+          val gPulse by rememberPreference(echo.music.iad1tya.constants.GarageGlowPulseKey, true)
+          val gGlowStrength by rememberPreference(echo.music.iad1tya.constants.GarageGlowStrengthKey, 0.6f)
+          val gAccent by rememberPreference(echo.music.iad1tya.constants.GarageAccentKey, 0)
+          val gCtrlScale by rememberPreference(echo.music.iad1tya.constants.GarageControlsScaleKey, 1f)
+          val gFontScale by rememberPreference(echo.music.iad1tya.constants.GarageFontScaleKey, 1f)
           Box(
             contentAlignment = Alignment.TopCenter,
             modifier = Modifier.weight(1f),
@@ -3101,7 +3121,7 @@ fun BottomSheetPlayer(
                 Thumbnail(
                   sliderPositionProvider = sliderPositionProvider,
                   modifier = Modifier.nestedScroll(state.preUpPostDownNestedScrollConnection)
-                    .graphicsLayer { scaleX = customThumbScale; scaleY = customThumbScale; translationY = customThumbY * density },
+                    .graphicsLayer { scaleX = customThumbScale; scaleY = customThumbScale; translationY = customThumbY * density; alpha = gArtAlpha; shadowElevation = gShadow * density; clip = false },
                   isPlayerExpanded = isExpandedProvider,
                   isListenTogetherGuest = isListenTogetherGuest
                 )
@@ -3151,7 +3171,15 @@ fun BottomSheetPlayer(
           }
 
           Box {
-            Column(Modifier.graphicsLayer { translationY = customCtrlY * density }, horizontalAlignment = Alignment.CenterHorizontally) { mediaMetadata?.let { controlsContent(it) } }
+            val garageScheme = if (gAccent == 0) MaterialTheme.colorScheme else MaterialTheme.colorScheme.copy(primary = Color(gAccent))
+            val baseDensity = androidx.compose.ui.platform.LocalDensity.current
+            androidx.compose.runtime.CompositionLocalProvider(
+              androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(baseDensity.density, baseDensity.fontScale * gFontScale),
+            ) {
+              MaterialTheme(colorScheme = garageScheme, typography = MaterialTheme.typography, shapes = MaterialTheme.shapes) {
+                Column(Modifier.graphicsLayer { translationY = customCtrlY * density; scaleX = gCtrlScale; scaleY = gCtrlScale }, horizontalAlignment = Alignment.CenterHorizontally) { mediaMetadata?.let { controlsContent(it) } }
+              }
+            }
             if (editMode) {
               Box(
                 Modifier.matchParentSize()
