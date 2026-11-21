@@ -3017,16 +3017,6 @@ fun BottomSheetPlayer(
             val currentSliderPosition by rememberUpdatedState(sliderPosition)
             val sliderPositionProvider = remember { { currentSliderPosition } }
             val isExpandedProvider = remember(state) { { state.isExpanded } }
-            if (gGlow) {
-              val glowAnim = androidx.compose.animation.core.rememberInfiniteTransition(label = "garage-glow")
-              val breathe by glowAnim.animateFloat(0.7f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(2400), androidx.compose.animation.core.RepeatMode.Reverse), label = "b")
-              val gc = if (gAccent == 0) Color(0xFF22D3EE) else Color(gAccent)
-              Box(
-                Modifier.align(Alignment.Center).fillMaxWidth(0.95f).aspectRatio(1f)
-                  .graphicsLayer { translationY = customThumbY * density; alpha = (gGlowStrength * (if (gPulse) breathe else 1f)).coerceIn(0f, 1f) }
-                  .background(Brush.radialGradient(listOf(gc.copy(alpha = 0.7f), Color.Transparent)), CircleShape),
-              )
-            }
             AnimatedContent(
               targetState = showInlineLyrics,
               label = "Lyrics",
@@ -3106,6 +3096,16 @@ fun BottomSheetPlayer(
             val currentSliderPosition by rememberUpdatedState(sliderPosition)
             val sliderPositionProvider = remember { { currentSliderPosition } }
             val isExpandedProvider = remember(state) { { state.isExpanded } }
+            if (gGlow) {
+              val glowAnim = androidx.compose.animation.core.rememberInfiniteTransition(label = "garage-glow")
+              val breathe by glowAnim.animateFloat(0.7f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(2400), androidx.compose.animation.core.RepeatMode.Reverse), label = "b")
+              val gc = if (gAccent == 0) Color(0xFF22D3EE) else Color(gAccent)
+              Box(
+                Modifier.align(Alignment.Center).fillMaxWidth(0.95f).aspectRatio(1f)
+                  .graphicsLayer { translationY = customThumbY * density; alpha = (gGlowStrength * (if (gPulse) breathe else 1f)).coerceIn(0f, 1f) }
+                  .background(Brush.radialGradient(listOf(gc.copy(alpha = 0.7f), Color.Transparent)), CircleShape),
+              )
+            }
             AnimatedContent(
               targetState = showInlineLyrics,
               label = "Lyrics",
