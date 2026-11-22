@@ -458,6 +458,7 @@ enum class PlayerBackgroundStyle {
   TOKYO,
   FIREWORKS,
   CLASSIC_CAR,
+  GTA_VI,
 }
 
 /** Styles shown in the player-background pickers (older styles stay readable but are hidden). */
@@ -474,6 +475,7 @@ val SelectablePlayerBackgroundStyles: List<PlayerBackgroundStyle> =
     PlayerBackgroundStyle.LAVA,
     PlayerBackgroundStyle.LIQUID_SOUND,
     PlayerBackgroundStyle.BEAT_CITY,
+    PlayerBackgroundStyle.GTA_VI,
   )
 
 val TopSize = stringPreferencesKey("topSize")
@@ -852,6 +854,7 @@ val AmbientFullScreenArtKey = booleanPreferencesKey("ambient_full_screen_art")
 val AmbientSpacingKey = floatPreferencesKey("ambient_spacing")
 
 enum class AppFont(val value: String) {
+  DUNE_RISE("dune_rise"),
   IMPACTED("impacted"),
   SPOTABE("spotabe"),
   PAYBACK("payback"),
@@ -865,7 +868,7 @@ enum class AppFont(val value: String) {
   CUSTOM("custom");
 
   companion object {
-    fun fromValue(value: String): AppFont = entries.find { it.value == value } ?: IMPACTED
+    fun fromValue(value: String): AppFont = entries.find { it.value == value } ?: DUNE_RISE
   }
 }
 
@@ -906,6 +909,7 @@ private fun bk(n: String) = androidx.datastore.preferences.core.booleanPreferenc
 
 val LiquidThemeKey = bk("liquid_theme_enabled")
 val CityThemeKey = bk("city_theme_enabled")
+val GtaThemeKey = bk("gta_vi_theme_enabled")
 
 val LiquidStyleKey = ik("liquid_style")          // 0 orb, 1 chrome waves, 2 liquid glass
 val LiquidMaterialKey = ik("liquid_material")    // 0 chrome, 1 liquid glass, 2 holographic, 3 matte
@@ -989,17 +993,52 @@ val LowEndModeKey = booleanPreferencesKey("perf_low_end_mode")
 val BatterySaverKey = booleanPreferencesKey("perf_battery_saver")
 val ReduceAnimationsKey = booleanPreferencesKey("perf_reduce_animations")
 
-/** Seasonal Halloween edition (experimental). "" = not chosen yet, "halloween" or "original" once the user picked. */
-val HalloweenChoiceKey = stringPreferencesKey("halloween_choice")
-val HalloweenReducedMotionKey = booleanPreferencesKey("halloween_reduced_motion")
-val HalloweenAmbientKey = booleanPreferencesKey("halloween_ambient")
-val HalloweenPortalKey = booleanPreferencesKey("halloween_portal")
+/** Winter edition (default theme). */
+val WinterEnabledKey = booleanPreferencesKey("winter_enabled")
+/** frozen, aurora, midnight, snowwhite, christmas, newyear */
+val WinterVariantKey = stringPreferencesKey("winter_variant")
+/** off, snow, fire, leaves, spin, water */
+val EffectKindKey = stringPreferencesKey("effect_kind")
+val SnowIntensityKey = intPreferencesKey("snow_intensity")
+/** gentle or storm */
+val SnowModeKey = stringPreferencesKey("snow_mode")
+val FrostEdgesKey = booleanPreferencesKey("frost_edges")
+val EffectTouchKey = booleanPreferencesKey("effect_touch")
+val WinterLowPerfKey = booleanPreferencesKey("winter_low_perf")
+val WaterFillKey = booleanPreferencesKey("water_fill_enabled")
+val EasterEggsFoundKey = intPreferencesKey("winter_eggs_found")
 val GestureDrawKey = booleanPreferencesKey("gesture_draw_enabled")
 
-/** Gesture Music: double-tap-and-hold, then draw. Independent of the Halloween theme. */
+/** Gesture Music: double-tap-and-hold, then draw. Independent of the seasonal theme. */
 val GestureMusicEnabledKey = booleanPreferencesKey("gesture_music_enabled")
 val GestureMusicWriteKey = booleanPreferencesKey("gesture_music_write")
 val GestureMusicWriteLangKey = stringPreferencesKey("gesture_music_write_lang")
 val GestureMusicManualSeenKey = booleanPreferencesKey("gesture_music_manual_seen")
 val GestureMusicGlitterKey = booleanPreferencesKey("gesture_music_glitter")
 val LiquidOpenKey = booleanPreferencesKey("liquid_song_open")
+
+/** Overlay effects (separate from the Winter theme). */
+val OverlayEnabledKey = booleanPreferencesKey("overlay_enabled")
+/** snow, fire, leaves, spin, water */
+val OverlayEffectKey = stringPreferencesKey("overlay_effect")
+val OverlayIntensityKey = intPreferencesKey("overlay_intensity")
+
+/** Player customizer. */
+val PlayerThumbScaleKey = floatPreferencesKey("player_thumb_scale")
+val PlayerThumbOffsetYKey = floatPreferencesKey("player_thumb_offset_y")
+val PlayerControlsOffsetYKey = floatPreferencesKey("player_controls_offset_y")
+
+/** Player Garage (Now Playing customization studio). */
+val GarageGlowKey = booleanPreferencesKey("garage_glow")
+val GarageGlowPulseKey = booleanPreferencesKey("garage_glow_pulse")
+val GarageGlowStrengthKey = floatPreferencesKey("garage_glow_strength")
+val GarageAccentKey = intPreferencesKey("garage_accent") // 0 = follow theme, otherwise ARGB
+val GarageArtShadowKey = floatPreferencesKey("garage_art_shadow")
+val GarageArtAlphaKey = floatPreferencesKey("garage_art_alpha")
+val GarageControlsScaleKey = floatPreferencesKey("garage_controls_scale")
+val GarageFontScaleKey = floatPreferencesKey("garage_font_scale")
+val GarageBuildsKey = stringPreferencesKey("garage_builds")
+val GarageActiveBuildKey = stringPreferencesKey("garage_active_build")
+val DevModeUnlockedKey = booleanPreferencesKey("dev_mode_unlocked")
+val DuneRiseMigratedKey = androidx.datastore.preferences.core.booleanPreferencesKey("dune_rise_migrated")
+val GtaDefaultMigratedKey = androidx.datastore.preferences.core.booleanPreferencesKey("gta_default_migrated")

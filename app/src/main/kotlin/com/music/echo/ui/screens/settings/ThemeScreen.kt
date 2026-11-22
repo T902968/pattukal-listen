@@ -94,6 +94,8 @@ fun ThemeScreen(navController: NavController, highlightKey: String? = null) {
   val (lavaTheme, onLavaThemeChange) = rememberPreference(LavaThemeKey, defaultValue = false)
   val (liquidTheme, onLiquidThemeChange) = rememberPreference(LiquidThemeKey, defaultValue = false)
   val (cityTheme, onCityThemeChange) = rememberPreference(CityThemeKey, defaultValue = false)
+  val (gtaTheme, onGtaChange) = rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, defaultValue = true)
+  val (_, onWinterChange) = rememberPreference(echo.music.iad1tya.constants.WinterEnabledKey, defaultValue = false)
   val (_, onPlayerBgChange) =
     echo.music.iad1tya.utils.rememberEnumPreference(
       PlayerBackgroundStyleKey,
@@ -173,12 +175,12 @@ fun ThemeScreen(navController: NavController, highlightKey: String? = null) {
               modifier = Modifier.weight(1f),
               title = "Pattukal",
               icon = Icons.Rounded.DarkMode,
-              isSelected = darkMode != DarkMode.OFF && !pureBlack && !natureTheme && !lavaTheme && !liquidTheme && !cityTheme,
+              isSelected = darkMode != DarkMode.OFF && !pureBlack && !natureTheme && !lavaTheme && !liquidTheme && !cityTheme && !gtaTheme,
               onClick = {
                 onNatureThemeChange(false)
                 onLavaThemeChange(false)
                 onLiquidThemeChange(false)
-                onCityThemeChange(false)
+                onCityThemeChange(false); onGtaChange(false)
                 onDarkModeChange(DarkMode.ON)
                 onPureBlackChange(false)
               }
@@ -192,7 +194,7 @@ fun ThemeScreen(navController: NavController, highlightKey: String? = null) {
                 onNatureThemeChange(false)
                 onLavaThemeChange(false)
                 onLiquidThemeChange(false)
-                onCityThemeChange(false)
+                onCityThemeChange(false); onGtaChange(false)
                 onDarkModeChange(DarkMode.OFF)
                 onPureBlackChange(false)
               }
@@ -211,7 +213,7 @@ fun ThemeScreen(navController: NavController, highlightKey: String? = null) {
                 onNatureThemeChange(false)
                 onLavaThemeChange(false)
                 onLiquidThemeChange(false)
-                onCityThemeChange(false)
+                onCityThemeChange(false); onGtaChange(false)
                 onDarkModeChange(DarkMode.ON)
                 onPureBlackChange(true)
               }
@@ -222,10 +224,10 @@ fun ThemeScreen(navController: NavController, highlightKey: String? = null) {
               icon = Icons.Rounded.Eco,
               isSelected = natureTheme && !pureBlack && !lavaTheme && !liquidTheme && !cityTheme,
               onClick = {
-                onNatureThemeChange(true)
+                onNatureThemeChange(true); onWinterChange(false); onGtaChange(false)
                 onLavaThemeChange(false)
                 onLiquidThemeChange(false)
-                onCityThemeChange(false)
+                onCityThemeChange(false); onGtaChange(false)
                 onDarkModeChange(DarkMode.ON)
                 onPureBlackChange(false)
               }
@@ -242,9 +244,9 @@ fun ThemeScreen(navController: NavController, highlightKey: String? = null) {
               isSelected = lavaTheme && !liquidTheme && !cityTheme,
               onClick = {
                 onNatureThemeChange(false)
-                onLavaThemeChange(true)
+                onLavaThemeChange(true); onWinterChange(false); onGtaChange(false)
                 onLiquidThemeChange(false)
-                onCityThemeChange(false)
+                onCityThemeChange(false); onGtaChange(false)
                 onDarkModeChange(DarkMode.ON)
                 onPureBlackChange(false)
               }
@@ -257,8 +259,8 @@ fun ThemeScreen(navController: NavController, highlightKey: String? = null) {
               onClick = {
                 onNatureThemeChange(false)
                 onLavaThemeChange(false)
-                onCityThemeChange(false)
-                onLiquidThemeChange(true)
+                onCityThemeChange(false); onGtaChange(false)
+                onLiquidThemeChange(true); onWinterChange(false); onGtaChange(false)
                 onDarkModeChange(DarkMode.ON)
                 onPureBlackChange(false)
                 onPlayerBgChange(PlayerBackgroundStyle.LIQUID_SOUND)
@@ -278,13 +280,28 @@ fun ThemeScreen(navController: NavController, highlightKey: String? = null) {
                 onNatureThemeChange(false)
                 onLavaThemeChange(false)
                 onLiquidThemeChange(false)
-                onCityThemeChange(true)
+                onCityThemeChange(true); onWinterChange(false); onGtaChange(false)
                 onDarkModeChange(DarkMode.ON)
                 onPureBlackChange(false)
                 onPlayerBgChange(PlayerBackgroundStyle.BEAT_CITY)
               }
             )
-            Spacer(Modifier.weight(1f))
+            ThemeModeCard(
+              modifier = Modifier.weight(1f),
+              title = "GTA VI  NEW",
+              icon = Icons.Rounded.DarkMode,
+              isSelected = gtaTheme,
+              onClick = {
+                onNatureThemeChange(false)
+                onLavaThemeChange(false)
+                onLiquidThemeChange(false)
+                onCityThemeChange(false)
+                onGtaChange(true); onWinterChange(false)
+                onDarkModeChange(DarkMode.ON)
+                onPureBlackChange(false)
+                onPlayerBgChange(PlayerBackgroundStyle.GTA_VI)
+              }
+            )
           }
         }
       }

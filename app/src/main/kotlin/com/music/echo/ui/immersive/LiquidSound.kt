@@ -60,13 +60,13 @@ class LiquidConfig(
 
 @Composable
 fun rememberLiquidConfig(forceCompact: Boolean? = null): LiquidConfig {
-  val (style, _) = rememberPreference(LiquidStyleKey, 0)
-  val (material, _) = rememberPreference(LiquidMaterialKey, 0)
+  val (style, _) = rememberPreference(LiquidStyleKey, 1)
+  val (material, _) = rememberPreference(LiquidMaterialKey, 1)
   val (colorMode, _) = rememberPreference(LiquidColorModeKey, 0)
   val (custom, _) = rememberPreference(LiquidCustomColorKey, LiquidOptions.customSwatches[0])
   val (intensity, _) = rememberPreference(LiquidIntensityKey, 1)
-  val (bg, _) = rememberPreference(LiquidBackgroundKey, 0)
-  val (quality, _) = rememberPreference(LiquidQualityKey, 1)
+  val (bg, _) = rememberPreference(LiquidBackgroundKey, 2)
+  val (quality, _) = rememberPreference(LiquidQualityKey, 2)
   val (layout, _) = rememberPreference(LiquidLayoutKey, 0)
   return LiquidConfig(style, material, colorMode, Color(custom), intensity, bg, quality, forceCompact ?: (layout == 1))
 }

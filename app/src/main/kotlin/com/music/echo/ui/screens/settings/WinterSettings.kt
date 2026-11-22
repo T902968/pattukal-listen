@@ -1,6 +1,8 @@
 package echo.music.iad1tya.ui.screens.settings
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.height
@@ -10,7 +12,9 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,12 +29,17 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavController
 import echo.music.iad1tya.LocalPlayerAwareWindowInsets
 import echo.music.iad1tya.R
-import echo.music.iad1tya.constants.HalloweenAmbientKey
-import echo.music.iad1tya.constants.HalloweenChoiceKey
-import echo.music.iad1tya.constants.HalloweenReducedMotionKey
+import echo.music.iad1tya.constants.EasterEggsFoundKey
+import echo.music.iad1tya.constants.EffectTouchKey
+import echo.music.iad1tya.constants.FrostEdgesKey
+import echo.music.iad1tya.constants.WaterFillKey
+import echo.music.iad1tya.constants.WinterEnabledKey
+import echo.music.iad1tya.constants.WinterLowPerfKey
+import echo.music.iad1tya.constants.WinterVariantKey
 import echo.music.iad1tya.ui.component.IconButton as AppIconButton
 import echo.music.iad1tya.ui.component.Material3SettingsGroup
 import echo.music.iad1tya.ui.component.Material3SettingsItem
+import echo.music.iad1tya.ui.component.WinterVariant
 import echo.music.iad1tya.ui.utils.backToMain
 import echo.music.iad1tya.utils.rememberPreference
 
@@ -46,12 +55,12 @@ private fun boolItem(title: String, desc: String, key: Preferences.Key<Boolean>,
   )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-fun HalloweenSettings(navController: NavController, scrollBehavior: TopAppBarScrollBehavior) {
+fun WinterSettings(navController: NavController, scrollBehavior: TopAppBarScrollBehavior) {
   val scroll = rememberScrollState()
-  var choice by rememberPreference(HalloweenChoiceKey, "")
-  val enabled = choice == "halloween"
+  var variant by rememberPreference(WinterVariantKey, "midnight")
+  val (eggs, _) = rememberPreference(EasterEggsFoundKey, 0)
   Column(
     Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal))
       .verticalScroll(scroll)
@@ -61,24 +70,29 @@ fun HalloweenSettings(navController: NavController, scrollBehavior: TopAppBarScr
     Spacer(Modifier.height(16.dp))
     Material3SettingsGroup(
       scrollState = scroll,
-      title = "Seasonal Halloween Test (Experimental)",
+      title = "Winter",
       items =
         listOf(
-          Material3SettingsItem(
-            icon = painterResource(R.drawable.sparks),
-            title = { Text("Halloween effects") },
-            description = { Text("Haunted Home, cursed cube, portals. Turn off to return to the original Pattukal theme. Your settings and playback are not changed.") },
-            trailingContent = { Switch(checked = enabled, onCheckedChange = { choice = if (it) "halloween" else "original" }) },
-            onClick = { choice = if (enabled) "original" else "halloween" },
-          ),
-          boolItem("Reduced motion", "Shorter, simpler animations for Halloween effects", HalloweenReducedMotionKey, false),
-          boolItem("Ambient wind sound", "Quiet generated wind on Home. Off by default", HalloweenAmbientKey, false),
+          boolItem("Winter mode", "Icy navy theme, aurora Home and winter effects. Turn off to return to your normal theme", WinterEnabledKey, false),
+          boolItem("Frost edges", "Frosted glow around the screen edges", FrostEdgesKey, false),
+          boolItem("Touch reacts", "Flakes and particles move away from your finger", EffectTouchKey, true),
+          boolItem("Water fill", "Pull the cord at the top of Home to fill the screen with water. Albums float on it", WaterFillKey, true),
+          boolItem("Low-performance mode", "Fewer particles, 30 fps and a still aurora. Effects also pause when the app is in the background", WinterLowPerfKey, false),
         ),
     )
+    Spacer(Modifier.height(16.dp))
+    Text("Theme", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 6.dp)) {
+      WinterVariant.entries.forEach { v -> FilterChip(selected = variant == v.key, onClick = { variant = v.key }, label = { Text(v.label) }) }
+    }
+    Spacer(Modifier.height(12.dp))
+    Text("Falling snow, fire sparks, leaves, spin and water drops are now in Settings > Overlay effects.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Spacer(Modifier.height(8.dp))
+    Text("Hidden snowflakes found: $eggs  (golden flakes drift through the snow, tap them)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     Spacer(Modifier.height(24.dp))
   }
   TopAppBar(
-    title = { Text("Halloween (Experimental)") },
+    title = { Text("Winter") },
     navigationIcon = {
       AppIconButton(onClick = navController::navigateUp, onLongClick = navController::backToMain) {
         Icon(painterResource(R.drawable.arrow_back), contentDescription = null)

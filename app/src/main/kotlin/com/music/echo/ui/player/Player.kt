@@ -42,6 +42,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -56,6 +58,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -69,6 +72,8 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -346,6 +351,7 @@ fun BottomSheetPlayer(
         PlayerBackgroundStyle.TOKYO,
         PlayerBackgroundStyle.FIREWORKS,
         PlayerBackgroundStyle.CLASSIC_CAR,
+        PlayerBackgroundStyle.GTA_VI,
         PlayerBackgroundStyle.LIQUID_GLASS -> true
         PlayerBackgroundStyle.DEFAULT -> useDarkTheme
       }
@@ -795,6 +801,7 @@ fun BottomSheetPlayer(
         playerBackground == PlayerBackgroundStyle.TOKYO ||
         playerBackground == PlayerBackgroundStyle.FIREWORKS ||
         playerBackground == PlayerBackgroundStyle.CLASSIC_CAR ||
+        playerBackground == PlayerBackgroundStyle.GTA_VI ||
         playerBackground == PlayerBackgroundStyle.LIQUID_GLASS -> {
         when (playerButtonsStyle) {
           PlayerButtonsStyle.DEFAULT -> Pair(Color.White, Color.Black)
@@ -1067,6 +1074,7 @@ fun BottomSheetPlayer(
         playerBackground == PlayerBackgroundStyle.TOKYO ||
         playerBackground == PlayerBackgroundStyle.FIREWORKS ||
         playerBackground == PlayerBackgroundStyle.CLASSIC_CAR ||
+        playerBackground == PlayerBackgroundStyle.GTA_VI ||
         playerBackground == PlayerBackgroundStyle.LIQUID_GLASS -> Color.Black
       else -> if (useBlackBackground) Color.Black else MaterialTheme.colorScheme.surfaceContainer
     }
@@ -1679,6 +1687,11 @@ fun BottomSheetPlayer(
             echo.music.iad1tya.ui.component.ClassicCarBackground(
               modifier = Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() },
               running = !state.isCollapsed,
+            )
+          }
+          PlayerBackgroundStyle.GTA_VI -> {
+            echo.music.iad1tya.ui.component.GtaViNightBackground(
+              modifier = Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() },
             )
           }
           PlayerBackgroundStyle.DEFAULT -> {}
@@ -3063,6 +3076,19 @@ fun BottomSheetPlayer(
               .padding(bottom = bottomPadding)
               .animateContentSize(),
         ) {
+          val customThumbScale by rememberPreference(echo.music.iad1tya.constants.PlayerThumbScaleKey, 1f)
+          var customThumbY by rememberPreference(echo.music.iad1tya.constants.PlayerThumbOffsetYKey, 0f)
+          var customCtrlY by rememberPreference(echo.music.iad1tya.constants.PlayerControlsOffsetYKey, 0f)
+          var editTab by remember { mutableStateOf(GarageTab.BODY) }
+          var editMode by remember { mutableStateOf(false) }
+          val gArtAlpha by rememberPreference(echo.music.iad1tya.constants.GarageArtAlphaKey, 1f)
+          val gShadow by rememberPreference(echo.music.iad1tya.constants.GarageArtShadowKey, 0f)
+          val gGlow by rememberPreference(echo.music.iad1tya.constants.GarageGlowKey, false)
+          val gPulse by rememberPreference(echo.music.iad1tya.constants.GarageGlowPulseKey, true)
+          val gGlowStrength by rememberPreference(echo.music.iad1tya.constants.GarageGlowStrengthKey, 0.6f)
+          val gAccent by rememberPreference(echo.music.iad1tya.constants.GarageAccentKey, 0)
+          val gCtrlScale by rememberPreference(echo.music.iad1tya.constants.GarageControlsScaleKey, 1f)
+          val gFontScale by rememberPreference(echo.music.iad1tya.constants.GarageFontScaleKey, 1f)
           Box(
             contentAlignment = Alignment.TopCenter,
             modifier = Modifier.weight(1f),
@@ -3070,6 +3096,16 @@ fun BottomSheetPlayer(
             val currentSliderPosition by rememberUpdatedState(sliderPosition)
             val sliderPositionProvider = remember { { currentSliderPosition } }
             val isExpandedProvider = remember(state) { { state.isExpanded } }
+            if (gGlow) {
+              val glowAnim = androidx.compose.animation.core.rememberInfiniteTransition(label = "garage-glow")
+              val breathe by glowAnim.animateFloat(0.7f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(2400), androidx.compose.animation.core.RepeatMode.Reverse), label = "b")
+              val gc = if (gAccent == 0) Color(0xFF22D3EE) else Color(gAccent)
+              Box(
+                Modifier.align(Alignment.Center).fillMaxWidth(0.95f).aspectRatio(1f)
+                  .graphicsLayer { translationY = customThumbY * density; alpha = (gGlowStrength * (if (gPulse) breathe else 1f)).coerceIn(0f, 1f) }
+                  .background(Brush.radialGradient(listOf(gc.copy(alpha = 0.7f), Color.Transparent)), CircleShape),
+              )
+            }
             AnimatedContent(
               targetState = showInlineLyrics,
               label = "Lyrics",
@@ -3084,14 +3120,46 @@ fun BottomSheetPlayer(
               } else {
                 Thumbnail(
                   sliderPositionProvider = sliderPositionProvider,
-                  modifier = Modifier.nestedScroll(state.preUpPostDownNestedScrollConnection),
+                  modifier = Modifier.nestedScroll(state.preUpPostDownNestedScrollConnection)
+                    .graphicsLayer { scaleX = customThumbScale; scaleY = customThumbScale; translationY = customThumbY * density; alpha = gArtAlpha; shadowElevation = gShadow * density; clip = false },
                   isPlayerExpanded = isExpandedProvider,
                   isListenTogetherGuest = isListenTogetherGuest
                 )
               }
             }
+            // Edit mode (like Android home-screen editing): tap or drag the thumbnail to restyle / move it.
+            if (editMode) {
+              Box(
+                Modifier.matchParentSize()
+                  .graphicsLayer { translationY = customThumbY * density }
+                  .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp))
+                  .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), RoundedCornerShape(24.dp))
+                  .pointerInput(Unit) { detectTapGestures { editTab = GarageTab.BODY } }
+                  .pointerInput(Unit) {
+                    detectDragGestures { change, drag ->
+                      change.consume()
+                      customThumbY = (customThumbY + drag.y / density).coerceIn(-120f, 160f)
+                    }
+                  },
+                contentAlignment = Alignment.Center,
+              ) {
+                Text("Artwork · drag to move", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+              }
+            }
+            // Pencil: toggles edit mode. Sits below the status bar so it is always reachable.
+            androidx.compose.material3.FilledTonalIconButton(
+              onClick = { editMode = !editMode },
+              modifier = Modifier.align(Alignment.TopStart)
+                .windowInsetsPadding(WindowInsets.Companion.statusBars)
+                .padding(start = 10.dp, top = 56.dp).size(38.dp),
+            ) {
+              Icon(
+                painter = painterResource(if (editMode) R.drawable.close else R.drawable.edit),
+                contentDescription = "Customize player",
+                modifier = Modifier.size(18.dp),
+              )
+            }
           }
-
           if (showLyricsOnPlayer && !showInlineLyrics) {
             PlayerSyncedLyricsView(
               mediaMetadata = mediaMetadata,
@@ -3100,8 +3168,40 @@ fun BottomSheetPlayer(
             )
           }
 
-          mediaMetadata?.let { controlsContent(it) }
+          Box {
+            val garageScheme = if (gAccent == 0) MaterialTheme.colorScheme else MaterialTheme.colorScheme.copy(primary = Color(gAccent))
+            val baseDensity = androidx.compose.ui.platform.LocalDensity.current
+            androidx.compose.runtime.CompositionLocalProvider(
+              androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(baseDensity.density, baseDensity.fontScale * gFontScale),
+            ) {
+              MaterialTheme(colorScheme = garageScheme, typography = MaterialTheme.typography, shapes = MaterialTheme.shapes) {
+                Column(Modifier.graphicsLayer { translationY = customCtrlY * density; scaleX = gCtrlScale; scaleY = gCtrlScale }, horizontalAlignment = Alignment.CenterHorizontally) { mediaMetadata?.let { controlsContent(it) } }
+              }
+            }
+            if (editMode) {
+              Box(
+                Modifier.matchParentSize()
+                  .graphicsLayer { translationY = customCtrlY * density }
+                  .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(20.dp))
+                  .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.08f), RoundedCornerShape(20.dp))
+                  .pointerInput(Unit) { detectTapGestures { editTab = GarageTab.WHEELS } }
+                  .pointerInput(Unit) {
+                    detectDragGestures { change, drag ->
+                      change.consume()
+                      customCtrlY = (customCtrlY + drag.y / density).coerceIn(-160f, 120f)
+                    }
+                  },
+                contentAlignment = Alignment.Center,
+              ) {
+                Text("Play / controls · drag to move", color = MaterialTheme.colorScheme.tertiary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+              }
+            }
+          }
 
+
+          if (editMode) {
+            PlayerEditPanel(tab = editTab, onTabChange = { editTab = it }, onDismiss = { editMode = false })
+          }
 
           Spacer(Modifier.height(if (useNewPlayerDesign) 30.dp else 8.dp))
         }

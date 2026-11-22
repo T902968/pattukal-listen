@@ -479,6 +479,7 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
   private var originalQueueSize: Int = 0
   private var queueGeneration = 0L
   private var loadMoreJob: Job? = null
+  private var endlessJob: Job? = null
 
   private var consecutivePlaybackErr = 0
   private var retryJob: Job? = null
@@ -645,7 +646,7 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
         NotificationCompat.Builder(this, CHANNEL_ID)
           .setContentTitle(getString(R.string.music_player))
           .setContentText("")
-          .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(this))
+          .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(this)).setColor(0xFF2F7BFF.toInt())
           .setColor(0xFF2F7BFF.toInt())
           .setContentIntent(pending)
           .setOngoing(true)
@@ -938,7 +939,15 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
       .map { it[echo.music.iad1tya.constants.KaraokeModeKey] ?: false }
       .distinctUntilChanged()
       .collectLatest(scope) { karaoke ->
-        playerStereoWideners.values.forEach { it.vocalRemoval = karaoke }
+        playerStereoWideners.values.forEach { it.vocalRemoval = karaoke; it.resetAnalysis() }
+        if (karaoke) {
+          val main = android.os.Handler(android.os.Looper.getMainLooper())
+          main.post { android.widget.Toast.makeText(this@MusicService, "Karaoke: analyzing this song…", android.widget.Toast.LENGTH_SHORT).show() }
+          // Listen to a few seconds of the real audio, then tell the user how well the voice could be removed.
+          kotlinx.coroutines.delay(9000)
+          val text = playerStereoWideners.values.firstNotNullOfOrNull { it.analysisSummary() }
+          if (text != null) main.post { android.widget.Toast.makeText(this@MusicService, text, android.widget.Toast.LENGTH_LONG).show() }
+        }
       }
 
     dataStore.data
@@ -2527,6 +2536,36 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
                 shufflePlaylistFirst
               )
             }
+          }
+        }
+    }
+
+    // Endless playback: when a finite queue (a playlist, search result, Wrapped or Time Fold list) is about to run out,
+    // keep going with songs related to what is playing instead of stopping.
+    if (
+      dataStore.get(AutoLoadMoreKey, true) &&
+        reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT &&
+        currentQueue != EmptyQueue &&
+        !currentQueue.hasNextPage() &&
+        player.repeatMode != REPEAT_MODE_ALL &&
+        player.mediaItemCount > 0 &&
+        player.mediaItemCount - player.currentMediaItemIndex <= 3
+    ) {
+      endlessJob?.cancel()
+      val endlessQueue = currentQueue
+      val endlessGen = queueGeneration
+      val seedId = player.getMediaItemAt(player.mediaItemCount - 1).mediaId
+      endlessJob =
+        scope.launch(SilentHandler) {
+          val existing = (0 until player.mediaItemCount).map { player.getMediaItemAt(it).mediaId }.toSet()
+          val more =
+            withContext(Dispatchers.IO) {
+              YouTube.next(WatchEndpoint(videoId = seedId)).getOrNull()?.items.orEmpty()
+                .filter { it.id !in existing }
+                .map { it.toMediaItem() }
+            }
+          if (isActive && more.isNotEmpty() && queueGeneration == endlessGen && currentQueue === endlessQueue && player.playbackState != STATE_IDLE) {
+            player.addMediaItems(more)
           }
         }
     }

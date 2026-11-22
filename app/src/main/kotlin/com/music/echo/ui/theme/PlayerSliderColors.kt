@@ -37,6 +37,7 @@ object PlayerSliderColors {
         PlayerBackgroundStyle.TOKYO,
         PlayerBackgroundStyle.FIREWORKS,
         PlayerBackgroundStyle.CLASSIC_CAR,
+        PlayerBackgroundStyle.GTA_VI,
         PlayerBackgroundStyle.LIQUID_GLASS -> {
           Color.White.copy(alpha = 0.4f)
         }

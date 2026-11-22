@@ -9,6 +9,7 @@ val bbhBartle = FontFamily(Font(R.font.bbh_bartle_regular, FontWeight.Normal))
 
 val VesperFraktur = FontFamily(Font(R.font.vesper_fraktur_regular, FontWeight.Normal))
 
+val DuneRiseFont = FontFamily(Font(R.font.dune_rise, FontWeight.Normal))
 val ImpactedFont = FontFamily(Font(R.font.impacted, FontWeight.Normal))
 val SpotabeFont = FontFamily(Font(R.font.spotabe, FontWeight.Normal))
 val PaybackFont = FontFamily(Font(R.font.payback, FontWeight.Normal))

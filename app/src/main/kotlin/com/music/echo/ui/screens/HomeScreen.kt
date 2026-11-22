@@ -1230,13 +1230,14 @@ fun HomeScreen(
          */
         Box(modifier = Modifier.fillMaxSize()) {
 
-            PattukalLiquidBackground(
+            val gtaHome by echo.music.iad1tya.utils.rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, true)
+            if (gtaHome) {
+                echo.music.iad1tya.ui.component.GtaViBackground(Modifier.matchParentSize(), scrim = 0.42f)
+            } else PattukalLiquidBackground(
                 modifier = Modifier.matchParentSize()
             )
-            if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) {
-                echo.music.iad1tya.ui.component.HalloweenBackdrop(Modifier.matchParentSize())
-                val ambientOn by echo.music.iad1tya.utils.rememberPreference(echo.music.iad1tya.constants.HalloweenAmbientKey, false)
-                echo.music.iad1tya.ui.component.HalloweenAmbientWind(ambientOn)
+            if (echo.music.iad1tya.ui.component.rememberWinterOn()) {
+                echo.music.iad1tya.ui.component.WinterBackdrop(Modifier.matchParentSize())
             }
 
             BoxWithConstraints(
@@ -1340,6 +1341,10 @@ fun HomeScreen(
                         }
                     }
 
+                    item(key = "spotify_home") {
+                        echo.music.iad1tya.ui.component.SpotifyHomeRow(navController)
+                    }
+
                     item(key = "language_song_rows") {
                         echo.music.iad1tya.ui.component.FirstLaunchMusicLanguagePrompt()
                         echo.music.iad1tya.ui.component.LanguageSongRows(
@@ -1348,13 +1353,15 @@ fun HomeScreen(
                         )
                     }
 
-                    item(key = "halloween_extras") {
-                        echo.music.iad1tya.ui.component.HalloweenChoiceDialog()
+                    item(key = "dev_remote_home") {
+                        val remoteCfg by echo.music.iad1tya.devmode.HomeConfigRepository.config.collectAsState()
+                        remoteCfg?.let { echo.music.iad1tya.devmode.RemoteHomeSections(it, navController, Modifier.padding(bottom = 8.dp)) }
+                    }
+
+                    item(key = "winter_extras") {
                         echo.music.iad1tya.ui.component.MysteryCapsule()
                         echo.music.iad1tya.ui.component.TimeFoldEntry()
-                        if (echo.music.iad1tya.ui.component.rememberHalloweenOn()) {
-                            echo.music.iad1tya.ui.component.HalloweenCollections(refreshCount)
-                        }
+                        echo.music.iad1tya.ui.component.WrappedEntry(navController)
                     }
 
                     item(key = "taste_ai_rows") {
@@ -3324,6 +3331,7 @@ fun HomeScreen(
                     }
                 }
             }
+            echo.music.iad1tya.ui.component.WaterFillLayer(Modifier.matchParentSize())
         }
     }
 }

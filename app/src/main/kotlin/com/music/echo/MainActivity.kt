@@ -3,6 +3,7 @@ package echo.music.iad1tya
 import echo.music.iad1tya.utils.onlinePlaylistIdFromUrl
 import echo.music.iad1tya.utils.onlinePlaylistRoute
 import echo.music.iad1tya.ui.component.PattukalStartupOverlay
+import echo.music.iad1tya.ui.component.winterTouchObserver
 import echo.music.iad1tya.ui.component.gestureMusic
 import echo.music.iad1tya.ui.component.pattukalStartupBlur
 import echo.music.iad1tya.ui.component.rememberPattukalStartup
@@ -419,6 +420,19 @@ class MainActivity : ComponentActivity() {
             echo.music.iad1tya.constants.AppFont.IMPACTED.value
           preferences[echo.music.iad1tya.constants.ImpactedFontMigratedKey] = true
         }
+        // Dune Rise is the new default font; GTA VI is the new default theme with its player background.
+        if (preferences[echo.music.iad1tya.constants.DuneRiseMigratedKey] != true) {
+          preferences[echo.music.iad1tya.constants.SelectedFontKey] =
+            echo.music.iad1tya.constants.AppFont.DUNE_RISE.value
+          preferences[echo.music.iad1tya.constants.DuneRiseMigratedKey] = true
+        }
+        if (preferences[echo.music.iad1tya.constants.GtaDefaultMigratedKey] != true) {
+          preferences[echo.music.iad1tya.constants.GtaThemeKey] = true
+          preferences[echo.music.iad1tya.constants.WinterEnabledKey] = false
+          preferences[echo.music.iad1tya.constants.PlayerBackgroundStyleKey] =
+            echo.music.iad1tya.constants.PlayerBackgroundStyle.GTA_VI.name
+          preferences[echo.music.iad1tya.constants.GtaDefaultMigratedKey] = true
+        }
       }
     }
 
@@ -628,7 +642,7 @@ class MainActivity : ComponentActivity() {
 
             val notification =
               androidx.core.app.NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(context))
+                .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(context)).setColor(0xFF2F7BFF.toInt())
                 .setContentTitle("Happy Birthday Aditya!")
                 .setContentText("Today is the developer's birthday!")
                 .setLargeIcon(bitmap)
@@ -1260,7 +1274,7 @@ class MainActivity : ComponentActivity() {
         ) {
           val startup = rememberPattukalStartup(playerReady = playerConnection != null)
           val buddyLook = remember { echo.music.iad1tya.ui.buddy.BuddyLook() }
-          Box(modifier = Modifier.fillMaxSize().buddyTapTracker(buddyLook).gestureMusic(navController)) {
+          Box(modifier = Modifier.fillMaxSize().buddyTapTracker(buddyLook).winterTouchObserver().gestureMusic(navController)) {
             Box(
               modifier =
                 Modifier.fillMaxSize()
@@ -1281,10 +1295,12 @@ class MainActivity : ComponentActivity() {
                   TopAppBar(
                     title = {
                       if (currentTitle.isNotEmpty()) {
+                        val (gtaTitle, _) = echo.music.iad1tya.utils.rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, true)
                         Text(
                           text = currentTitle,
                           style =
                             MaterialTheme.typography.titleLarge.copy(
+                              brush = if (gtaTitle && currentTitle == "PATTUKAL") androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(androidx.compose.ui.graphics.Color(0xFFFF4FA3), androidx.compose.ui.graphics.Color(0xFFFF9A3C), androidx.compose.ui.graphics.Color(0xFFFFD86B))) else null,
                               fontWeight = FontWeight.Bold,
                               fontSize = if (currentTitle == "PATTUKAL") 28.sp else 24.sp,
                               letterSpacing = if (currentTitle == "PATTUKAL") 3.sp else 0.sp
@@ -1653,11 +1669,11 @@ class MainActivity : ComponentActivity() {
           }
             }
             if (!startup.visible) {
-              echo.music.iad1tya.ui.component.HalloweenGlobalOverlay()
-              echo.music.iad1tya.ui.component.LiquidSongOpenHost(buddyLook)
+                            echo.music.iad1tya.ui.component.LiquidSongOpenHost(buddyLook)
               echo.music.iad1tya.ui.component.GestureMusicOverlay()
               echo.music.iad1tya.ui.component.GestureMusicFirstRun()
             }
+            echo.music.iad1tya.ui.component.WinterEffectsOverlay()
             if (startup.visible) {
               PattukalStartupOverlay(progress = { startup.progress.value })
             }

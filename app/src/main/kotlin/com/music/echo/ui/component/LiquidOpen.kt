@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import echo.music.iad1tya.LocalPlayerConnection
-import echo.music.iad1tya.constants.HalloweenReducedMotionKey
+import echo.music.iad1tya.constants.WinterLowPerfKey
 import echo.music.iad1tya.constants.LiquidOpenKey
 import echo.music.iad1tya.ui.buddy.BuddyLook
 import echo.music.iad1tya.ui.buddy.BuddyStageAnchor
@@ -41,7 +41,7 @@ import kotlin.random.Random
 @Composable
 fun LiquidSongOpenHost(look: BuddyLook) {
   val (on, _) = rememberPreference(LiquidOpenKey, true)
-  val (hwReduced, _) = rememberPreference(HalloweenReducedMotionKey, false)
+  val (hwReduced, _) = rememberPreference(WinterLowPerfKey, false)
   val reduced = rememberReduceMotion()
   val connection = LocalPlayerConnection.current
   val meta by (connection?.mediaMetadata?.collectAsState() ?: remember { mutableStateOf(null) })

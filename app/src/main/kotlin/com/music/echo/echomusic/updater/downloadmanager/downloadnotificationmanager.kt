@@ -70,7 +70,7 @@ object DownloadNotificationManager {
   fun showDownloadFailed(version: String, errorMessage: String) {
     val notification =
       NotificationCompat.Builder(appContext, CHANNEL_ID)
-        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext))
+        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext)).setColor(0xFF2F7BFF.toInt())
         .setContentTitle(appContext.getString(R.string.update_failed))
         .setContentText(appContext.getString(R.string.failed_to_download_version, version))
         .setStyle(
@@ -113,7 +113,7 @@ object DownloadNotificationManager {
 
     val builder =
       Notification.Builder(appContext, CHANNEL_ID)
-        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext))
+        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext)).setColor(0xFF2F7BFF.toInt())
         .setContentTitle(appContext.getString(R.string.downloading_update))
         .setContentText(appContext.getString(R.string.version_file_size, version, fileSize))
         .setOngoing(true)
@@ -151,7 +151,7 @@ object DownloadNotificationManager {
 
     val builder =
       Notification.Builder(appContext, CHANNEL_ID)
-        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext))
+        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext)).setColor(0xFF2F7BFF.toInt())
         .setContentTitle(appContext.getString(R.string.downloading_update))
         .setContentText(appContext.getString(R.string.version_progress, version, progress))
         .setOngoing(progress < 100)
@@ -211,7 +211,7 @@ object DownloadNotificationManager {
 
     val builder =
       Notification.Builder(appContext, CHANNEL_ID)
-        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext))
+        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext)).setColor(0xFF2F7BFF.toInt())
         .setContentTitle(appContext.getString(R.string.update_ready))
         .setContentText(appContext.getString(R.string.tap_to_install_version, version))
         .setAutoCancel(true)
@@ -258,7 +258,7 @@ object DownloadNotificationManager {
 
   private fun buildDownloadStartingLegacy(version: String, fileSize: String): Notification {
     return NotificationCompat.Builder(appContext, CHANNEL_ID)
-      .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext))
+      .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext)).setColor(0xFF2F7BFF.toInt())
       .setContentTitle(appContext.getString(R.string.downloading_update))
       .setContentText(appContext.getString(R.string.version_file_size, version, fileSize))
       .setProgress(100, 0, false)
@@ -272,7 +272,7 @@ object DownloadNotificationManager {
 
   private fun buildDownloadProgressLegacy(progress: Int, version: String): Notification {
     return NotificationCompat.Builder(appContext, CHANNEL_ID)
-      .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext))
+      .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext)).setColor(0xFF2F7BFF.toInt())
       .setContentTitle(appContext.getString(R.string.downloading_update))
       .setContentText(appContext.getString(R.string.version_progress, version, progress))
       .setProgress(100, progress, false)
@@ -309,7 +309,7 @@ object DownloadNotificationManager {
 
     val notification =
       NotificationCompat.Builder(appContext, CHANNEL_ID)
-        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext))
+        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(appContext)).setColor(0xFF2F7BFF.toInt())
         .setContentTitle(appContext.getString(R.string.update_ready))
         .setContentText(appContext.getString(R.string.tap_to_install_version, version))
         .setProgress(0, 0, false)

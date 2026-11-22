@@ -1,16 +1,23 @@
 {
   "features": [
-    "Happy Halloween! 🎃 The new Halloween Edition: haunted Home with a glowing moon, castle, bats and pumpkins, a cursed Magic Cube, and the Mystery Capsule (Trick or Track)",
-    "New Gesture Music: double tap and hold, then draw with a glitter glitch trail. Circle opens Favorites, wave opens Recently played, diagonal shuffles, heart likes the song, or write a song name and it plays",
-    "Time Fold: explore what you played by day in a 3D card view, or browse songs by language through the years",
-    "Liquid touch effect when you open a song",
-    "Pattukal Blue is the new default app icon, and the notification icon is now always the Pattukal mark",
-    "New features and stability maximised: faster, steadier Home and refresh, Settings Back button fixed",
-    "Performance mode, Karaoke mode, Wavy player slider with new slider styles, Taste AI and the new Home layout"
+    "GTA VI theme, now the default: animated sunset Home, a neon night-drive player background and a vinyl disc player",
+    "Dune Rise is the new default font",
+    "Pattukal Wrapped redesigned as a story: your minutes, your #1 song on a spinning record, your top artist, then a top-11 grid where you pick songs and Play, Play next or add to queue. New listeners get recommended songs",
+    "Time Fold now opens full screen in liquid glass, with many more songs and Play next on every card",
+    "Now Playing edit mode: tap the pencil to restyle the artwork, play buttons, progress bar, glow and accent colour right on the player, drag things where you like, save your own builds and reset anytime",
+    "Endless playback: when a song, playlist or search finishes, Pattukal keeps adding related songs automatically",
+    "Spotify shortcut on Home to connect and import playlists, and your Spotify playlists appear on Home",
+    "Winter mode (Midnight, snow, water fill) and separate Overlay effects, reachable from Settings > Appearance",
+    "Stronger Karaoke vocal removal",
+    "Pattukal Blue app icon everywhere, with blue notification accents"
   ],
   "bug_fixes": [
-    "Settings Back button now works after opening a setting",
-    "Home refresh no longer makes the list jump"
+    "Fixed the Settings Back button so you can leave Settings without the cross",
+    "Fixed Google login",
+    "Home rows no longer reshuffle or jump while you scroll or refresh",
+    "Removed the gesture pop-up notifications",
+    "Fixed the player edit button hiding under the status bar",
+    "Removed the Home snow globe"
   ],
   "contributors": []
 }

@@ -146,6 +146,12 @@ fun LoginScreen(
           }
         settings.apply {
           javaScriptEnabled = true
+          domStorageEnabled = true
+          databaseEnabled = true
+          // Google refuses sign-in inside an embedded WebView ("browser or app may not be secure"). A plain
+          // mobile Chrome user agent without the WebView "wv" marker lets the sign-in page load normally.
+          userAgentString =
+            "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36"
           setSupportZoom(true)
           builtInZoomControls = true
           displayZoomControls = false
@@ -170,6 +176,7 @@ fun LoginScreen(
         )
         webView = this
 
+        CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
         CookieManager.getInstance().removeAllCookies(null)
         CookieManager.getInstance().flush()
         loadUrl("https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fmusic.youtube.com")

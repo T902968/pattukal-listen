@@ -100,7 +100,9 @@ fun BottomSheet(
           clip = true
         }
   ) {
-    if (!state.isRestingClosed) {
+    // Only intercept Back while the player is really opened above the mini player. At the mini player (or
+    // anywhere near it) Back must go to the screen underneath, otherwise Settings pages could not be left.
+    if (state.isOpenedBeyondMini) {
       BackHandler(onBack = state::collapseSoft)
     }
 
@@ -150,6 +152,8 @@ class BottomSheetState(
   val isDismissed by derivedStateOf { value == animatable.lowerBound!! }
 
   val isCollapsed by derivedStateOf { value == collapsedBound }
+
+  val isOpenedBeyondMini by derivedStateOf { value > collapsedBound + 12.dp }
 
   val isExpanded by derivedStateOf { value == animatable.upperBound }
 
