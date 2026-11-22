@@ -46,6 +46,7 @@ fun SpotifyHomeRow(navController: NavController) {
   val all by database.playlistsByUpdatedDateAsc().collectAsState(initial = emptyList())
   val spotify = all.filter { it.playlist.id.startsWith("SPOTIFY_") }.asReversed()
   Column(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
     Row(
       Modifier.padding(horizontal = 16.dp).clip(RoundedCornerShape(50)).clickable { navController.navigate("settings/spotify_import") }
         .background(Color(0xFF1DB954).copy(alpha = 0.16f)).padding(start = 6.dp, end = 14.dp, top = 6.dp, bottom = 6.dp),
@@ -56,6 +57,7 @@ fun SpotifyHomeRow(navController: NavController) {
         Icon(painterResource(R.drawable.ic_spotify), contentDescription = "Spotify", tint = Color.Black, modifier = Modifier.size(18.dp))
       }
       Text(if (spotify.isEmpty()) "Connect Spotify · import playlists" else "Spotify · import or connect more", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+    }
     }
     if (spotify.isNotEmpty()) {
       Text("Your Spotify playlists", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 16.dp, top = 10.dp, bottom = 6.dp))

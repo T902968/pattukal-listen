@@ -829,7 +829,8 @@ suspend fun fetchChangelogForVersion(currentVersion: String): WhatsNewInfo? =
       for (i in 0 until releases.length()) {
         val release = releases.getJSONObject(i)
         val tagClean = release.getString("tag_name").removePrefix("b").removePrefix("v").trim()
-        if (tagClean == cleanCurrent) {
+        val bodyVersion = Regex("Pattukal version:\\s*([0-9][^\\s]*)").find(release.optString("body", ""))?.groupValues?.get(1)
+        if (tagClean == cleanCurrent || bodyVersion == cleanCurrent) {
           matchedRelease = release
           break
         }

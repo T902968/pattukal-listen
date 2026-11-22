@@ -1331,15 +1331,6 @@ fun HomeScreen(
                         )
                     }
 
-                    item(key = "dev_remote_home") {
-                        val remoteCfg by echo.music.iad1tya.devmode.HomeConfigRepository.config.collectAsState()
-                        remoteCfg?.let { echo.music.iad1tya.devmode.RemoteHomeSections(it, navController, Modifier.padding(bottom = 8.dp)) }
-                    }
-
-                    item(key = "spotify_home") {
-                        echo.music.iad1tya.ui.component.SpotifyHomeRow(navController)
-                    }
-
                     item(key = "home_music_cube") {
                         androidx.compose.runtime.key(refreshCount, selectedChip?.title) {
                             echo.music.iad1tya.ui.immersive.HomeMusicCube(
@@ -1350,12 +1341,21 @@ fun HomeScreen(
                         }
                     }
 
+                    item(key = "spotify_home") {
+                        echo.music.iad1tya.ui.component.SpotifyHomeRow(navController)
+                    }
+
                     item(key = "language_song_rows") {
                         echo.music.iad1tya.ui.component.FirstLaunchMusicLanguagePrompt()
                         echo.music.iad1tya.ui.component.LanguageSongRows(
                             refreshKey = refreshCount,
                             mood = selectedChip?.title
                         )
+                    }
+
+                    item(key = "dev_remote_home") {
+                        val remoteCfg by echo.music.iad1tya.devmode.HomeConfigRepository.config.collectAsState()
+                        remoteCfg?.let { echo.music.iad1tya.devmode.RemoteHomeSections(it, navController, Modifier.padding(bottom = 8.dp)) }
                     }
 
                     item(key = "winter_extras") {

@@ -479,6 +479,7 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
   private var originalQueueSize: Int = 0
   private var queueGeneration = 0L
   private var loadMoreJob: Job? = null
+  private var endlessJob: Job? = null
 
   private var consecutivePlaybackErr = 0
   private var retryJob: Job? = null
@@ -2535,6 +2536,36 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
                 shufflePlaylistFirst
               )
             }
+          }
+        }
+    }
+
+    // Endless playback: when a finite queue (a playlist, search result, Wrapped or Time Fold list) is about to run out,
+    // keep going with songs related to what is playing instead of stopping.
+    if (
+      dataStore.get(AutoLoadMoreKey, true) &&
+        reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT &&
+        currentQueue != EmptyQueue &&
+        !currentQueue.hasNextPage() &&
+        player.repeatMode != REPEAT_MODE_ALL &&
+        player.mediaItemCount > 0 &&
+        player.mediaItemCount - player.currentMediaItemIndex <= 3
+    ) {
+      endlessJob?.cancel()
+      val endlessQueue = currentQueue
+      val endlessGen = queueGeneration
+      val seedId = player.getMediaItemAt(player.mediaItemCount - 1).mediaId
+      endlessJob =
+        scope.launch(SilentHandler) {
+          val existing = (0 until player.mediaItemCount).map { player.getMediaItemAt(it).mediaId }.toSet()
+          val more =
+            withContext(Dispatchers.IO) {
+              YouTube.next(WatchEndpoint(videoId = seedId)).getOrNull()?.items.orEmpty()
+                .filter { it.id !in existing }
+                .map { it.toMediaItem() }
+            }
+          if (isActive && more.isNotEmpty() && queueGeneration == endlessGen && currentQueue === endlessQueue && player.playbackState != STATE_IDLE) {
+            player.addMediaItems(more)
           }
         }
     }

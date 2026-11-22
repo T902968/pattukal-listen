@@ -324,7 +324,7 @@ fun TimeFoldEntry() {
           else -> "Older"
         }
         val list = byPeriod.getValue(key)
-        if (list.none { it.id == e.song.id } && list.size < 30) list += e.song
+        if (list.none { it.id == e.song.id } && list.size < 120) list += e.song
       }
       byPeriod.filterValues { it.isNotEmpty() }.entries.map { it.key to it.value.map { s -> FoldSong(s.id, s.song.title, s.artists.joinToString { a -> a.name }, s.song.thumbnailUrl, s.toMediaMetadata()) } }
     }
@@ -339,7 +339,9 @@ fun TimeFoldEntry() {
         eras.map { (name, q) ->
           async {
             name to withContext(Dispatchers.IO) {
-              YouTube.search("${l.query} $q", YouTube.SearchFilter.FILTER_SONG).getOrNull()?.items.orEmpty().filterIsInstance<SongItem>().take(14)
+              listOf("${l.query} $q", "${l.query} $q songs", "best of ${l.query} $q").map { query ->
+                async { YouTube.search(query, YouTube.SearchFilter.FILTER_SONG).getOrNull()?.items.orEmpty().filterIsInstance<SongItem>() }
+              }.awaitAll().flatten().distinctBy { it.id }.take(60)
                 .map { FoldSong(it.id, it.title, it.artists.joinToString { a -> a.name }, it.thumbnail, null, it) }
             }
           }
