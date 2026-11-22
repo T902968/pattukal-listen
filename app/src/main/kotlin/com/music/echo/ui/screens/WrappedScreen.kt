@@ -1,6 +1,17 @@
 package echo.music.iad1tya.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.geometry.Size
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -90,7 +101,7 @@ private class WTile(val id: String, val title: String, val artist: String, val t
  * get a recommended set instead. Tap tiles to select them, then Play / Play next / Add to queue.
  */
 @Composable
-fun WrappedScreen(navController: NavController) {
+private fun WrappedGridPage(navController: NavController) {
   val database = LocalDatabase.current
   val variant = rememberWinterVariant()
   val connection = LocalPlayerConnection.current
@@ -215,4 +226,143 @@ private fun WBtn(label: String, primary: Boolean, onClick: () -> Unit) {
     color = if (primary) Color(0xFF0B1E3D) else Color.White,
     modifier = Modifier.clip(CircleShape).background(if (primary) Color.White else Color.White.copy(alpha = 0.16f)).clickable { onClick() }.padding(horizontal = 14.dp, vertical = 9.dp),
   )
+}
+
+
+private val WrapPalettes = listOf(
+  listOf(Color(0xFF12033A), Color(0xFF7B1FA2), Color(0xFFFF4FA3)),
+  listOf(Color(0xFF021B3A), Color(0xFF0B5FA5), Color(0xFF22D3EE)),
+  listOf(Color(0xFF2A0A1A), Color(0xFFB4235A), Color(0xFFFF9A3C)),
+  listOf(Color(0xFF05060F), Color(0xFF1B1464), Color(0xFF8B5CF6)),
+)
+
+/**
+ * Pattukal Wrapped as a cinematic story: swipe through your year (minutes counting up, your #1 song on a spinning
+ * record, your top artist) and finish on the interactive top-11 grid where you can select songs and play them.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun WrappedScreen(navController: NavController) {
+  val database = LocalDatabase.current
+  val year = remember { LocalDate.now().year }
+  val from = remember { LocalDate.of(year, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli() }
+  val to = remember { LocalDateTime.now().plusDays(1).toInstant(ZoneOffset.UTC).toEpochMilli() }
+  val songs by remember { database.mostPlayedSongs(from, 11, 0, to) }.collectAsState(initial = null)
+  val artists by remember { database.mostPlayedArtists(from, 3, 0, to) }.collectAsState(initial = emptyList())
+  val totalMs by remember { database.getTotalPlayTimeInRange(from, to) }.collectAsState(initial = 0L)
+  val minutes = ((totalMs ?: 0L) / 60000L)
+  val hasHistory = (songs?.size ?: 0) >= 3
+  val pageCount = if (hasHistory) 4 else 2
+  val pager = rememberPagerState { pageCount }
+  val target = WrapPalettes[pager.currentPage % WrapPalettes.size]
+  val c0 by animateColorAsState(target[0], tween(700), label = "c0")
+  val c1 by animateColorAsState(target[1], tween(700), label = "c1")
+  val c2 by animateColorAsState(target[2], tween(700), label = "c2")
+  val drift = rememberInfiniteTransition(label = "wrap-drift")
+  val ph by drift.animateFloat(0f, 6.2831f, infiniteRepeatable(tween(20000, easing = LinearEasing)), label = "ph")
+
+  Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(c0, c1, c0)))) {
+    Canvas(Modifier.fillMaxSize()) {
+      for (i in 0 until 4) {
+        val cx = size.width * (0.5f + 0.45f * sin(ph + i * 1.7f))
+        val cy = size.height * (0.5f + 0.4f * cos(ph * 0.8f + i * 2.1f))
+        drawCircle(Brush.radialGradient(listOf(c2.copy(alpha = 0.35f), Color.Transparent), Offset(cx, cy), size.width * 0.55f), size.width * 0.55f, Offset(cx, cy))
+      }
+    }
+    HorizontalPager(state = pager, modifier = Modifier.fillMaxSize()) { page ->
+      val off = (pager.currentPage - page) + pager.currentPageOffsetFraction
+      Box(Modifier.fillMaxSize().graphicsLayer { alpha = 1f - abs(off).coerceAtMost(1f) * 0.6f; translationX = off * size.width * 0.25f; val k = 1f - abs(off).coerceAtMost(1f) * 0.08f; scaleX = k; scaleY = k }) {
+        if (!hasHistory) {
+          if (page == 0) WrapWelcome() else WrappedGridPage(navController)
+        } else when (page) {
+          0 -> WrapIntro(minutes, year, active = pager.currentPage == 0)
+          1 -> WrapTopSong(songs?.firstOrNull(), active = pager.currentPage == 1)
+          2 -> WrapTopArtist(artists.firstOrNull()?.artist?.name, artists.firstOrNull()?.artist?.thumbnailUrl, artists.drop(1).mapNotNull { it.artist.name })
+          else -> WrappedGridPage(navController)
+        }
+      }
+    }
+    // story progress bars
+    Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 14.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+      repeat(pageCount) { i ->
+        Box(Modifier.weight(1f).height(3.dp).clip(CircleShape).background(Color.White.copy(alpha = if (i <= pager.currentPage) 0.95f else 0.25f)))
+      }
+    }
+  }
+}
+
+@Composable
+private fun WrapIntro(minutes: Long, year: Int, active: Boolean) {
+  val count = remember { Animatable(0f) }
+  LaunchedEffect(active, minutes) { if (active) { count.snapTo(0f); count.animateTo(minutes.toFloat(), tween(2200)) } }
+  Column(Modifier.fillMaxSize().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Text("PATTUKAL WRAPPED $year", fontSize = 12.sp, letterSpacing = 4.sp, color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.Bold)
+    Spacer(Modifier.height(24.dp))
+    Text("%,d".format(count.value.toLong()), fontSize = 88.sp, fontWeight = FontWeight.Black, color = Color.White, lineHeight = 90.sp)
+    Text("minutes of music", fontSize = 22.sp, color = Color.White.copy(alpha = 0.9f), fontWeight = FontWeight.SemiBold)
+    Spacer(Modifier.height(18.dp))
+    val hours = minutes / 60
+    val label = when {
+      hours >= 200 -> "Legend. The music never stops."
+      hours >= 80 -> "A true music devotee."
+      hours >= 20 -> "You really know your sound."
+      else -> "A great start to your story."
+    }
+    Text("That is about $hours hours. $label", fontSize = 15.sp, color = Color.White.copy(alpha = 0.75f), textAlign = TextAlign.Center)
+    Spacer(Modifier.height(40.dp))
+    Text("Swipe  →", color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp)
+  }
+}
+
+@Composable
+private fun WrapTopSong(song: echo.music.iad1tya.db.entities.Song?, active: Boolean) {
+  val connection = LocalPlayerConnection.current
+  val spin = rememberInfiniteTransition(label = "vinyl")
+  val rot by spin.animateFloat(0f, 360f, infiniteRepeatable(tween(7000, easing = LinearEasing)), label = "rot")
+  Column(Modifier.fillMaxSize().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Text("YOUR #1 SONG", fontSize = 12.sp, letterSpacing = 4.sp, color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.Bold)
+    Spacer(Modifier.height(28.dp))
+    Box(Modifier.size(280.dp).graphicsLayer { rotationZ = if (active) rot else 0f }, contentAlignment = Alignment.Center) {
+      Canvas(Modifier.fillMaxSize()) {
+        drawCircle(Color(0xFF0B0B0F))
+        for (r in 1..9) drawCircle(Color.White.copy(alpha = 0.06f), size.minDimension / 2f * (0.42f + r * 0.058f), style = androidx.compose.ui.graphics.drawscope.Stroke(1.5f))
+        drawArc(Color.White.copy(alpha = 0.12f), 200f, 40f, false, Offset(size.width * 0.06f, size.height * 0.06f), Size(size.width * 0.88f, size.height * 0.88f), style = androidx.compose.ui.graphics.drawscope.Stroke(14f))
+      }
+      AsyncImage(model = song?.song?.thumbnailUrl?.resize(500, 500), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(150.dp).clip(CircleShape))
+      Box(Modifier.size(14.dp).clip(CircleShape).background(Color(0xFF0B0B0F)))
+    }
+    Spacer(Modifier.height(28.dp))
+    Text(song?.song?.title ?: "", fontSize = 28.sp, fontWeight = FontWeight.Black, color = Color.White, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
+    Text(song?.artists?.joinToString { it.name } ?: "", fontSize = 15.sp, color = Color.White.copy(alpha = 0.75f), maxLines = 1)
+    Spacer(Modifier.height(22.dp))
+    WBtn("▶  Play it again", true) { song?.let { connection?.playQueue(ListQueue(title = "Wrapped", items = listOf(it.toMediaMetadata().toMediaItem()))) } }
+  }
+}
+
+@Composable
+private fun WrapTopArtist(name: String?, image: String?, others: List<String>) {
+  Column(Modifier.fillMaxSize().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Text("YOUR TOP ARTIST", fontSize = 12.sp, letterSpacing = 4.sp, color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.Bold)
+    Spacer(Modifier.height(26.dp))
+    Box(contentAlignment = Alignment.Center) {
+      Box(Modifier.size(260.dp).clip(CircleShape).background(Brush.sweepGradient(listOf(Color(0xFFFF4FA3), Color(0xFFFF9A3C), Color(0xFF22D3EE), Color(0xFFFF4FA3)))))
+      AsyncImage(model = image?.resize(500, 500), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(244.dp).clip(CircleShape).background(Color.Black))
+    }
+    Spacer(Modifier.height(26.dp))
+    Text(name ?: "", fontSize = 34.sp, fontWeight = FontWeight.Black, color = Color.White, textAlign = TextAlign.Center, maxLines = 2)
+    if (others.isNotEmpty()) Text("Also on repeat: " + others.joinToString(" · "), fontSize = 14.sp, color = Color.White.copy(alpha = 0.7f), textAlign = TextAlign.Center, modifier = Modifier.padding(top = 10.dp))
+  }
+}
+
+@Composable
+private fun WrapWelcome() {
+  Column(Modifier.fillMaxSize().padding(28.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Text("WELCOME TO PATTUKAL", fontSize = 12.sp, letterSpacing = 4.sp, color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.Bold)
+    Spacer(Modifier.height(20.dp))
+    Text("Your story\nstarts here", fontSize = 52.sp, fontWeight = FontWeight.Black, color = Color.White, textAlign = TextAlign.Center, lineHeight = 56.sp)
+    Spacer(Modifier.height(16.dp))
+    Text("Listen for a while and your Wrapped fills with your minutes, songs and artists. Swipe for picks to begin.", fontSize = 15.sp, color = Color.White.copy(alpha = 0.75f), textAlign = TextAlign.Center)
+    Spacer(Modifier.height(36.dp))
+    Text("Swipe  →", color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp)
+  }
 }

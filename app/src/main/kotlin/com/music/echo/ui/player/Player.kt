@@ -1690,7 +1690,7 @@ fun BottomSheetPlayer(
             )
           }
           PlayerBackgroundStyle.GTA_VI -> {
-            echo.music.iad1tya.ui.component.GtaViBackground(
+            echo.music.iad1tya.ui.component.GtaViNightBackground(
               modifier = Modifier.fillMaxSize().graphicsLayer { alpha = backgroundAlphaProvider() },
             )
           }
@@ -3079,7 +3079,7 @@ fun BottomSheetPlayer(
           val customThumbScale by rememberPreference(echo.music.iad1tya.constants.PlayerThumbScaleKey, 1f)
           var customThumbY by rememberPreference(echo.music.iad1tya.constants.PlayerThumbOffsetYKey, 0f)
           var customCtrlY by rememberPreference(echo.music.iad1tya.constants.PlayerControlsOffsetYKey, 0f)
-          var showCustomizer by remember { mutableStateOf(false) }
+          var editTab by remember { mutableStateOf(GarageTab.BODY) }
           var editMode by remember { mutableStateOf(false) }
           val gArtAlpha by rememberPreference(echo.music.iad1tya.constants.GarageArtAlphaKey, 1f)
           val gShadow by rememberPreference(echo.music.iad1tya.constants.GarageArtShadowKey, 0f)
@@ -3134,7 +3134,7 @@ fun BottomSheetPlayer(
                   .graphicsLayer { translationY = customThumbY * density }
                   .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp))
                   .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), RoundedCornerShape(24.dp))
-                  .pointerInput(Unit) { detectTapGestures { showCustomizer = true } }
+                  .pointerInput(Unit) { detectTapGestures { editTab = GarageTab.BODY } }
                   .pointerInput(Unit) {
                     detectDragGestures { change, drag ->
                       change.consume()
@@ -3143,7 +3143,7 @@ fun BottomSheetPlayer(
                   },
                 contentAlignment = Alignment.Center,
               ) {
-                Text("Tap to customize · drag to move", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text("Artwork · drag to move", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
               }
             }
             // Pencil: toggles edit mode. Sits below the status bar so it is always reachable.
@@ -3160,8 +3160,6 @@ fun BottomSheetPlayer(
               )
             }
           }
-          if (showCustomizer) PlayerCustomizerSheet(onDismiss = { showCustomizer = false })
-
           if (showLyricsOnPlayer && !showInlineLyrics) {
             PlayerSyncedLyricsView(
               mediaMetadata = mediaMetadata,
@@ -3186,7 +3184,7 @@ fun BottomSheetPlayer(
                   .graphicsLayer { translationY = customCtrlY * density }
                   .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(20.dp))
                   .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.08f), RoundedCornerShape(20.dp))
-                  .pointerInput(Unit) { detectTapGestures { showCustomizer = true } }
+                  .pointerInput(Unit) { detectTapGestures { editTab = GarageTab.WHEELS } }
                   .pointerInput(Unit) {
                     detectDragGestures { change, drag ->
                       change.consume()
@@ -3195,11 +3193,15 @@ fun BottomSheetPlayer(
                   },
                 contentAlignment = Alignment.Center,
               ) {
-                Text("Controls · tap to customize · drag to move", color = MaterialTheme.colorScheme.tertiary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text("Play / controls · drag to move", color = MaterialTheme.colorScheme.tertiary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
               }
             }
           }
 
+
+          if (editMode) {
+            PlayerEditPanel(tab = editTab, onTabChange = { editTab = it }, onDismiss = { editMode = false })
+          }
 
           Spacer(Modifier.height(if (useNewPlayerDesign) 30.dp else 8.dp))
         }

@@ -94,8 +94,8 @@ fun ThemeScreen(navController: NavController, highlightKey: String? = null) {
   val (lavaTheme, onLavaThemeChange) = rememberPreference(LavaThemeKey, defaultValue = false)
   val (liquidTheme, onLiquidThemeChange) = rememberPreference(LiquidThemeKey, defaultValue = false)
   val (cityTheme, onCityThemeChange) = rememberPreference(CityThemeKey, defaultValue = false)
-  val (gtaTheme, onGtaChange) = rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, defaultValue = false)
-  val (_, onWinterChange) = rememberPreference(echo.music.iad1tya.constants.WinterEnabledKey, defaultValue = true)
+  val (gtaTheme, onGtaChange) = rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, defaultValue = true)
+  val (_, onWinterChange) = rememberPreference(echo.music.iad1tya.constants.WinterEnabledKey, defaultValue = false)
   val (_, onPlayerBgChange) =
     echo.music.iad1tya.utils.rememberEnumPreference(
       PlayerBackgroundStyleKey,

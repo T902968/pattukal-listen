@@ -73,7 +73,7 @@ fun WinterSettings(navController: NavController, scrollBehavior: TopAppBarScroll
       title = "Winter",
       items =
         listOf(
-          boolItem("Winter mode", "Icy navy theme, aurora Home and winter effects. Turn off to return to your normal theme", WinterEnabledKey, true),
+          boolItem("Winter mode", "Icy navy theme, aurora Home and winter effects. Turn off to return to your normal theme", WinterEnabledKey, false),
           boolItem("Frost edges", "Frosted glow around the screen edges", FrostEdgesKey, false),
           boolItem("Touch reacts", "Flakes and particles move away from your finger", EffectTouchKey, true),
           boolItem("Water fill", "Pull the cord at the top of Home to fill the screen with water. Albums float on it", WaterFillKey, true),

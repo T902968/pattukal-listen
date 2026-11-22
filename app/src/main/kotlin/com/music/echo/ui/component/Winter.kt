@@ -171,7 +171,7 @@ private fun spawn(kind: String, w: Float, h: Float, anywhere: Boolean, d: Float,
 
 @Composable
 fun WinterEffectsOverlay() {
-  val (winterOn, _) = rememberPreference(WinterEnabledKey, true)
+  val (winterOn, _) = rememberPreference(WinterEnabledKey, false)
   val (overlayOn, _) = rememberPreference(OverlayEnabledKey, true)
   val (kind, _) = rememberPreference(OverlayEffectKey, "snow")
   val (intensity, _) = rememberPreference(OverlayIntensityKey, 6)

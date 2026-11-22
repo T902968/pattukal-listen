@@ -57,7 +57,7 @@ object UpdateNotificationHelper {
 
     val notif =
       NotificationCompat.Builder(context, CHANNEL_ID)
-        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(context))
+        .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(context)).setColor(0xFF2F7BFF.toInt())
         .setContentTitle(context.getString(R.string.update_available_title))
         .setContentText(versionName)
         .setContentIntent(pending)

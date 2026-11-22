@@ -70,7 +70,7 @@ object LocalFileDownloader {
           NotificationCompat.Builder(context, channelId)
             .setContentTitle(fileName)
             .setContentText("Downloading...")
-            .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(context))
+            .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(context)).setColor(0xFF2F7BFF.toInt())
             .setOngoing(true)
             .setProgress(100, 0, true)
 
@@ -125,7 +125,7 @@ object LocalFileDownloader {
           .setContentText("Download complete")
           .setProgress(0, 0, false)
           .setOngoing(false)
-          .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(context))
+          .setSmallIcon(echo.music.iad1tya.utils.NotificationIcon.current(context)).setColor(0xFF2F7BFF.toInt())
         notificationManager.notify(notificationId, notificationBuilder.build())
       } catch (e: Exception) {
         Timber.e(e, "Error downloading local file")

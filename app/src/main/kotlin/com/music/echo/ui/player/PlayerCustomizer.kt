@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -85,7 +86,7 @@ private val Glass = Color(0xFFFFFFFF)
 
 private fun pretty(name: String) = name.lowercase().split('_').joinToString(" ") { it.replaceFirstChar(Char::uppercase) }
 
-private enum class GarageTab(val label: String, val hint: String) {
+enum class GarageTab(val label: String, val hint: String) {
   BODY("BODY", "Layout, artwork frame and position"),
   PAINT("PAINT", "Background and accent colour"),
   LIGHTING("LIGHTING", "Ambient album-art glow"),
@@ -103,7 +104,7 @@ private val Accents = listOf(0, 0xFF22D3EE.toInt(), 0xFF8B5CF6.toInt(), 0xFF3B82
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun PlayerCustomizerSheet(onDismiss: () -> Unit) {
+fun PlayerEditPanel(tab: GarageTab, onTabChange: (GarageTab) -> Unit, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
 
@@ -127,7 +128,6 @@ fun PlayerCustomizerSheet(onDismiss: () -> Unit) {
   var fontScale by rememberPreference(GarageFontScaleKey, 1f)
   val activeId by rememberPreference(GarageActiveBuildKey, "")
 
-  var tab by remember { mutableStateOf(GarageTab.BODY) }
   var entry by remember { mutableStateOf<JSONObject?>(null) }
   var builds by remember { mutableStateOf(listOf<GarageBuild>()) }
   var nameDialog by remember { mutableStateOf<Pair<String?, String>?>(null) } // (buildId or null for new, text)
@@ -139,45 +139,31 @@ fun PlayerCustomizerSheet(onDismiss: () -> Unit) {
   val meta by (LocalPlayerConnection.current?.mediaMetadata ?: remember { MutableStateFlow(null) }).collectAsState()
   val accentColor = if (accent == 0) Cyan else Color(accent)
 
-  Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
-    Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Ink, Color(0xFF0A0B26), Color(0xFF10072A))))) {
-      Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-        // Header
-        Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-          Column(Modifier.weight(1f)) {
-            Text("PATTUKAL", fontSize = 11.sp, letterSpacing = 4.sp, color = Cyan, fontWeight = FontWeight.Bold)
-            Text("Player Garage", fontSize = 26.sp, fontWeight = FontWeight.Black, color = Color.White)
-            Text(builds.firstOrNull { it.id == activeId }?.let { "Build: ${it.name}" } ?: "Build: Unsaved", fontSize = 12.sp, color = Color.White.copy(alpha = 0.55f))
-          }
-          TextButton(onClick = { scope.launch { GarageBuilds.restoreDefaults(context) } }) { Text("Factory", color = Violet) }
+  Column(
+    modifier.fillMaxWidth()
+      .clip(RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp))
+      .background(Brush.verticalGradient(listOf(Color(0xF00A0B26), Color(0xF405060F))))
+      .border(1.dp, Brush.horizontalGradient(listOf(Cyan, Violet, Blue)), RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp))
+      .padding(top = 10.dp),
+  ) {
+    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+      LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.weight(1f)) {
+        items(GarageTab.entries.toList()) { t ->
+          val sel = t == tab
+          Text(
+            t.label, fontSize = 11.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold,
+            color = if (sel) Ink else Color.White.copy(alpha = 0.8f),
+            modifier = Modifier.clip(RoundedCornerShape(50))
+              .background(if (sel) Brush.horizontalGradient(listOf(Cyan, Violet)) else Brush.horizontalGradient(listOf(Glass.copy(alpha = 0.08f), Glass.copy(alpha = 0.08f))))
+              .clickable { onTabChange(t) }.padding(horizontal = 12.dp, vertical = 7.dp),
+          )
         }
-
-        // Live preview
-        GaragePreview(
-          thumb = meta?.thumbnailUrl, title = meta?.title ?: "Your song", artist = meta?.artists?.joinToString { it.name } ?: "Artist",
-          corner = corner, disc = disc, rotating = rotating, scale = scale, artAlpha = artAlpha, shadow = shadow,
-          glow = glow, pulse = pulse, glowStrength = glowStrength, accent = accentColor, buttons = buttons,
-          slider = slider, hideSlider = hideSlider, ctrlScale = ctrlScale, fontScale = fontScale,
-        )
-
-        // Category rail
-        LazyRow(contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 12.dp)) {
-          items(GarageTab.entries.toList()) { t ->
-            val sel = t == tab
-            Text(
-              t.label, fontSize = 12.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold,
-              color = if (sel) Ink else Color.White.copy(alpha = 0.8f),
-              modifier = Modifier.clip(RoundedCornerShape(50))
-                .background(if (sel) Brush.horizontalGradient(listOf(Cyan, Violet)) else Brush.horizontalGradient(listOf(Glass.copy(alpha = 0.08f), Glass.copy(alpha = 0.08f))))
-                .border(1.dp, Glass.copy(alpha = if (sel) 0f else 0.14f), RoundedCornerShape(50))
-                .clickable { tab = t }.padding(horizontal = 16.dp, vertical = 9.dp),
-            )
-          }
-        }
-
+      }
+      TextButton(onClick = { scope.launch { GarageBuilds.restoreDefaults(context) } }) { Text("Reset all", color = Violet, fontSize = 12.sp) }
+    }
         // Panel
         Column(
-          Modifier.weight(1f).fillMaxWidth().padding(top = 8.dp).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
+          Modifier.heightIn(max = 230.dp).fillMaxWidth().padding(top = 4.dp).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
         ) {
           AnimatedContent(targetState = tab, transitionSpec = { fadeIn(tween(220)) togetherWith fadeOut(tween(160)) }, label = "garage-tab") { t ->
             Column {
@@ -288,17 +274,11 @@ fun PlayerCustomizerSheet(onDismiss: () -> Unit) {
           Spacer(Modifier.height(20.dp))
         }
 
-        // Action bar
-        Row(
-          Modifier.fillMaxWidth().padding(16.dp).clip(RoundedCornerShape(24.dp)).background(Glass.copy(alpha = 0.08f))
-            .border(1.dp, Glass.copy(alpha = 0.14f), RoundedCornerShape(24.dp)).padding(10.dp),
-          horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically,
-        ) {
-          GButton("Cancel", false, Modifier.weight(1f)) { scope.launch { entry?.let { GarageBuilds.restore(context, it) }; onDismiss() } }
-          GButton("Save build", false, Modifier.weight(1f)) { nameDialog = (activeId.ifBlank { null }?.takeIf { id -> builds.any { it.id == id } }) to (builds.firstOrNull { it.id == activeId }?.name ?: "My build ${builds.size + 1}") }
-          GButton("Apply", true, Modifier.weight(1f)) { onDismiss() }
-        }
-      }
+
+    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+      GButton("Undo", false, Modifier.weight(1f)) { scope.launch { entry?.let { GarageBuilds.restore(context, it) } } }
+      GButton("Save build", false, Modifier.weight(1f)) { nameDialog = (activeId.ifBlank { null }?.takeIf { id -> builds.any { it.id == id } }) to (builds.firstOrNull { it.id == activeId }?.name ?: "My build ${builds.size + 1}") }
+      GButton("Done", true, Modifier.weight(1f)) { onDismiss() }
     }
   }
 

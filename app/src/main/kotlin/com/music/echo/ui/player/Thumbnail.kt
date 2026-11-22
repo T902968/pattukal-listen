@@ -577,7 +577,9 @@ private fun ThumbnailItem(
   modifier: Modifier = Modifier,
 ) {
   val rotatingThumbnail by rememberPreference(RotatingThumbnailKey, defaultValue = false)
-  val discThumbnail by rememberPreference(echo.music.iad1tya.constants.DiscThumbnailKey, defaultValue = false)
+  val discPref by rememberPreference(echo.music.iad1tya.constants.DiscThumbnailKey, defaultValue = false)
+  val gtaThemeOn by rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, defaultValue = true)
+  val discThumbnail = discPref || gtaThemeOn // vinyl disc is part of the GTA VI theme
   val isPlaying by playerConnection.isPlaying.collectAsState()
   val isCurrentItem = item.mediaId == currentMediaId
 

@@ -37,6 +37,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -118,7 +120,7 @@ private val Crimson = Color(0xFF2A5BD7)
 /** True when the Winter edition is on (it is the default theme). */
 @Composable
 fun rememberWinterOn(): Boolean {
-  val (on, _) = rememberPreference(WinterEnabledKey, true)
+  val (on, _) = rememberPreference(WinterEnabledKey, false)
   return on
 }
 
@@ -346,11 +348,29 @@ fun TimeFoldEntry() {
       if (value.isNotEmpty()) HomeCache.put(key, value)
     }
     val groups = if (selectedLang == null) history else eraSongs
-    AlertDialog(
+    androidx.compose.ui.window.Dialog(
       onDismissRequest = { open = false; SeasonState.phase = SeasonPhase.Idle },
-      shape = RoundedCornerShape(28.dp),
-      title = { Text("Time Fold") },
-      text = {
+      properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+    ) {
+      Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF05060F), Color(0xFF14083A), Color(0xFF0A1B3D))))) {
+        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+          drawCircle(Brush.radialGradient(listOf(Color(0xFF8B5CF6).copy(alpha = 0.45f), Color.Transparent), Offset(size.width * 0.2f, size.height * 0.2f), size.width * 0.7f), size.width * 0.7f, Offset(size.width * 0.2f, size.height * 0.2f))
+          drawCircle(Brush.radialGradient(listOf(Color(0xFF22D3EE).copy(alpha = 0.35f), Color.Transparent), Offset(size.width * 0.85f, size.height * 0.75f), size.width * 0.75f), size.width * 0.75f, Offset(size.width * 0.85f, size.height * 0.75f))
+        }
+        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalContentColor provides Color.White) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(16.dp)) {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+              Text("PATTUKAL", fontSize = 11.sp, letterSpacing = 4.sp, color = Color(0xFF22D3EE), fontWeight = FontWeight.Bold)
+              Text("Time Fold", fontSize = 30.sp, fontWeight = FontWeight.Black)
+            }
+            TextButton(onClick = { open = false }) { Text("Close", color = Color(0xFF8B5CF6)) }
+          }
+          Spacer(Modifier.height(10.dp))
+          Box(
+            Modifier.fillMaxWidth().weight(1f).glassSurface(RoundedCornerShape(30.dp), Color.White)
+              .border(1.dp, Brush.linearGradient(listOf(Color(0xFF22D3EE).copy(alpha = 0.7f), Color(0xFF8B5CF6).copy(alpha = 0.7f))), RoundedCornerShape(30.dp)).padding(16.dp),
+          ) {
         Column {
           if (languages.isNotEmpty()) {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -374,11 +394,11 @@ fun TimeFoldEntry() {
               Text("${groups[i].second.size} songs · swipe the cards", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
               androidx.compose.runtime.key(groups[i].first, lang) {
                 val ls = androidx.compose.foundation.lazy.rememberLazyListState()
-                LazyRow(state = ls, contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 70.dp), horizontalArrangement = Arrangement.spacedBy((-14).dp)) {
+                LazyRow(state = ls, contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 80.dp), horizontalArrangement = Arrangement.spacedBy((-24).dp)) {
                   items(groups[i].second, key = { "tf_${lang}_${groups[i].first}_${it.id}" }) { s ->
                     val itemKey = "tf_${lang}_${groups[i].first}_${s.id}"
                     Column(
-                      Modifier.size(width = 130.dp, height = 204.dp)
+                      Modifier.size(width = 190.dp, height = 300.dp)
                         .graphicsLayer {
                           // 3D cover-flow: cards fold away from the centre like layers of time
                           val info = ls.layoutInfo
@@ -397,7 +417,7 @@ fun TimeFoldEntry() {
                           open = false
                         }
                     ) {
-                      AsyncImage(model = s.thumb?.resize(360, 360), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(130.dp).clip(RoundedCornerShape(18.dp)).border(1.dp, Brush.linearGradient(listOf(Orange.copy(alpha = 0.7f), Violet.copy(alpha = 0.7f))), RoundedCornerShape(18.dp)))
+                      AsyncImage(model = s.thumb?.resize(520, 520), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(190.dp).clip(RoundedCornerShape(18.dp)).border(1.dp, Brush.linearGradient(listOf(Orange.copy(alpha = 0.7f), Violet.copy(alpha = 0.7f))), RoundedCornerShape(18.dp)))
                       Text(s.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
                       Text(s.artist, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                       Text("＋ Play next", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary,
@@ -412,9 +432,11 @@ fun TimeFoldEntry() {
             }
           }
         }
-      },
-      confirmButton = { TextButton(onClick = { open = false }) { Text("Close") } },
-    )
+          }
+        }
+        }
+      }
+    }
   }
 }
 

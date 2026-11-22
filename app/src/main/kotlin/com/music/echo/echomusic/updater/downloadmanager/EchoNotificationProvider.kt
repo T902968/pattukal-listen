@@ -55,6 +55,7 @@ class EchoNotificationProvider(
         player.playbackState != Player.STATE_ENDED
 
     val notification = mediaNotification.notification
+    notification.color = 0xFF2F7BFF.toInt() // Pattukal blue accent
     if (shouldBeOngoing) {
       notification.flags = notification.flags or Notification.FLAG_ONGOING_EVENT
     } else {

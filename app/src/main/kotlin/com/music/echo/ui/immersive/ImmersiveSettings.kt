@@ -123,7 +123,7 @@ fun ImmersiveSettingsScreen(navController: NavController) {
   val (cubeReduced, setCubeReduced) = rememberPreference(MusicCubeReducedMotionKey, false)
   val (cubeGrid, setCubeGrid) = rememberPreference(MusicCubeGridKey, false)
   val (pitch, setPitch) = rememberPreference(MiniPlayerPitchKey, true)
-  val (_, setWinterOff) = rememberPreference(WinterEnabledKey, true)
+  val (_, setWinterOff) = rememberPreference(WinterEnabledKey, false)
   val (_, setNature) = rememberPreference(NatureThemeKey, false)
   val (_, setLava) = rememberPreference(LavaThemeKey, false)
   val (_, setLiquidT) = rememberPreference(LiquidThemeKey, false)

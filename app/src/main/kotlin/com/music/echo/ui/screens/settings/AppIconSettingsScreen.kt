@@ -180,7 +180,7 @@ fun AppIconSettingsScreen(
           AppIconType.CLASSIC,
           "Pattukal Classic",
           "The original Pattukal launcher icon",
-          R.mipmap.ic_launcher
+          R.mipmap.icon_classic
         ),
         AppIconOption(
           AppIconType.GREEN,

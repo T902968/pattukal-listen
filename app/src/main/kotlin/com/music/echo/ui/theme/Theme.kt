@@ -174,8 +174,8 @@ fun echomusicTheme(
   val lavaTheme by rememberPreference(echo.music.iad1tya.constants.LavaThemeKey, false)
   val liquidTheme by rememberPreference(echo.music.iad1tya.constants.LiquidThemeKey, false)
   val cityTheme by rememberPreference(echo.music.iad1tya.constants.CityThemeKey, false)
-  val gtaTheme by rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, false)
-  val winterOn by rememberPreference(echo.music.iad1tya.constants.WinterEnabledKey, true)
+  val gtaTheme by rememberPreference(echo.music.iad1tya.constants.GtaThemeKey, true)
+  val winterOn by rememberPreference(echo.music.iad1tya.constants.WinterEnabledKey, false)
   val winterVariantKey by rememberPreference(echo.music.iad1tya.constants.WinterVariantKey, "frozen")
   val winterTheme = winterOn && darkTheme
   val winterVariant = echo.music.iad1tya.ui.component.WinterVariant.from(winterVariantKey)

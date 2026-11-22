@@ -385,7 +385,7 @@ fun GestureMusicManual(onDismiss: () -> Unit) {
 fun GestureMusicFirstRun() {
   val (enabled, _) = rememberPreference(GestureMusicEnabledKey, true)
   var seen by rememberPreference(GestureMusicManualSeenKey, false)
-  val (choice, _) = rememberPreference(WinterEnabledKey, true)
+  val (choice, _) = rememberPreference(WinterEnabledKey, false)
   var shown by remember { mutableStateOf(false) }
   // The first-run manual popup was removed: gestures just work, no popup or status bubble.
   return

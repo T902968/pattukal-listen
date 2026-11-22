@@ -38,7 +38,7 @@ object GtaLaunchNotifier {
     val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     nm.createNotificationChannel(NotificationChannel(CH, "Special days", NotificationManager.IMPORTANCE_DEFAULT))
     val n = NotificationCompat.Builder(context, CH)
-      .setSmallIcon(NotificationIcon.current(context))
+      .setSmallIcon(NotificationIcon.current(context)).setColor(0xFF2F7BFF.toInt())
       .setContentTitle("GTA VI is launched 🤣")
       .setContentText("Pattukal has a GTA VI theme and player style now. Try it in Settings → Theme.")
       .setAutoCancel(true)

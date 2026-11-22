@@ -129,3 +129,80 @@ fun GtaViBackground(modifier: Modifier = Modifier, scrim: Float = 0.28f) {
     drawRect(Color.Black.copy(alpha = scrim))
   }
 }
+
+/**
+ * Player version: a neon Vice-style night drive. Skyline with lit windows, a big pink moon, a perspective road grid
+ * rushing toward you and light streaks of passing cars. Original procedural art, in phase with the Home sunset.
+ */
+@Composable
+fun GtaViNightBackground(modifier: Modifier = Modifier, scrim: Float = 0.3f) {
+  var t by remember { mutableFloatStateOf(0f) }
+  LaunchedEffect(Unit) { while (true) withFrameNanos { t = (System.currentTimeMillis() % 3_600_000L) / 1000f } }
+  Canvas(modifier.fillMaxSize()) {
+    val w = size.width
+    val h = size.height
+    val horizon = h * 0.58f
+    drawRect(Brush.verticalGradient(listOf(Color(0xFF05010F), Color(0xFF1A0540), Color(0xFF5B1285), Color(0xFFFF3FA4)), 0f, horizon))
+    for (i in 0 until 60) {
+      val x = ((i * 7919) % 1000) / 1000f * w
+      val y = ((i * 104729) % 1000) / 1000f * horizon * 0.7f
+      val tw = (sin(t * 1.4 + i) * 0.5 + 0.5).toFloat()
+      drawCircle(Color.White.copy(alpha = 0.12f + 0.55f * tw), 1f + tw, Offset(x, y))
+    }
+    val moon = Offset(w * 0.5f, horizon * 0.52f)
+    drawCircle(Brush.radialGradient(listOf(Color(0xFFFF7AC8).copy(alpha = 0.5f), Color.Transparent), moon, w * 0.5f), w * 0.5f, moon)
+    drawCircle(Brush.verticalGradient(listOf(Color(0xFFFFB3E1), Color(0xFFFF5FA8)), moon.y - w * 0.16f, moon.y + w * 0.16f), w * 0.16f, moon)
+    // skyline
+    for (layer in 0..1) {
+      val shift = (t * (2f + layer * 3f)) % (w * 0.6f)
+      val col = if (layer == 0) Color(0xFF1B0638) else Color(0xFF0B0214)
+      for (rep in 0..2) for (i in 0 until 14) {
+        val bw = w * (0.05f + ((i * 37 + layer * 11) % 5) * 0.014f)
+        val bh = h * (0.07f + ((i * 53 + layer * 7) % 9) * 0.017f) * (if (layer == 0) 1.0f else 0.7f)
+        val x = i * w * 0.075f + rep * w * 0.6f - shift - layer * 20f
+        drawRect(col, Offset(x, horizon - bh), Size(bw, bh))
+        for (wi in 0 until 4) {
+          val on = ((i * 31 + wi * 17 + layer * 5 + (t * 0.4f).toInt()) % 4) != 0
+          if (on) drawRect((if (wi % 2 == 0) Color(0xFF22D3EE) else Color(0xFFFF6FC4)).copy(alpha = 0.75f), Offset(x + bw * 0.18f, horizon - bh + h * 0.012f + wi * h * 0.016f), Size(bw * 0.2f, h * 0.006f))
+        }
+      }
+    }
+    // road
+    drawRect(Brush.verticalGradient(listOf(Color(0xFF16062C), Color(0xFF05010F)), horizon, h), Offset(0f, horizon), Size(w, h - horizon))
+    val vp = Offset(w * 0.5f, horizon)
+    for (i in -8..8) { // converging lines
+      drawLine(Color(0xFF22D3EE).copy(alpha = 0.35f), vp, Offset(w * 0.5f + i * w * 0.32f, h), 2f)
+    }
+    for (k in 0 until 9) { // lines rushing toward the viewer
+      val p = ((k / 9f) + t * 0.18f) % 1f
+      val y = horizon + (h - horizon) * p * p
+      drawLine(Color(0xFFFF4FA3).copy(alpha = 0.15f + 0.5f * p), Offset(0f, y), Offset(w, y), 1.5f + 3f * p)
+    }
+    // passing car lights
+    for (i in 0 until 5) {
+      val p = ((t * (0.12f + i * 0.03f) + i * 0.21f) % 1f)
+      val y = horizon + (h - horizon) * p * p
+      val lane = (if (i % 2 == 0) -1 else 1) * (0.06f + p * 0.28f) * w
+      val r = 2f + 7f * p
+      drawCircle(if (i % 2 == 0) Color(0xFFFF2D55) else Color(0xFFFFF1B8), r, Offset(w * 0.5f + lane - r * 2f, y))
+      drawCircle(if (i % 2 == 0) Color(0xFFFF2D55) else Color(0xFFFFF1B8), r, Offset(w * 0.5f + lane + r * 2f, y))
+    }
+    // palms
+    fun palm(x: Float, height: Float, lean: Float, phase: Float) {
+      val sway = sin(t * 0.8 + phase).toFloat() * 9f
+      val base = Offset(x, h * 0.99f)
+      val topP = Offset(x + lean + sway, base.y - height)
+      drawPath(Path().apply { moveTo(base.x - 7f, base.y); lineTo(base.x + 7f, base.y); lineTo(topP.x + 3f, topP.y); lineTo(topP.x - 3f, topP.y); close() }, Color(0xFF05010F))
+      for (a in listOf(-170f, -145f, -120f, -95f, -75f, -50f, -25f, -5f)) {
+        val rad = a * PI / 180.0
+        val len = height * 0.4f
+        val end = Offset(topP.x + (cos(rad) * len).toFloat(), topP.y + (sin(rad) * len * 0.55f).toFloat() + len * 0.3f)
+        val c = Offset((topP.x + end.x) / 2f, topP.y - len * 0.25f)
+        drawPath(Path().apply { moveTo(topP.x, topP.y); quadraticBezierTo(c.x, c.y, end.x, end.y); quadraticBezierTo(c.x, c.y + 16f, topP.x, topP.y + 9f); close() }, Color(0xFF05010F))
+      }
+    }
+    palm(w * 0.06f, h * 0.38f, 40f, 0f)
+    palm(w * 0.95f, h * 0.34f, -36f, 2f)
+    drawRect(Color.Black.copy(alpha = scrim))
+  }
+}
