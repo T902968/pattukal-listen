@@ -9,9 +9,6 @@ import androidx.compose.ui.geometry.Size
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
