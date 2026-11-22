@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-22T04:34:46.283657Z",
+  "banner": {
+    "enabled": false,
+    "title": "",
+    "subtitle": "",
+    "imageUrl": "",
+    "songId": ""
+  },
+  "announcements": [],
+  "sections": [
+    {
+      "id": "featured",
+      "type": "featured",
+      "title": "Featured",
+      "enabled": true,
+      "items": [
+        {
+          "id": "WxfXwkq0f2Q",
+          "kind": "song",
+          "title": "Imakal Chimmathiravum (From \"Adrishyam\")",
+          "subtitle": "Ranjin Raj, K. S. Harisankar, Nithya Mammen",
+          "thumb": "https:\/\/yt3.googleusercontent.com\/-lm7y5xjijxC49fp9d50a2oF0NZStCMETSgfQz7mQcHx0HnczWO0js8QTCiW_xb8Xij0Mw-Zi-sUZODW=w120-h120-l90-rj"
+        }
+      ]
+    },
+    {
+      "id": "trending",
+      "type": "trending",
+      "title": "Trending now",
+      "enabled": true,
+      "items": []
+    },
+    {
+      "id": "playlists",
+      "type": "playlists",
+      "title": "Playlists for you",
+      "enabled": true,
+      "items": []
+    },
+    {
+      "id": "recommended",
+      "type": "recommended",
+      "title": "Recommended",
+      "enabled": true,
+      "items": []
+    }
+  ]
+}
