@@ -5,7 +5,8 @@ Single-page web app served at `/app-test/`. Plays through an audio element fed b
 ## Files
 - `index.html` – app (player core, home, search, library, Theme Studio, settings)
 - `extras.js` – Music Galaxy and Buddy, lazy-loaded only when opened
-- `halloween.js` – Halloween Edition, Gesture Music, Mystery Capsule, Time Fold, collections, liquid song-open effect (same features as the Android app 1.5.0)
+- `winter.js` – Winter Edition (6 themes, aurora Home), Overlay effects (snow, fire sparks, leaves, spin, water drops), Water fill, Frost edges, Gesture Music, Mystery Capsule, Time Fold, collections, liquid song-open effect
+- `DuneRise.ttf` – the Dune Rise font, now the default heading font
 - `sw.js` – network-first service worker (bumps `C` to refresh caches)
 
 ## Platform limits (not hidden)

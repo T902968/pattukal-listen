@@ -37,6 +37,9 @@ input{font:inherit;color:inherit}
 main{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 12px) 16px 150px}
 h1{font-size:26px;margin:6px 0 10px;letter-spacing:-.4px}
 h2{font-size:19px;margin:22px 0 2px}
+@font-face{font-family:DuneRise;src:url(DuneRise.ttf) format('truetype');font-display:swap}
+h1,h2,h3,.ptitle,.brandmark b,.opt>span:first-child,.langcard h2{font-family:DuneRise,var(--font);font-weight:400;letter-spacing:.4px}
+.opt>span:first-child small{font-family:var(--font);letter-spacing:0}
 .sub{color:var(--mut);font-size:13px;margin:0 0 8px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
 .chip{padding:7px 14px;border-radius:99px;background:var(--glass);border:1px solid var(--line);white-space:nowrap;font-size:13px}
@@ -275,14 +278,14 @@ let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.style.display
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
 /* ---------- settings ---------- */
-const SECTIONS=[['continue','Continue listening'],['quick','Quick Play'],['cube','Magic Cube'],['capsule','Mystery Capsule'],['fold','Time Fold'],['hwcol','Halloween collections'],['recent','Recently played'],['lang','Language songs'],['taste','Taste AI mixes'],['mood','Moods & genres'],['artists','Your artists'],['top','Top songs']];
+const SECTIONS=[['continue','Continue listening'],['quick','Quick Play'],['cube','Magic Cube'],['capsule','Mystery Capsule'],['fold','Time Fold'],['hwcol','Winter collections'],['recent','Recently played'],['lang','Language songs'],['taste','Taste AI mixes'],['mood','Moods & genres'],['artists','Your artists'],['top','Top songs']];
 const THEMES=[['violet','Violet Galaxy',['#0d0620','#b07bff']],['amoled','AMOLED Black',['#000','#8b7bff']],['midnight','Midnight Blue',['#070d1f','#5aa2ff']],['crimson','Crimson',['#150608','#ff4d5e']],['frosted','Frosted Glass',['#10121c','#9fb4ff']],['liquid','Liquid Glass',['#06101a','#4de0d0']],['light','Minimal Light',['#f6f6fb','#5b45e0']],['cream','Warm Cream',['#f7efe0','#b8601f']],['dynamic','Dynamic Album',['#0b0b12','#ff6fb1']]];
 const LIGHT_THEMES=['light','cream'];
 const LAYOUTS=[['immersive','Immersive Artwork'],['minimal','Minimal'],['vinyl','Vinyl'],['neon','Neon'],['frosted','Frosted Glass'],['classic','Classic']];
 const GRADS=[['Default',null,null],['Sunset','#ff7a45','#ff3d8b'],['Ocean','#2fd0ff','#5a6bff'],['Aurora','#4dffb0','#7a5cff'],['Mango','#ffd24d','#ff6b3d']];
 const S=Object.assign({lowEnd:!!(navigator.deviceMemory&&navigator.deviceMemory<=2),battery:false,reduceAnim:false,tasteAi:true,daily:true,mood:true,discover:true,ambienceBtn:true,cropThumb:true,slider:'wavy',bg:'waves',langs:null,
   theme:'violet',themeLight:'light',themeDark:'violet',mode:'dark',accent:null,accent2:null,useGrad:false,blur:18,artR:22,contrast:false,big:false,fs:15,anim:1,layout:'immersive',dynCol:true,artFx:true,
-  autoRadio:true,restore:true,openFull:false,shufDef:false,repDef:'off',dataSaver:false,buddy:true,hw:'on',hwReduce:false,hwSound:false,gest:true,gestGlitter:true,liquid:true,gestSeen:false},LS.get('settings',{}));
+  autoRadio:true,restore:true,openFull:false,shufDef:false,repDef:'off',dataSaver:false,buddy:true,winterOn:true,wvar:'midnight',frost:false,wtouch:true,water:true,wlow:false,ovOn:true,ovFx:'snow',ovMode:'gentle',ovInt:6,hwReduce:false,hwSound:false,gest:true,gestGlitter:true,liquid:true,gestSeen:false},LS.get('settings',{}));
 if(!Array.isArray(S.sections))S.sections=[];
 SECTIONS.forEach(x=>{if(!S.sections.some(y=>y.id===x[0]))S.sections.push({id:x[0],on:true})});
 S.sections=S.sections.filter(y=>SECTIONS.some(x=>x[0]===y.id));
@@ -363,7 +366,7 @@ let offline=false;
 async function sx(q){const r=await search(q);if(r===null){offline=true;return[]}offline=false;return r}
 
 /* ---------- player core: the YouTube embedded player is the single audio engine ---------- */
-const APP_VER='Web 1.5 · Halloween Edition, Gesture Music, liquid open';
+const APP_VER='Web 1.6 · Winter Edition, Overlay effects, Water fill, Dune Rise font, Gesture Music';
 const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 let yt=null,ytReady=false,pending=null,status='idle',errRun=0,loadTok=0,restored=null,stallT=0,ytWait=0;
 const diag=[];const dlog=m=>{diag.push(new Date().toTimeString().slice(0,8)+' '+m);if(diag.length>60)diag.shift()};
@@ -860,9 +863,22 @@ function renderSettings(){
   <div class="opt"><span>Player background</span></div>${chipsH('bg',BGS,S.bg)}
   ${sw('cropThumb','Crop thumbnail','Fills the artwork square')}${sw('ambienceBtn','Ambience button','Show the ambience button in the player')}
 
-  ${H2('Halloween Edition & Gesture Music')}
-  <div class="opt"><span>Theme<small>Switching never changes your music, favourites, language or where you are</small></span></div>${chipsH('hw',[['on','Halloween Edition'],['off','Original Pattukal theme']],S.hw)}
-  ${sw('hwReduce','Reduced motion','Still haunted scene, simple fades')}${sw('hwSound','Ambient sound effects','Soft wind, chimes and portal sound. Off by default, always quiet')}
+  ${H2('Winter')}
+  ${sw('winterOn','Winter mode','Icy navy theme, aurora Home and winter effects. Turn off to return to your normal theme')}
+  ${sw('frost','Frost edges','Frosted glow around the screen edges')}
+  ${sw('wtouch','Touch reacts','Flakes and particles move away from your finger')}
+  ${sw('water','Water fill','Pull the cord at the top of Home to fill the screen with water. Albums float on it')}
+  ${sw('wlow','Low-performance mode','Fewer particles, 30 fps and a still aurora. Effects also pause when the app is in the background')}
+  <div class="opt"><span>Theme<small>Switching never changes your music, favourites, language or where you are</small></span></div>${chipsH('wvar',[['frozen','Frozen'],['aurora','Aurora'],['midnight','Midnight'],['snowwhite','Snow White'],['christmas','Christmas'],['newyear','New Year']],S.wvar)}
+
+  ${H2('Overlay effects')}
+  ${sw('ovOn','Overlay effect','Draws over every screen. Never blocks touches. Pauses when the app is in the background')}
+  <div class="opt"><span>Effect</span></div>${chipsH('ovFx',[['snow','Winter snow'],['fire','Fire sparks'],['leaves','Falling leaves'],['spin','Spin'],['water','Water drops']],S.ovFx)}
+  ${S.ovFx==='snow'?`<div class="opt"><span>Snow mode</span></div>${chipsH('ovMode',[['gentle','Gentle snowfall'],['storm','Snowstorm']],S.ovMode)}`:''}
+  ${rangeH('ovInt','Intensity',1,100,1,'%')}
+
+  ${H2('Motion, sound & Gesture Music')}
+  ${sw('hwReduce','Reduced motion','Still scene, simple fades')}${sw('hwSound','Ambient sound effects','Soft wind, chimes and portal sound. Off by default, always quiet')}
   ${sw('liquid','Liquid song-opening effect','A liquid ripple spreads from your touch when you open a song')}
   ${sw('gest','Gesture Music','Double tap and hold, then draw: circle = Favorites, wave = Recently played, diagonal = shuffle, heart = like')}${sw('gestGlitter','Glitter glitch trail','Sparkles and glitch while you draw')}
   <button class="chip" data-act="gman">How to use Gesture Music</button>
@@ -926,10 +942,10 @@ let extrasP=null;
 function ensurePK(){if(!window.PK)window.PK={};Object.assign(window.PK,{S,LS,toast,sheet,closeSheet,search,sx,visible,play,playNext,addQueue,hist,likes,seen,LANGS,MOODS,GENRES,esc,thumb,shuffle,topArtists,openSearch,go:t=>go(t),getCur:()=>cur,isPlaying:()=>playing,still,loadQueue,sessions,MOODQ:langPart,uniqHist,toggle,openPlayer,effAcc:()=>ACC,like,setShuffle:(v)=>setShuffle(v),shuf:()=>shuf,getTab:()=>tab,save:saveS})}
 function loadExtras(){if(window.PK&&PK.galaxy)return Promise.resolve();if(extrasP)return extrasP;ensurePK();
   extrasP=new Promise((res,rej)=>{const s=document.createElement('script');s.src='extras.js?v=1';s.onload=res;s.onerror=()=>{extrasP=null;rej()};document.head.appendChild(s)});return extrasP}
-/* Halloween Edition, Gesture Music, Capsule, Time Fold: loaded right after first paint */
+/* Winter Edition, overlay effects, Gesture Music, Capsule, Time Fold: loaded right after first paint */
 let hwP=null;
 function loadHW(){if(window.PK&&PK.hw)return Promise.resolve();if(hwP)return hwP;ensurePK();
-  hwP=new Promise((res,rej)=>{const s=document.createElement('script');s.src='halloween.js?v=1';s.onload=res;s.onerror=()=>{hwP=null;rej()};document.head.appendChild(s)});return hwP}
+  hwP=new Promise((res,rej)=>{const s=document.createElement('script');s.src='winter.js?v=2';s.onload=res;s.onerror=()=>{hwP=null;rej()};document.head.appendChild(s)});return hwP}
 function syncBuddy(){const b=$('#buddy');b.style.display=S.buddy?'':'none'}
 /* Buddy floats above everything: drag it anywhere, the spot is remembered */
 (function(){const b=$('#buddy');let sx=0,sy=0,ox=0,oy=0,moved=0,drag=false;
