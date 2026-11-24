@@ -25,8 +25,10 @@ jobs:
       - name: Assemble site (current website unchanged, web app under /app-test/)
         run: |
           mkdir -p _site/app-test
-          cp index.html _site/index.html
-          [ -f docs/pattukal-official-music-app-download.html ] && cp docs/pattukal-official-music-app-download.html _site/ || true
+          # The homepage always comes from main, so this deploy can never publish an older copy of it.
+          git fetch --depth=1 origin main
+          git show FETCH_HEAD:index.html > _site/index.html
+          git show FETCH_HEAD:docs/pattukal-official-music-app-download.html > _site/pattukal-official-music-app-download.html 2>/dev/null || true
           cp -r web-app/. _site/app-test/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
