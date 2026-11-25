@@ -3517,7 +3517,9 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
             val extStream = extensionManager.resolveStream(knownTitle, knownArtist, knownDuration, mediaId)
             Timber.tag("MusicService").e("ADDON STREAM RESULT: url=${extStream?.url} format=${extStream?.format} quality=${extStream?.quality} audioQuality=${extStream?.audioQuality}")
             if (extStream != null) {
-               val flac = extStream.format.contains("flac", ignoreCase = true)
+               val flac = extStream.isLossless
+               val reportedBps = extStream.bitrate?.let { if (it < 5000) it * 1000 else it }
+               val mime = extStream.mimeType ?: if (flac) "audio/flac" else "audio/mpeg"
                Result.success(echo.music.iad1tya.utils.YTPlayerUtils.PlaybackData(
                  audioConfig = null,
                  videoDetails = null,
@@ -3525,18 +3527,18 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
                  format = com.music.innertube.models.response.PlayerResponse.StreamingData.Format(
                     itag = 0,
                     url = extStream.url,
-                    mimeType = if (flac) "audio/flac" else "audio/mpeg",
-                    bitrate = if (flac) 1411000 else 320000,
+                    mimeType = mime,
+                    bitrate = reportedBps ?: if (flac) 1411000 else 320000,
                     width = null,
                     height = null,
                     contentLength = null,
                     quality = extStream.quality,
                     fps = null,
                     qualityLabel = null,
-                    averageBitrate = if (flac) 1411000 else 320000,
-                    audioQuality = "AUDIO_QUALITY_LOSSLESS",
+                    averageBitrate = reportedBps ?: if (flac) 1411000 else 320000,
+                    audioQuality = if (flac) "AUDIO_QUALITY_LOSSLESS" else "AUDIO_QUALITY_HIGH",
                     approxDurationMs = null,
-                    audioSampleRate = if (flac) 44100 else 48000,
+                    audioSampleRate = extStream.sampleRate ?: if (flac) 44100 else 48000,
                     audioChannels = 2,
                     loudnessDb = null,
                     lastModified = null,

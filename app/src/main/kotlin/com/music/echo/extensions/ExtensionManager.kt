@@ -51,8 +51,38 @@ data class AddonStreamResponse(
     val quality: String = "",
     val streamQuality: String = "",
     val audioQuality: String = "",
-    val codec: String? = null
-)
+    val codec: String? = null,
+    val bitrate: Int? = null,
+    val sampleRate: Int? = null,
+    val bitDepth: Int? = null,
+    val mimeType: String? = null,
+    val container: String? = null,
+    val atmos: Boolean? = null,
+    val error: String? = null
+) {
+    val isLossless get() = audioQuality.contains("LOSSLESS", true) || format.contains("flac", true) ||
+        format.contains("alac", true) || codec?.contains("flac", true) == true
+    val isAtmos get() = atmos == true || format.contains("atmos", true) || codec?.contains("eac3", true) == true
+    /** Honest one-line description built only from what the server reported. */
+    fun summary(): String = buildList {
+        add((codec ?: format).uppercase().ifBlank { "AUDIO" })
+        bitrate?.takeIf { it > 0 }?.let { add("${if (it > 5000) it / 1000 else it} kbps") }
+        if (sampleRate != null && bitDepth != null) add("${bitDepth}-bit/${sampleRate / 1000.0} kHz")
+        if (isLossless) add("Lossless")
+        if (isAtmos) add("Dolby Atmos")
+    }.joinToString(" · ")
+}
+
+/** Quality asked of addon servers (BitChord-compatible names). MB/hr are approximate. */
+enum class AddonQuality(val label: String, val mbPerHour: String) {
+    LOW("Low · 64 kbps", "~29 MB/hr"),
+    MEDIUM("Medium · ~170 kbps", "~77 MB/hr"),
+    HIGH("High · up to 320 kbps", "~144 MB/hr"),
+    LOSSLESS("Lossless / best available", "300+ MB/hr")
+}
+
+/** The last stream an addon actually served, for the Stats view. */
+object LastAddonStream { @Volatile var info: String? = null }
 
 @Singleton
 class ExtensionManager @Inject constructor(
@@ -61,6 +91,17 @@ class ExtensionManager @Inject constructor(
     private val httpClient = OkHttpClient()
     private val ADDONS_KEY = stringPreferencesKey("extensions_addons_list")
     private val json = Json { ignoreUnknownKeys = true }
+
+    private val QUALITY_KEY = stringPreferencesKey("extensions_addon_quality")
+
+    suspend fun getQuality(): AddonQuality {
+        val v = context.dataStore.data.map { it[QUALITY_KEY] }.first()
+        return AddonQuality.values().firstOrNull { it.name == v } ?: AddonQuality.LOSSLESS
+    }
+
+    suspend fun setQuality(q: AddonQuality) {
+        context.dataStore.edit { it[QUALITY_KEY] = q.name }
+    }
 
     suspend fun getAddons(): List<AddonEndpoint> {
         val jsonStr = context.dataStore.data.map { it[ADDONS_KEY] }.first() ?: "[]"
@@ -162,12 +203,12 @@ class ExtensionManager @Inject constructor(
                 val targetAddon = addons.find { it.id == addonId }
                 if (targetAddon != null) {
                     val baseUrl = if (targetAddon.url.startsWith("http")) targetAddon.url else "https://" + targetAddon.url
-                    val streamUrlReq = "${baseUrl.removeSuffix("/")}/stream/$trackId?quality=LOSSLESS"
+                    val streamUrlReq = "${baseUrl.removeSuffix("/")}/stream/$trackId?quality=${getQuality().name}"
                     val streamReq = Request.Builder().url(streamUrlReq).build()
                     val streamRes = httpClient.newCall(streamReq).execute()
                     val streamBody = streamRes.body?.string()
                     if (streamRes.isSuccessful && !streamBody.isNullOrEmpty()) {
-                        return@withContext json.decodeFromString<AddonStreamResponse>(streamBody)
+                        return@withContext json.decodeFromString<AddonStreamResponse>(streamBody).also { LastAddonStream.info = it.summary() }
                     }
                 }
             }
@@ -191,20 +232,20 @@ class ExtensionManager @Inject constructor(
                     val addonResponse: AddonSearchResponse = json.decodeFromString(body)
                     val addonResults = addonResponse.tracks
                     // Very basic Matcher:
-                    val match = addonResults.firstOrNull { 
-                        it.title.contains(title, ignoreCase = true) 
-                    } ?: addonResults.firstOrNull()
+                    val match = bestMatch(addonResults, title, artist, duration)
                     
                     if (match != null) {
                         android.util.Log.e("ExtensionManager", "Matched track: ${match.title} by ${match.artist}. Fetching stream...")
                         val baseUrl = if (addon.url.startsWith("http")) addon.url else "https://" + addon.url
-                        val streamUrlReq = "${baseUrl.removeSuffix("/")}/stream/${match.id}?quality=LOSSLESS"
+                        val streamUrlReq = "${baseUrl.removeSuffix("/")}/stream/${match.id}?quality=${getQuality().name}"
                         val streamReq = Request.Builder().url(streamUrlReq).build()
                         val streamRes = httpClient.newCall(streamReq).execute()
                         val streamBody = streamRes.body?.string()
                         if (streamRes.isSuccessful && !streamBody.isNullOrEmpty()) {
                             android.util.Log.e("ExtensionManager", "Stream response: $streamBody")
                             val streamData: AddonStreamResponse = json.decodeFromString(streamBody)
+                            if (streamData.url.isBlank()) continue
+                            LastAddonStream.info = streamData.summary()
                             return@withContext streamData
                         } else {
                             android.util.Log.e("ExtensionManager", "Stream request failed: ${streamRes.code} ${streamRes.message}")
@@ -216,5 +257,22 @@ class ExtensionManager @Inject constructor(
             }
         }
         null
+    }
+
+    private fun norm(s: String) = s.lowercase().replace(Regex("\\(.*?\\)|\\[.*?]"), "").replace(Regex("[^\\p{L}\\p{N} ]"), " ").trim().replace(Regex("\\s+"), " ")
+
+    /** Title must match; artist and duration (within 5 s) break ties. Returns null instead of guessing wrong. */
+    private fun bestMatch(c: List<AddonTrack>, title: String, artist: String, durationMs: Long?): AddonTrack? {
+        val t = norm(title)
+        val a = norm(artist.split(",", "&").first())
+        return c.map { tr ->
+            var score = 0
+            val tt = norm(tr.title)
+            if (tt == t) score += 4 else if (tt.contains(t) || t.contains(tt)) score += 2 else return@map tr to -1
+            val ta = norm(tr.artist)
+            if (a.isNotEmpty() && (ta.contains(a) || a.contains(ta))) score += 3
+            if (durationMs != null && tr.duration != null && kotlin.math.abs(tr.duration - durationMs / 1000) <= 5) score += 2
+            tr to score
+        }.filter { it.second >= 5 }.maxByOrNull { it.second }?.first
     }
 }

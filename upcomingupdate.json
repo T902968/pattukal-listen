@@ -9,7 +9,8 @@
     "Spotify shortcut on Home to connect and import playlists, and your Spotify playlists appear on Home",
     "Winter mode (Midnight, snow, water fill) and separate Overlay effects, reachable from Settings > Appearance",
     "Stronger Karaoke vocal removal",
-    "Pattukal Blue app icon everywhere, with blue notification accents"
+    "Pattukal Blue app icon everywhere, with blue notification accents",
+    "Extensions: choose addon audio quality (Low / Medium / High up to 320 / Lossless) with MB-per-hour, stricter song matching, and the real codec, bitrate and sample rate of what your addon server streamed. Needs an addon server; without one, YouTube playback is unchanged"
   ],
   "bug_fixes": [
     "Fixed the Settings Back button so you can leave Settings without the cross",
