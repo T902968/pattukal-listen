@@ -57,6 +57,8 @@ Pattukal is the name and branding used for this customized project, maintained i
 
 This project is based on **[Echo Music](https://github.com/EchoMusicApp/Echo-Music)**. The upstream project's code, license obligations, notices, and third-party attributions remain applicable to the portions derived from it. Pattukal does not claim authorship of the original Echo Music code or the work of its contributors.
 
+The addon audio-quality protocol is modelled on [BitChord](https://github.com/kushagrasinghx/BitChord) (GPL-3.0) by kushagrasinghx.
+
 Thank you to the upstream developers and the open-source projects that made this codebase possible. See the repository's source files and license notices for relevant attributions.
 
 ## License
