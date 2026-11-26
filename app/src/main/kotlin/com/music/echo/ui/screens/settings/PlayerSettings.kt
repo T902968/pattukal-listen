@@ -199,23 +199,30 @@ fun PlayerSettings(
       defaultValue = echo.music.iad1tya.constants.DownloadQuality.YOUTUBE
     )
 
+  var showMobileQualityDialog by remember { mutableStateOf(false) }
+  val (mobileQuality, onMobileQualityChange) =
+    rememberEnumPreference(echo.music.iad1tya.constants.AudioQualityMobileKey, defaultValue = audioQuality)
+
   if (showAudioQualityDialog) {
     EnumDialog(
       onDismiss = { showAudioQualityDialog = false },
-      onSelect = {
-        onAudioQualityChange(it)
-        showAudioQualityDialog = false
-      },
-      title = stringResource(R.string.audio_quality),
+      onSelect = { onAudioQualityChange(it); showAudioQualityDialog = false },
+      title = "Audio quality · On Wi-Fi",
       current = audioQuality,
-      values = listOf(AudioQuality.OPUS),
-      valueText = {
-        when (it) {
-          AudioQuality.OPUS -> "Opus"
-          else -> ""
-        }
-      },
-      valueDescription = { "" }
+      values = AudioQuality.entries.toList(),
+      valueText = { it.label },
+      valueDescription = { "${it.detail} · ${it.mbPerHour}" }
+    )
+  }
+  if (showMobileQualityDialog) {
+    EnumDialog(
+      onDismiss = { showMobileQualityDialog = false },
+      onSelect = { onMobileQualityChange(it); showMobileQualityDialog = false },
+      title = "Audio quality · On mobile data",
+      current = mobileQuality,
+      values = AudioQuality.entries.toList(),
+      valueText = { it.label },
+      valueDescription = { "${it.detail} · ${it.mbPerHour}" }
     )
   }
 
@@ -390,16 +397,17 @@ fun PlayerSettings(
             Material3SettingsItem(
               isHighlighted = (highlightKey == stringResource(R.string.audio_quality)),
               icon = painterResource(R.drawable.graphic_eq),
-              title = { Text(stringResource(R.string.audio_quality)) },
-              description = {
-                Text(
-                  when (audioQuality) {
-                    AudioQuality.OPUS -> "Opus"
-                    else -> "Opus"
-                  }
-                )
-              },
-              onClick = null
+              title = { Text("Audio quality · On Wi-Fi") },
+              description = { Text("${audioQuality.label} · ${audioQuality.mbPerHour}") },
+              onClick = { showAudioQualityDialog = true }
+            )
+          )
+          add(
+            Material3SettingsItem(
+              icon = painterResource(R.drawable.graphic_eq),
+              title = { Text("Audio quality · On mobile data") },
+              description = { Text("${mobileQuality.label} · ${mobileQuality.mbPerHour}") },
+              onClick = { showMobileQualityDialog = true }
             )
           )
 

@@ -73,14 +73,6 @@ data class AddonStreamResponse(
     }.joinToString(" · ")
 }
 
-/** Quality asked of addon servers (BitChord-compatible names). MB/hr are approximate. */
-enum class AddonQuality(val label: String, val mbPerHour: String) {
-    LOW("Low · 64 kbps", "~29 MB/hr"),
-    MEDIUM("Medium · ~170 kbps", "~77 MB/hr"),
-    HIGH("High · up to 320 kbps", "~144 MB/hr"),
-    LOSSLESS("Lossless / best available", "300+ MB/hr")
-}
-
 /** The last stream an addon actually served, for the Stats view. */
 object LastAddonStream { @Volatile var info: String? = null }
 
@@ -91,17 +83,6 @@ class ExtensionManager @Inject constructor(
     private val httpClient = OkHttpClient()
     private val ADDONS_KEY = stringPreferencesKey("extensions_addons_list")
     private val json = Json { ignoreUnknownKeys = true }
-
-    private val QUALITY_KEY = stringPreferencesKey("extensions_addon_quality")
-
-    suspend fun getQuality(): AddonQuality {
-        val v = context.dataStore.data.map { it[QUALITY_KEY] }.first()
-        return AddonQuality.values().firstOrNull { it.name == v } ?: AddonQuality.LOSSLESS
-    }
-
-    suspend fun setQuality(q: AddonQuality) {
-        context.dataStore.edit { it[QUALITY_KEY] = q.name }
-    }
 
     suspend fun getAddons(): List<AddonEndpoint> {
         val jsonStr = context.dataStore.data.map { it[ADDONS_KEY] }.first() ?: "[]"
@@ -193,7 +174,15 @@ class ExtensionManager @Inject constructor(
         null
     }
 
-    suspend fun resolveStream(title: String?, artist: String?, duration: Long?, videoId: String): AddonStreamResponse? = withContext(Dispatchers.IO) {
+    private fun addonQ(t: echo.music.iad1tya.constants.AudioQuality) = when (t) {
+        echo.music.iad1tya.constants.AudioQuality.HIGH -> "HIGH"
+        else -> "LOSSLESS"
+    }
+
+    /** LOW/Medium never ask addons: they are the YouTube tiers. High and above try addons first. */
+    suspend fun resolveStream(title: String?, artist: String?, duration: Long?, videoId: String, tier: echo.music.iad1tya.constants.AudioQuality = echo.music.iad1tya.constants.AudioQuality.LOSSLESS): AddonStreamResponse? = withContext(Dispatchers.IO) {
+        if (!videoId.startsWith("addon_") &&
+            (tier == echo.music.iad1tya.constants.AudioQuality.LOW || tier == echo.music.iad1tya.constants.AudioQuality.OPUS)) return@withContext null
         if (videoId.startsWith("addon_")) {
             val parts = videoId.split("_", limit = 3)
             if (parts.size == 3) {
@@ -203,7 +192,7 @@ class ExtensionManager @Inject constructor(
                 val targetAddon = addons.find { it.id == addonId }
                 if (targetAddon != null) {
                     val baseUrl = if (targetAddon.url.startsWith("http")) targetAddon.url else "https://" + targetAddon.url
-                    val streamUrlReq = "${baseUrl.removeSuffix("/")}/stream/$trackId?quality=${getQuality().name}"
+                    val streamUrlReq = "${baseUrl.removeSuffix("/")}/stream/$trackId?quality=${addonQ(tier)}"
                     val streamReq = Request.Builder().url(streamUrlReq).build()
                     val streamRes = httpClient.newCall(streamReq).execute()
                     val streamBody = streamRes.body?.string()
@@ -237,7 +226,7 @@ class ExtensionManager @Inject constructor(
                     if (match != null) {
                         android.util.Log.e("ExtensionManager", "Matched track: ${match.title} by ${match.artist}. Fetching stream...")
                         val baseUrl = if (addon.url.startsWith("http")) addon.url else "https://" + addon.url
-                        val streamUrlReq = "${baseUrl.removeSuffix("/")}/stream/${match.id}?quality=${getQuality().name}"
+                        val streamUrlReq = "${baseUrl.removeSuffix("/")}/stream/${match.id}?quality=${addonQ(tier)}"
                         val streamReq = Request.Builder().url(streamUrlReq).build()
                         val streamRes = httpClient.newCall(streamReq).execute()
                         val streamBody = streamRes.body?.string()

@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.music.echo.extensions.AddonEndpoint
 import com.music.echo.extensions.ExtensionManager
-import com.music.echo.extensions.AddonQuality
 import com.music.echo.extensions.LastAddonStream
 import dagger.hilt.android.lifecycle.HiltViewModel
 import echo.music.iad1tya.R
@@ -48,16 +47,7 @@ class ExtensionSettingsViewModel @Inject constructor(
     private val _addons = MutableStateFlow<List<AddonEndpoint>>(emptyList())
     val addons: StateFlow<List<AddonEndpoint>> = _addons
 
-    private val _quality = MutableStateFlow(AddonQuality.LOSSLESS)
-    val quality: StateFlow<AddonQuality> = _quality
-
-    fun setQuality(q: AddonQuality) {
-        _quality.value = q
-        viewModelScope.launch { extensionManager.setQuality(q) }
-    }
-
     init {
-        viewModelScope.launch { _quality.value = extensionManager.getQuality() }
         loadAddons()
     }
 
@@ -112,25 +102,11 @@ fun ExtensionSettingsScreen(
         Spacer(Modifier.windowInsetsPadding(echo.music.iad1tya.LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Top)))
         Spacer(Modifier.height(16.dp))
 
-        val quality by viewModel.quality.collectAsState()
-        Text("Addon audio quality", style = MaterialTheme.typography.titleSmall)
         Text(
-            "Sent to your addon servers. What you actually get depends on the server; if no addon matches a song, Pattukal plays it from YouTube as before.",
+            "Addons are used for High, Lossless and Dolby Atmos. Choose the level in Settings > Player > Audio quality.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        AddonQuality.values().forEach { q ->
-            Row(
-                Modifier.fillMaxWidth().padding(vertical = 2.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(selected = quality == q, onClick = { viewModel.setQuality(q) })
-                Column {
-                    Text(q.label)
-                    Text(q.mbPerHour, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
         LastAddonStream.info?.let {
             Text("Last addon stream: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
         }

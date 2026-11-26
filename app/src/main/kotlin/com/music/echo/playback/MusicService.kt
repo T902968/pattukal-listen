@@ -486,6 +486,9 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
   private var retryCount = 0
   private var silenceSkipJob: Job? = null
 
+  private fun isMeteredNow(): Boolean =
+    runCatching { connectivityManager.isActiveNetworkMetered }.getOrDefault(false)
+
   private val songUrlCache = HashMap<String, Pair<String, Long>>()
 
   private val bypassCacheForQualityChange = mutableSetOf<String>()
@@ -800,12 +803,11 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
             } catch (e: Exception) {
               null
             })
-          val quality =
-            qualityStr?.let { value ->
-              echo.music.iad1tya.constants.AudioQuality.entries.find { enumVal ->
-                enumVal.name == value
-              }
-            } ?: echo.music.iad1tya.constants.AudioQuality.OPUS
+          val wifiQ = qualityStr?.let { v -> echo.music.iad1tya.constants.AudioQuality.entries.find { e -> e.name == v } }
+            ?: echo.music.iad1tya.constants.AudioQuality.OPUS
+          val mobileQ = it[echo.music.iad1tya.constants.AudioQualityMobileKey]
+            ?.let { v -> echo.music.iad1tya.constants.AudioQuality.entries.find { e -> e.name == v } } ?: wifiQ
+          val quality = if (isMeteredNow()) mobileQ else wifiQ
           val dataSaver = it[echo.music.iad1tya.constants.DataSaverEnabledKey] ?: false
           if (dataSaver) echo.music.iad1tya.constants.AudioQuality.OPUS else quality
         }
@@ -3514,7 +3516,7 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
             val knownTitle = dbSong?.song?.title
             val knownDuration = dbSong?.song?.duration?.let { if (it > 0) it * 1000L else null }
 
-            val extStream = extensionManager.resolveStream(knownTitle, knownArtist, knownDuration, mediaId)
+            val extStream = extensionManager.resolveStream(knownTitle, knownArtist, knownDuration, mediaId, lockedQuality)
             Timber.tag("MusicService").e("ADDON STREAM RESULT: url=${extStream?.url} format=${extStream?.format} quality=${extStream?.quality} audioQuality=${extStream?.audioQuality}")
             if (extStream != null) {
                val flac = extStream.isLossless

@@ -10,7 +10,7 @@
     "Winter mode (Midnight, snow, water fill) and separate Overlay effects, reachable from Settings > Appearance",
     "Stronger Karaoke vocal removal",
     "Pattukal Blue app icon everywhere, with blue notification accents",
-    "Extensions: choose addon audio quality (Low / Medium / High up to 320 / Lossless) with MB-per-hour, stricter song matching, and the real codec, bitrate and sample rate of what your addon server streamed. Needs an addon server; without one, YouTube playback is unchanged"
+    "Audio quality tiers (Low / Medium / High / Lossless / Dolby Atmos) with MB per hour, set separately for Wi-Fi and mobile data. Low really drops to ~64 kbps. High and above ask your addon servers first; YouTube is the fallback"
   ],
   "bug_fixes": [
     "Fixed the Settings Back button so you can leave Settings without the cross",

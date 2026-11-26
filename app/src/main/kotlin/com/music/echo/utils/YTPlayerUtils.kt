@@ -234,7 +234,7 @@ object YTPlayerUtils {
     val extracted =
       echo.music.iad1tya.utils.InnerTubeXResolver.extract(
         videoId = videoId,
-        maxKbps = 160,
+        maxKbps = if (audioQuality == echo.music.iad1tya.constants.AudioQuality.LOW) 64 else 160,
         requireM4a = false
       ) ?: throw Exception("No stream found via InnerTubeXResolver")
 

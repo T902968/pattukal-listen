@@ -121,10 +121,16 @@ val SelectedYtmPlaylistsKey = stringPreferencesKey("selectedYtmPlaylists")
 
 val ShowAudioFallbackToastKey = booleanPreferencesKey("show_audio_fallback_toast")
 val AudioQualityKey = stringPreferencesKey("audioQuality")
+val AudioQualityMobileKey = stringPreferencesKey("audioQualityMobile")
 val IpVersionKey = stringPreferencesKey("ipVersion")
 
-enum class AudioQuality {
-  OPUS,
+/** OPUS is the stored name of the Medium tier (kept so existing settings stay valid). */
+enum class AudioQuality(val label: String, val detail: String, val mbPerHour: String) {
+  LOW("Low", "~64 kbps · smallest data use", "29 MB/hr"),
+  OPUS("Medium", "Best YouTube stream · ~130-160 kbps", "58-77 MB/hr"),
+  HIGH("High", "Asks your addon servers for up to 320 kbps first, YouTube fallback", "~144 MB/hr"),
+  LOSSLESS("Lossless", "Asks your addon servers for lossless first, YouTube fallback", "300+ MB/hr"),
+  ATMOS("Dolby Atmos", "Immersive E-AC-3 only if your addon serves it, else lossless/YouTube", "~350 MB/hr"),
 }
 
 val DownloadQualityKey = stringPreferencesKey("downloadQuality")
