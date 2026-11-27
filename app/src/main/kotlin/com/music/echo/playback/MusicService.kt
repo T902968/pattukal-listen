@@ -1331,6 +1331,7 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
         skipSilenceEnabled = dataStore.get(SkipSilenceKey, false)
       }
       addAnalyticsListener(PlaybackStatsListener(false, this@MusicService))
+      addAnalyticsListener(echo.music.iad1tya.playback.AudioOutputInfo.listener)
     }
     _playerFlow.value = player
     return player
@@ -3677,7 +3678,11 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
         enableAudioTrackPlaybackParams: Boolean,
       ): androidx.media3.exoplayer.audio.AudioSink {
         val defaultSink = DefaultAudioSink.Builder(this@MusicService)
-          .setEnableFloatOutput(enableFloatOutput)
+          // Off by default: only the user's own switch (Settings > Player) enables float output.
+          .setEnableFloatOutput(
+            enableFloatOutput ||
+              runBlocking { dataStore.get(echo.music.iad1tya.constants.FloatOutputKey, false) }
+          )
           .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
           .setAudioProcessorChain(
             DefaultAudioSink.DefaultAudioProcessorChain(

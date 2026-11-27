@@ -10,7 +10,8 @@
     "Winter mode (Midnight, snow, water fill) and separate Overlay effects, reachable from Settings > Appearance",
     "Stronger Karaoke vocal removal",
     "Pattukal Blue app icon everywhere, with blue notification accents",
-    "Audio quality tiers (Low / Medium / High / Lossless / Dolby Atmos) with MB per hour, set separately for Wi-Fi and mobile data. Low really drops to ~64 kbps. High and above ask your addon servers first; YouTube is the fallback"
+    "Audio quality tiers (Low / Medium / High / Lossless / Dolby Atmos) with MB per hour, set separately for Wi-Fi and mobile data. Low really drops to ~64 kbps. High and above ask your addon servers first; YouTube is the fallback",
+    "Player settings: optional 32-bit float audio output (off by default) and an Output info line showing the real format Android opened (sample rate, 16-bit or float). Output display idea credited to Auris / BitChord"
   ],
   "bug_fixes": [
     "Fixed the Settings Back button so you can leave Settings without the cross",

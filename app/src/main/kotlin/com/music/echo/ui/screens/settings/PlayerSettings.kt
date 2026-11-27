@@ -21,6 +21,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -121,6 +122,10 @@ fun PlayerSettings(
 
   val (audioOffload, onAudioOffloadChange) =
     rememberPreference(key = AudioOffload, defaultValue = false)
+
+  val (floatOutput, onFloatOutputChange) =
+    rememberPreference(key = echo.music.iad1tya.constants.FloatOutputKey, defaultValue = false)
+  val outputInfo by echo.music.iad1tya.playback.AudioOutputInfo.text.collectAsState()
 
   val (enableBitPerfectUsbDac, onEnableBitPerfectUsbDacChange) =
     rememberPreference(key = EnableBitPerfectUsbDacKey, defaultValue = false)
@@ -883,6 +888,43 @@ fun PlayerSettings(
                 )
               },
               onClick = { if (!crossfadeEnabled) onAudioOffloadChange(!audioOffload) }
+            )
+          )
+
+          add(
+            Material3SettingsItem(
+              icon = painterResource(R.drawable.graphic_eq),
+              title = { Text("32-bit float output") },
+              description = {
+                Text(
+                  "Asks Android for float audio output where the device supports it. Off by default; " +
+                    "it does not by itself make music sound better. Takes effect after restarting the app."
+                )
+              },
+              trailingContent = {
+                Switch(
+                  checked = floatOutput,
+                  onCheckedChange = onFloatOutputChange,
+                  thumbContent = {
+                    Icon(
+                      painter = painterResource(id = if (floatOutput) R.drawable.check else R.drawable.close),
+                      contentDescription = null,
+                      modifier = Modifier.size(SwitchDefaults.IconSize)
+                    )
+                  }
+                )
+              },
+              onClick = { onFloatOutputChange(!floatOutput) }
+            )
+          )
+          add(
+            Material3SettingsItem(
+              icon = painterResource(R.drawable.info),
+              title = { Text("Output info") },
+              description = {
+                Text(outputInfo ?: "Play a song to see what the audio output was opened with")
+              },
+              onClick = null
             )
           )
 

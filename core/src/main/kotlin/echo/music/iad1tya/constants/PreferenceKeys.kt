@@ -143,6 +143,7 @@ val DownloadOnWifiOnlyKey = booleanPreferencesKey("downloadOnWifiOnly")
 val DownloadWithMetadataKey = booleanPreferencesKey("downloadWithMetadata")
 
 val AudioOffload = booleanPreferencesKey("enableOffload")
+val FloatOutputKey = booleanPreferencesKey("enableFloatOutput")
 
 val SpatialAudioKey = booleanPreferencesKey("spatialAudio")
 

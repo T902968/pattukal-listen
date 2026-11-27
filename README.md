@@ -59,6 +59,8 @@ This project is based on **[Echo Music](https://github.com/EchoMusicApp/Echo-Mus
 
 The addon audio-quality protocol is modelled on [BitChord](https://github.com/kushagrasinghx/BitChord) (GPL-3.0) by kushagrasinghx.
 
+The audio output information display is inspired by [Auris](https://github.com/OreoMuncher45/Auris) (GPL-3.0); no Auris code is included in this release.
+
 Thank you to the upstream developers and the open-source projects that made this codebase possible. See the repository's source files and license notices for relevant attributions.
 
 ## License
