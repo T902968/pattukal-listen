@@ -234,8 +234,10 @@ object YTPlayerUtils {
     val extracted =
       echo.music.iad1tya.utils.InnerTubeXResolver.extract(
         videoId = videoId,
+        // AUTO keeps the extractor's best available Opus stream. When Opus is disabled,
+        // explicitly request the best AAC-in-MP4 stream instead.
         maxKbps = 160,
-        requireM4a = false
+        requireM4a = !forceOpusEnabled
       ) ?: throw Exception("No stream found via InnerTubeXResolver")
 
     PlaybackData(
@@ -248,21 +250,23 @@ object YTPlayerUtils {
       playbackTracking = null,
       format =
         com.music.innertube.models.response.PlayerResponse.StreamingData.Format(
-          itag = 251,
+          // InnerTubeX does not expose the original YouTube itag or all decoded
+          // format metadata here. Do not publish guessed values as if they were measured.
+          itag = 0,
           url = extracted.url,
           mimeType = extracted.mimeType,
           bitrate = extracted.kbps * 1000,
           width = null,
           height = null,
           contentLength = null,
-          quality = "high",
+          quality = "unknown",
           fps = null,
           qualityLabel = null,
           averageBitrate = extracted.kbps * 1000,
-          audioQuality = "AUDIO_QUALITY_HIGH",
+          audioQuality = null,
           approxDurationMs = null,
-          audioSampleRate = 48000,
-          audioChannels = 2,
+          audioSampleRate = null,
+          audioChannels = null,
           loudnessDb = extracted.loudnessDb,
           lastModified = null,
           signatureCipher = null,
